@@ -4,12 +4,12 @@ import { NForm, NInput, NButton, FormInst, UploadFileInfo, UploadCustomRequestOp
 import { t } from '@/locales';
 import { useMessage, NSelect, NGrid, NFormItemGi, NUpload, NSwitch } from 'naive-ui';
 import countryList, { Country } from 'country-list';
-import { useUniversityStore } from '@/store'
+import { useUsersStore } from '@/store'
 import { supabase, supabaseUrlImage } from '@/utils/supabase';
 import { SvgIcon } from '@/components/common';
 const path = 'University';
 const bucket = 'research';
-const universityStore = useUniversityStore()
+const universityStore = useUsersStore()
 interface Props {
     row: Research.University
 }
@@ -55,7 +55,7 @@ const rules = {
 async function handleUpdateUniversity() {
     try {
         loading.value = true;
-        await universityStore.updateUniversityAction({id:props.row.id!, updates:model.value});
+        await universityStore.updateDataAction({id:props.row.id!, updates:model.value});
         loading.value = false;
         universityStore.showModelUpdate = false;
         message.success(t('commn.updateSuccess'));

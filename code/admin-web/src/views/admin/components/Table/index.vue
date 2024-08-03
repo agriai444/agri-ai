@@ -6,7 +6,7 @@ import {
   DataTableRowKey, NModal,
   useMessage, DataTableFilterState, DataTableColumns,
 } from 'naive-ui'
-import { useUniversityStore } from '@/store'
+import { useUsersStore } from '@/store'
 import { t } from '@/locales';
 import { useIconRender } from '@/hooks/useIconRender'
 import { useBasicLayout } from '@/hooks/useBasicLayout';

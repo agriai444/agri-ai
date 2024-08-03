@@ -153,7 +153,7 @@ const options = computed(() => {
 
         <div
             class="flex flex-col relative overflow-hidden  place-self-center gap-6 w-80 pt-2 px-4 glass bg-blue-50 dark:bg-gray-800 dark:text-white rounded-lg">
-            <div class="h-20 w-20 absolute -left-5 -bottom-10 rounded-full bg-primary"></div>
+            <!-- <div class="h-20 w-20 absolute -left-5 -bottom-10 rounded-full bg-primary"></div> -->
             <div class="post-heading">
                 <div class="text1 text-3xl  font-bold text-center gtext p-1">{{ t('auth.loginIn') }}</div>
             </div>
@@ -250,17 +250,17 @@ const options = computed(() => {
                 </div>
             </NForm>
             <div>
-            <NDivider>
+            <!-- <NDivider>
                 {{ t('auth.or') }}
                 </NDivider>
-                <!-- <div @click="handleGoToForgetPass">{{ t('auth.goForgetPass') }}</div> -->
+            <div @click="handleGoToForgetPass">{{ t('auth.goForgetPass') }}</div> 
                 <div class="flex flex-row-reverse justify-center gap-1 mb-12">
                     <div @click="handleGoToSignUp" class="text-primary  cursor-pointer">
                         {{ t('auth.createAccount') }}
                     </div>
                     <div> {{ t('auth.goSignUp') }}</div>
-                </div>
-            </div>
+                </div> -->
+            </div> 
 
         </div>
 

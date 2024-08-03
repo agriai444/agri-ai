@@ -71,7 +71,7 @@ const show = computed({
         </NTabPane>
 
 
-
+<!-- 
        <NTabPane v-if="isChatGPTAPI || isAlharaqApi" name="Advanced" tab="Advanced">
           <template #tab>
             <SvgIcon class="text-lg" icon="ri:equalizer-line" />
@@ -80,7 +80,7 @@ const show = computed({
           <div class="min-h-[100px]">
             <Advanced />
           </div>
-        </NTabPane>
+        </NTabPane> -->
         
       </NTabs>
     </div>

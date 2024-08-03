@@ -80,7 +80,7 @@ const menuOptions: MenuOption[] = [
      
       },
       {
-        label: t('admin.users'),
+        label: t('common.users'),
         key: 'users',
         disabled: false,
         icon: iconRender({ icon: 'raphael:paper' }),
@@ -88,8 +88,16 @@ const menuOptions: MenuOption[] = [
 
       },
       {
-        label: t('admin.admin'),
-        key: 'students',
+        label: t('common.agriculturalExpert'),
+        key: 'agriculturalExpert',
+        icon: iconRender({ icon: 'mdi:account-student' }),
+        disabled: true,
+
+
+      },
+      {
+        label: t('common.admins'),
+        key: 'admins',
         icon: iconRender({ icon: 'mdi:account-student' }),
         disabled: true,
 

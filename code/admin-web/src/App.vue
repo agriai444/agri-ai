@@ -14,8 +14,8 @@ onMounted(() => {
   script.text = JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    'name': 'Agri AI',
-    'description': 'Engage in conversations with AI-powered chatbots. Free and No Ads.',
+    'name': 'Agricultural Expert',
+    'description': 'Engage in Agricultural Expert with AI-powered chatbots. Free and No Ads.',
     'url': 'https://example.com',
     'logo': 'https://.com',
     'potentialAction': {

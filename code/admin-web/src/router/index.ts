@@ -70,6 +70,12 @@ const routes: RouteRecordRaw[] = [
     children: [
 
       {
+        path: '/admin/users',
+        name: 'users',
+        component: () => import('@/views/admin/users/List.vue'),
+        // meta: { requiresAuth: true },
+      },
+      {
         path: '/admin/profile',
         name: 'profile',
         component: () => import('@/views/admin/profile/index.vue'),

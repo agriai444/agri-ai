@@ -209,7 +209,7 @@ async function handleDeleteAllConvAction(){
 
    
 
-   
+<!--    
  
         <NButton 
         :disabled="totalCountText <= 0"
@@ -248,7 +248,7 @@ async function handleDeleteAllConvAction(){
             </template>
             {{ $t('chat.deleteAllChatsTextAndImage') }}
           </NButton>
- 
+  -->
 
 
           <div class="flex items-center justify-between">

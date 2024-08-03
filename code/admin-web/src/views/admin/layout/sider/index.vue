@@ -72,9 +72,9 @@ watch(
 
         <div class="flex flex-col px-4 py-3  justify-center items-center ">
          
-            <div class="flex flex-row  justify-start  items-center gap-2 w-full">
-              <LogoApp :size="35" />
-              <div class="gtext font-bold text-base"> {{ $t('chat.newChatButton') }}</div>
+            <div class="flex flex-row py-2  justify-center  items-center gap-2 w-full">
+              <!-- <LogoApp :size="35" /> -->
+              <div class="gtext font-bold text-base"> {{ $t('common.nameApp') }}</div>
               <SvgIcon icon="ri:chat-new-fill" />
             </div>
  

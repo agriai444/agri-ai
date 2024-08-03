@@ -3,13 +3,13 @@ import { ref, h, VNodeChild } from 'vue';
 import { NForm, NInput, NButton, FormInst, UploadCustomRequestOptions, SelectOption } from 'naive-ui';
 import { t } from '@/locales';
 import { useMessage, NSelect, NGrid, NFormItemGi, NUpload, NSwitch } from 'naive-ui';
-import { useUniversityStore, useUtilStore} from '@/store'
+import { useUsersStore, useUtilStore} from '@/store'
 import { supabase } from '@/utils/supabase';
 import { SvgIcon } from '@/components/common';
 const folder: string = 'University';
 const bucket: string = 'research';
 
-const universityStore = useUniversityStore()
+const universityStore = useUsersStore()
 const utilStore = useUtilStore()
 const message = useMessage();
 const formRef = ref<FormInst | null>(null);
@@ -23,7 +23,7 @@ const rules = {
 async function handleAddUniversity() {
   try {
     loading.value = true;
-    await universityStore.insertUniversityAction(model.value);
+    await universityStore.insertDataAction(model.value);
     loading.value = false;
     universityStore.showModelAdd = false
     message.success(t('common.addSuccess'));

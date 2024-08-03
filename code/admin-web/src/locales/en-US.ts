@@ -26,7 +26,7 @@ export default {
 
   common: {
     you:'You',
-    nameApp: 'Rand AI',
+    nameApp: 'Agricultural Expert',
     errorSomeThing: 'Something went wrong',
     add: 'Add',
     addSuccess: 'Add Success',
@@ -61,6 +61,10 @@ export default {
     stopResponding: 'Stop Responding',
     tryAgain:'Try again',
     loadMore:'load More',
+    users:'Users',
+    admins:'Admins',
+    agriculturalExpert:'Agricultural Expert',
+
 
   },
   chat: {

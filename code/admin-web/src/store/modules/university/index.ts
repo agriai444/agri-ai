@@ -21,9 +21,9 @@ export function  initState(): Research.University {
 
 
 export const useUniversityStore = defineStore('university-store', {
-  state: (): ResearchState.University => ({
-    listUniversity:[],
-    universityInfo:initState(),
+  state: (): ResearchState.Users => ({
+    listUsers:[],
+    usersInfo:initState(),
     loadingInit:false,
     showModelAdd:false,
     showModelUpdate:false,
@@ -59,7 +59,7 @@ export const useUniversityStore = defineStore('university-store', {
         const user_id: string = userStore.userInfo!.user!.id!;
         console.log(userStore.userInfo!.user)
         const result = await fetchUniversities({ limit: limit, offset: offset } );
-        this.listUniversity = [...this.listUniversity, ...result];
+        this.listUsers = [...this.listUsers, ...result];
       } catch (error: any) {
         throw error;
       }
@@ -69,7 +69,7 @@ export const useUniversityStore = defineStore('university-store', {
       try {
         const insertedUniversity = await insertUniversity(newUniversity);
 
-        this.listUniversity = [insertedUniversity, ...this.listUniversity];
+        this.listUsers = [insertedUniversity, ...this.listUsers];
       } catch (error: any) {
         throw error;
       }
@@ -77,9 +77,9 @@ export const useUniversityStore = defineStore('university-store', {
     async deleteUniversityAction(id: number): Promise<void> {
       try {
         await deleteUniversity(id);
-        const index = this.listUniversity.findIndex((university) => university.id === id);
+        const index = this.listUsers.findIndex((university) => university.id === id);
         if (index !== -1) {
-          this.listUniversity.splice(index, 1);
+          this.listUsers.splice(index, 1);
         }
       } catch (error: any) {
         throw error;
@@ -89,7 +89,7 @@ export const useUniversityStore = defineStore('university-store', {
     async updateUniversityAction(payload: { id: number; updates: Partial<Research.University> }): Promise<void> {
       try {
         await updateUniversity(payload.id, payload.updates);
-        this.listUniversity = this.listUniversity.map((university) =>
+        this.listUsers = this.listUsers.map((university) =>
           university.id === payload.id ? { ...university, ...payload.updates } : university
         );
       } catch (error: any) {
