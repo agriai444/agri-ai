@@ -1,0 +1,11 @@
+{
+    "id": "UUID",
+    "name": "String",
+    "company_url": "String",
+    "logo_url": "String",
+    "api_url": "String",
+    "is_activate": true,
+    "created_at": "DateTime",
+    "updated_at": "DateTime"
+  }
+  

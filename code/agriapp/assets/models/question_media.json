@@ -1,0 +1,9 @@
+{
+    "id": "UUID",
+    "question_id": "UUID",
+    "media_url": "String",
+    "media_type": "String",
+    "created_at": "DateTime",
+    "updated_at": "DateTime"
+  }
+  

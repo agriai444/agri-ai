@@ -1,0 +1,433 @@
+import 'package:agri_ai/app/data/models/chat_ai_model.dart';
+import 'package:agri_ai/app/data/providers/chat_ai_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:async';
+import 'dart:io';
+
+class ChatAiChatController extends GetxController {
+  var messages = <Message>[].obs;
+  TextEditingController textController = TextEditingController();
+  ScrollController scrollController = ScrollController();
+  var isTextEmpty = true.obs;
+  var isLoadingMessageAI = false.obs;
+  var selectedImagePath = ''.obs;
+  var imageUploadProgress = 0.0.obs;
+
+  var isRecording = false.obs;
+  var isPaused = false.obs;
+
+  final ChatAiProvider provider = Get.put(ChatAiProvider());
+  final conversations = <Conversation>[].obs;
+  final isLoading = true.obs;
+  final isLoadingMore = false.obs;
+  final hasMoreConversations = true.obs;
+  int currentPage = 1;
+
+  @override
+  void onInit() {
+    super.onInit();
+    textController.addListener(() {
+      isTextEmpty.value = textController.text.isEmpty;
+    });
+        // loadConversations();
+
+    // Initialize with some demo messages
+    messages.addAll([
+      Message(
+        isUser: true,
+        content: 'Hi there!',
+        timestamp: '7/20/2024, 11:08:58 PM',
+        imageUrls: [
+          'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
+          'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
+          'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
+          'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
+        ],
+      ),
+      Message(
+        isUser: false,
+        content: 'Hello! How can I assist you today?',
+        timestamp: '7/20/2024, 11:09:58 PM',
+      ),
+      Message(
+        isUser: true,
+        content: 'Hi there!',
+        timestamp: '7/20/2024, 11:08:58 PM',
+        imageUrls: [
+          'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
+          'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
+          'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
+          'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
+        ],
+      ),
+      Message(
+        isUser: false,
+        content: 'Hello! How can I assist you today?',
+        timestamp: '7/20/2024, 11:09:58 PM',
+      ),
+    ]);
+
+    // Scroll to bottom when messages change
+    ever(messages, (_) => scrollToBottom());
+  }
+
+
+  
+  void addMessage(Message message) {
+    messages.add(message);
+    scrollToBottom();
+  }
+
+  void sendMessage(String content) async {
+    isLoadingMessageAI.value = true;
+
+    // Add the user's message immediately
+    addMessage(Message(
+      isUser: true,
+      content: content,
+      timestamp: DateTime.now().toString(),
+      imageUrls: selectedImagePath.value.isNotEmpty ? [selectedImagePath.value] : null,
+    ));
+
+    // Clear the text field and remove selected image
+    textController.clear();
+    removeSelectedImage();
+
+    // Add a placeholder for AI's response message with loading state
+    var aiMessage = Message(
+      isUser: false,
+      content: '',
+      timestamp: DateTime.now().toString(),
+      isLoading: true,
+    );
+    addMessage(aiMessage);
+
+    // Simulate streaming from an API (replace this with actual API call)
+    Stream<String> aiResponseStream = simulateStreamingAPIResponse();
+
+    // Listen to the stream and update the AI message content
+    aiResponseStream.listen((chunk) {
+      aiMessage.content += chunk;
+      messages.refresh();
+    }).onDone(() {
+      aiMessage.isLoading = false;
+      messages.refresh();
+      isLoadingMessageAI.value = false;
+    });
+  }
+
+  void stopLoading() {
+    isLoadingMessageAI.value = false;
+  }
+
+  // Scroll to the bottom of the list view
+  void scrollToBottom() {
+    if (scrollController.hasClients) {
+      Future.delayed(Duration(milliseconds: 300), () {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      });
+    }
+  }
+
+  // Simulate an API response stream
+  Stream<String> simulateStreamingAPIResponse() async* {
+    await Future.delayed(Duration(seconds: 1));
+    yield "This ";
+    await Future.delayed(Duration(seconds: 1));
+    yield "is ";
+    await Future.delayed(Duration(seconds: 1));
+    yield "a ";
+    await Future.delayed(Duration(seconds: 1));
+    yield "simulated ";
+    await Future.delayed(Duration(seconds: 1));
+    yield "AI ";
+    await Future.delayed(Duration(seconds: 1));
+    yield "response.";
+  }
+
+  // Pick an image from the camera or gallery
+  Future<void> pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      selectedImagePath.value = image.path;
+      // Simulate image upload
+      simulateImageUpload();
+    }
+  }
+
+  // Simulate image upload and update progress
+  void simulateImageUpload() async {
+    for (int i = 0; i <= 100; i++) {
+      await Future.delayed(Duration(milliseconds: 50));
+      imageUploadProgress.value = i / 100;
+    }
+  }
+
+  // Remove selected image
+  void removeSelectedImage() {
+    selectedImagePath.value = '';
+    imageUploadProgress.value = 0.0;
+  }
+
+
+    void startRecording() {
+    isRecording.value = true;
+    isPaused.value = false;
+  }
+
+  void pauseRecording() {
+    isPaused.value = true;
+  }
+
+  void resumeRecording() {
+    isPaused.value = false;
+  }
+
+  void cancelRecording() {
+    isRecording.value = false;
+    isPaused.value = false;
+  }
+
+  void confirmRecording() {
+    // Handle confirmation logic
+    cancelRecording();
+  }
+
+
+
+   Future<void> loadConversations() async {
+    try {
+      isLoading(true);
+      final newConversations = await provider.getConversations(page: currentPage);
+      conversations.addAll(newConversations);
+      hasMoreConversations(newConversations.length == 10);
+    } catch (e) {
+      print('Error loading conversations: $e');
+    } finally {
+     
+      isLoading(false);
+    }
+  }
+
+  Future<void> loadMoreConversations() async {
+    if (isLoadingMore.value || !hasMoreConversations.value) return;
+    try {
+      isLoadingMore(true);
+      currentPage++;
+      final newConversations = await provider.getConversations(page: currentPage);
+      conversations.addAll(newConversations);
+      hasMoreConversations(newConversations.length == 10);
+    } catch (e) {
+      print('Error loading more conversations: $e');
+    } finally {
+      isLoadingMore(false);
+    }
+  }
+
+  Future<void> addNewConversation(String title) async {
+    try {
+      isLoading(true);
+      final newConversation = await provider.addNewConversation(title);
+      conversations.insert(0, newConversation);
+    } catch (e) {
+      print('Error adding new conversation: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+}
+
+class Message {
+  final bool isUser;
+  bool? isLoading;
+  String content;
+  final String timestamp;
+  final List<String>? imageUrls;
+
+  Message({
+    required this.isUser,
+    required this.content,
+    required this.timestamp,
+    this.isLoading,
+    this.imageUrls,
+  });
+}
+
+
+class ChatAi {
+  String? id;
+  String? conversationId;
+  Conversation? conversation;
+  String? userId;
+  String? content;
+  List<QuestionMedia>? questionMedia;
+  List<Answers>? answers;
+  String? createdAt;
+  String? updatedAt;
+
+  ChatAi(
+      {this.id,
+      this.conversationId,
+      this.conversation,
+      this.userId,
+      this.content,
+      this.questionMedia,
+      this.answers,
+      this.createdAt,
+      this.updatedAt});
+
+  ChatAi.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    conversationId = json['conversation_id'];
+    conversation = json['conversation'] != null
+        ? Conversation?.fromJson(json['conversation'])
+        : null;
+    userId = json['user_id'];
+    content = json['content'];
+    if (json['question_media'] != null) {
+      questionMedia = <QuestionMedia>[];
+      json['question_media'].forEach((v) {
+        questionMedia?.add(QuestionMedia.fromJson(v));
+      });
+    }
+    if (json['answers'] != null) {
+      answers = <Answers>[];
+      json['answers'].forEach((v) {
+        answers?.add(Answers.fromJson(v));
+      });
+    }
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final data = <String, dynamic>{};
+    data['id'] = id;
+    data['conversation_id'] = conversationId;
+    if (conversation != null) {
+      data['conversation'] = conversation?.toJson();
+    }
+    data['user_id'] = userId;
+    data['content'] = content;
+    if (questionMedia != null) {
+      data['question_media'] = questionMedia?.map((v) => v.toJson()).toList();
+    }
+    if (answers != null) {
+      data['answers'] = answers?.map((v) => v.toJson()).toList();
+    }
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    return data;
+  }
+}
+
+class Conversation {
+  String? id;
+  String? userId;
+  String? title;
+  String? createdAt;
+  String? updatedAt;
+
+  Conversation(
+      {this.id, this.userId, this.title, this.createdAt, this.updatedAt});
+
+  Conversation.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    userId = json['user_id'];
+    title = json['title'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final data = <String, dynamic>{};
+    data['id'] = id;
+    data['user_id'] = userId;
+    data['title'] = title;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    return data;
+  }
+}
+
+class QuestionMedia {
+  String? id;
+  String? questionId;
+  String? mediaUrl;
+  String? mediaType;
+  String? createdAt;
+  String? updatedAt;
+
+  QuestionMedia(
+      {this.id,
+      this.questionId,
+      this.mediaUrl,
+      this.mediaType,
+      this.createdAt,
+      this.updatedAt});
+
+  QuestionMedia.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    questionId = json['question_id'];
+    mediaUrl = json['media_url'];
+    mediaType = json['media_type'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final data = <String, dynamic>{};
+    data['id'] = id;
+    data['question_id'] = questionId;
+    data['media_url'] = mediaUrl;
+    data['media_type'] = mediaType;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    return data;
+  }
+}
+
+class Answers {
+  String? id;
+  String? questionId;
+  String? userId;
+  String? content;
+  String? createdAt;
+  String? updatedAt;
+
+  Answers(
+      {this.id,
+      this.questionId,
+      this.userId,
+      this.content,
+      this.createdAt,
+      this.updatedAt});
+
+  Answers.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    questionId = json['question_id'];
+    userId = json['user_id'];
+    content = json['content'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final data = <String, dynamic>{};
+    data['id'] = id;
+    data['question_id'] = questionId;
+    data['user_id'] = userId;
+    data['content'] = content;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    return data;
+  }
+}
+i want remove Message class use ChatAi class

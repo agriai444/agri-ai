@@ -1,0 +1,38 @@
+[
+  {
+    "id": "UUID",
+    "user_id": "UUID",
+    "title": "String",
+    "created_at": "DateTime",
+    "updated_at": "DateTime",
+    "question": [
+      {
+        "id": "UUID",
+        "conversation_id": "UUID",
+        "content": "String",
+        "created_at": "DateTime",
+        "updated_at": "DateTime",
+        "question_media": [
+          {
+            "id": "UUID",
+            "question_id": "UUID",
+            "media_url": "String",
+            "media_type": "String",
+            "created_at": "DateTime",
+            "updated_at": "DateTime"
+          }
+        ],
+        "answer": [
+          {
+            "id": "UUID",
+            "question_id": "UUID",
+            "content": "String",
+            "isLoading":true,
+            "created_at": "DateTime",
+            "updated_at": "DateTime"
+          }
+        ]
+      }
+    ]
+    }
+  ]

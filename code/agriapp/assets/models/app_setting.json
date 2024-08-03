@@ -1,0 +1,9 @@
+{
+    "id": "UUID",
+    "default_ai_model": "UUID",
+    "default_message": "String",
+    "api_url": "String",
+    "created_at": "DateTime",
+    "updated_at": "DateTime"
+  }
+  
