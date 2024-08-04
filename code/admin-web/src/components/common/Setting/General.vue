@@ -251,7 +251,7 @@ async function handleDeleteAllConvAction(){
   -->
 
 
-          <div class="flex items-center justify-between">
+          <!-- <div class="flex items-center justify-between">
         <span class="flex-shrink-0 w-[100px]">{{ $t('setting.theme') }}</span>
         <div class="flex flex-wrap items-center gap-4">
       
@@ -268,7 +268,7 @@ async function handleDeleteAllConvAction(){
             </NButton>
           </template> 
         </div>
-      </div>
+      </div> -->
 
 
 </div>

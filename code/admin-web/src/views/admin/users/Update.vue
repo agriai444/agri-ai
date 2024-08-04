@@ -9,7 +9,7 @@ import { supabase, supabaseUrlImage } from '@/utils/supabase';
 import { SvgIcon } from '@/components/common';
 const path = 'University';
 const bucket = 'research';
-const universityStore = useUsersStore()
+const objStore = useUsersStore()
 interface Props {
     row: User.UserData
 }
@@ -25,27 +25,37 @@ const countriesOptions = allCountries.map(country => ({
 const formRef = ref<FormInst | null>(null);
 const loading = ref(false);
 const initialModelRef = ref<User.UserData>({
-    id:props.row.id,
+    id: props.row.id,
     firstName: props.row.firstName,
-    lastName:props.row.lastName,
+    lastName: props.row.lastName,
     country: props.row.country,
     state: props.row.state,
     // type_added:props.row.type_added,
     avatarUrl: props.row.avatarUrl,
     createdAt: props.row.createdAt,
     updatedAt: props.row.updatedAt,
+    email: null,
+    password: null,
+    dateOfBirth: null,
+    gender: null,
+    userType: null
 });
 
 const model = ref<User.UserData>({
-    id:props.row.id,
+    id: props.row.id,
     firstName: props.row.firstName,
-    lastName:props.row.lastName,
+    lastName: props.row.lastName,
     country: props.row.country,
     state: props.row.state,
     // type_added:props.row.type_added,
     avatarUrl: props.row.avatarUrl,
     createdAt: props.row.createdAt,
     updatedAt: props.row.updatedAt,
+    email: null,
+    password: null,
+    dateOfBirth: null,
+    gender: null,
+    userType: null
 });
 const rules = {
     name: [{ required: true, message: t('university.nameRequired'), trigger: ['input', 'blur'] }],
@@ -55,9 +65,9 @@ const rules = {
 async function handleUpdateUniversity() {
     try {
         loading.value = true;
-        await universityStore.updateDataAction({id:props.row.id!, updates:model.value});
+        await objStore.updateDataAction({id:props.row.id!, updates:model.value});
         loading.value = false;
-        universityStore.showModelUpdate = false;
+        objStore.showModelUpdate = false;
         message.success(t('commn.updateSuccess'));
     } catch (error: any) {
       
@@ -89,8 +99,8 @@ const customRequest = async ({
         let percent = 10;
         onProgress({ percent: Math.ceil(percent) })
         if (error) {
-            if (error.statusCode === "409" && error.error === "Duplicate") {
-                model.value.image_url = `${path}/${file.name}`
+            if (error.statusCode === "409" && error.message === "Duplicate") {
+                model.value.avatarUrl = `${path}/${file.name}`
                 console.log("Resource already exists. Skipping upload.");
                 onFinish()
             } else {
@@ -98,7 +108,7 @@ const customRequest = async ({
             }
         }
         if (data) {
-            model.value.image_url = data.path
+            model.value.avatarUrl = data.path
             onFinish()
         }
 
@@ -113,22 +123,23 @@ const customRequest = async ({
 const previewFileList = ref<UploadFileInfo[]>([
     {
         id: 'pp',
-        name: model.value.image_url || '',
+        name: model.value.avatarUrl || '',
         status: 'finished',
-        url: `${supabaseUrlImage}/${bucket}/${model.value.image_url}`
+        url: `${supabaseUrlImage}/${bucket}/${model.value.avatarUrl}`
     },
 ])
 
 function isButtonDisabled() {
-    return (
-        !model.value.name ||
-        !model.value.country_code ||
-        !model.value.image_url ||
-        (model.value.name === initialModelRef.value.name &&
-         model.value.country_code === initialModelRef.value.country_code &&
-         model.value.is_active=== initialModelRef.value.is_active &&
-         model.value.image_url === initialModelRef.value.image_url)
-    );
+    return  true
+    // (
+    //     !model.value.name ||
+    //     !model.value.country_code ||
+    //     !model.value.image_url ||
+    //     (model.value.name === initialModelRef.value.name &&
+    //      model.value.country_code === initialModelRef.value.country_code &&
+    //      model.value.is_active=== initialModelRef.value.is_active &&
+    //      model.value.image_url === initialModelRef.value.image_url)
+    // );
 }
 
 const renderLabel: (option: SelectOption) => VNodeChild = (option) => {
@@ -198,7 +209,7 @@ const renderLabel: (option: SelectOption) => VNodeChild = (option) => {
                             :label="t('university.universityName')"
                         >
                             <NInput
-                                v-model:value="model.name"
+                                v-model:value="model.firstName"
                                 placeholder="University Name"
                                 clearable
                                 @keydown.enter.prevent
@@ -212,7 +223,7 @@ const renderLabel: (option: SelectOption) => VNodeChild = (option) => {
                             <NSelect
                                 filterable
                                 trigger="hover"
-                                v-model:value="model.country_code"
+                                v-model:value="model.country"
                                 :options="countriesOptions"
                                 :render-label="renderLabel" 
                             >
@@ -226,7 +237,7 @@ const renderLabel: (option: SelectOption) => VNodeChild = (option) => {
                             :label="t('university.state')"
                         >
                             <NSwitch
-                                v-model:value="model.is_active"
+                                v-model:value="model.state as boolean"
                                 size="large"
                             />
                         </NFormItemGi>

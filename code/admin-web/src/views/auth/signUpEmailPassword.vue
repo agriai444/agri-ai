@@ -142,12 +142,12 @@ function handleFinish() {
 
 async function signUp() {
   try {
-    await authStore.signUp(
-      model.value.firstName!,
-      model.value.lastName!,
-      model.value.email!,
-      model.value.password!
-    );
+    // await authStore.signUp(
+    //   model.value.firstName!,
+    //   model.value.lastName!,
+    //   model.value.email!,
+    //   model.value.password!
+    // );
     loading.value = false;
     await goTo()
     // showOTP.value = true;

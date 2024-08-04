@@ -1,16 +1,18 @@
 // index.ts
 
 import { defineStore } from 'pinia';
-import { fetchData, deleteData, updateData, insertData ,
-  fetchTotalCount} from './helper';
+import {
+  fetchData, deleteData, updateData, insertData,
+  fetchTotalCount
+} from './helper';
 import { useUserStore } from '@/store';
-export function  initState(): User.UserData {
+export function initState(): User.UserData {
   const userStore = useUserStore()
   const user_id: string = userStore.userInfo!.user!.id!;
   return {
-    id: 1,
-    firstName: "John",
-    lastName: "Doe",
+    id: '',
+    firstName: "",
+    lastName: "",
     email: null,
     password: null,
     avatarUrl: "https://example.com/avatar.jpg",
@@ -28,49 +30,51 @@ export function  initState(): User.UserData {
 
 export const useUsersStore = defineStore('users-store', {
   state: (): ResearchState.Users => ({
-    listUsers:[],
-    usersInfo:initState(),
-    loadingInit:false,
-    showModelAdd:false,
-    showModelUpdate:false,
-    countTotalData:null
+    listUsers: [],
+    usersInfo: initState(),
+    loadingInit: false,
+    showModelAdd: false,
+    showModelUpdate: false,
+    countTotalData: null
   }),
   actions: {
     initState(): User.UserData {
       const userStore = useUserStore()
       const user_id: string = userStore.userInfo!.user!.id!;
       return {
-      
-        id: 1,
-    firstName: "John",
-    lastName: "Doe",
-    email: null,
-    password: null,
-    avatarUrl: "https://example.com/avatar.jpg",
-    dateOfBirth: "1990-01-01",
-    state: true,
-    gender: "Male",
-    userType: "Client",
-    country: "USA",
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z"
+
+        id: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        avatarUrl: "https://example.com/avatar.jpg",
+        dateOfBirth: "1990-01-01",
+        state: true,
+        gender: "Male",
+        userType: "Client",
+        country: "USA",
+        createdAt: "2024-01-01T00:00:00Z",
+        updatedAt: "2024-01-01T00:00:00Z"
       }
     },
     async countTotalDataAction(): Promise<void> {
       try {
         this.countTotalData = await fetchTotalCount();
-    
+
       } catch (error: any) {
         throw error;
       }
     },
-    async fetchDataAction({ limit, offset }: { limit: number; offset: number }): Promise<void> {
+    async fetchDataAction({ limit, offset, userType }: { limit: number; offset: number, userType: string }): Promise<void> {
       try {
-        const userStore = useUserStore()
-        const user_id: string = userStore.userInfo!.user!.id!;
-        console.log(userStore.userInfo!.user)
-        const result = await fetchData({ limit: limit, offset: offset } );
-        this.listUsers = [...this.listUsers, ...result];
+        // const userStore = useUserStore()
+        // const user_id: string = userStore.userInfo!.user!.id!;
+        // console.log(userStore.userInfo!.user)
+        const result = await fetchData({ limit: limit, offset: offset, userType });
+        const uniqueUsers = result.filter(newUser => !this.listUsers.some(existingUser => existingUser.id === newUser.id));
+
+        this.listUsers = [...this.listUsers, ...uniqueUsers];
       } catch (error: any) {
         throw error;
       }
@@ -85,7 +89,7 @@ export const useUsersStore = defineStore('users-store', {
         throw error;
       }
     },
-    async deleteDataityAction(id: number): Promise<void> {
+    async deleteDataAction(id: string): Promise<void> {
       try {
         await deleteData(id);
         const index = this.listUsers.findIndex((university) => university.id === id);
@@ -97,7 +101,7 @@ export const useUsersStore = defineStore('users-store', {
       }
     },
 
-    async updateDataAction(payload: { id: number; updates: Partial<User.UserData> }): Promise<void> {
+    async updateDataAction(payload: { id: string; updates: Partial<User.UserData> }): Promise<void> {
       try {
         await updateData(payload.id, payload.updates);
         this.listUsers = this.listUsers.map((university) =>

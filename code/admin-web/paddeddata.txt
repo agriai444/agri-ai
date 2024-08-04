@@ -1,3 +1,28 @@
+
+write store(Add.vue) for CompanyAI feild and use CompanyAI Store
+declare namespace APIAI {
+
+    type inputOutputData = 'Text' | 'Image' | 'Audio' | 'Video' | 'Documents'
+    interface CompanyAI {
+      id: string; // UUID
+      name: string;
+      companyUrl?: string; // Optional
+      logoUrl?: string; // Optional
+      apiUrl: string;
+      isActivate: boolean;
+      createdAt: string; // Timestamp
+      updatedAt: string; // Timestamp
+    }
+  
+
+  
+
+  
+  }
+  
+
+
+AddUser.vue
 <script setup lang="ts">
 import { ref, h, VNodeChild, computed } from 'vue';
 import { NForm, NInput, NButton, FormInst,

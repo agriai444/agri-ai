@@ -38,10 +38,10 @@ const { isMobile } = useBasicLayout()
     <div class="flex flex-col">
       <div class="font-bold text-base">
         <NEllipsis :line-clamp="1">
-          {{ row.firstName }}
+          {{ row.firstName }} {{ row.lastName }}
           <template #tooltip>
             <div class="w-36">
-              {{ row.firstName }}
+              {{ row.firstName }}   {{ row.lastName }}
             </div>
           </template>
         </NEllipsis>

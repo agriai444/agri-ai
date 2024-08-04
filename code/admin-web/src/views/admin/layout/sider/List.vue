@@ -30,37 +30,46 @@ function handleFinish() {
 async function handleUpdateValue(key: string, item: MenuOption) {
   handleStart()
 
-  
+
   switch (key) {
     case 'dashboard':
       await router.push({ name: '' });
-      handleFinish() 
+      handleFinish()
       break
-      case 'users':
-      await router.push({ name: 'users' });
-      handleFinish() 
+    case 'users':
+      await router.push({ name: 'users', params: { userType: 'Client' } });
+      handleFinish()
+      break
+    case 'Agri-Expert':
+      await router.push({ name: 'users', params: { userType: 'Agri-Expert' } });
+      handleFinish()
+      break
+    case 'admins':
+      await router.push({ name: 'users', params: { userType: 'Admin' } });
+      handleFinish()
       break
     case 'api':
       await router.push({ name: 'api' });
-      handleFinish() 
+      handleFinish()
       break
-    case 'company':
-      await router.push({ name: 'company' });
-      handleFinish() 
-      break
-      case 'profile':
-      await router.push({ name: 'profile' });
-      handleFinish() 
-      break
-      case 'gen-research':
-      await router.push({ name: 'gen-research' });
-      handleFinish() 
-      break
-      case 'major':
-      await router.push({ name: 'major' });
-      handleFinish() 
-      break
+    case 'companyai':
       
+      await router.push({ name: 'companyai' });
+      handleFinish()
+      break
+    case 'profile':
+      await router.push({ name: 'profile' });
+      handleFinish()
+      break
+    case 'gen-research':
+      await router.push({ name: 'gen-research' });
+      handleFinish()
+      break
+    case 'major':
+      await router.push({ name: 'major' });
+      handleFinish()
+      break
+
   }
 
 }
@@ -77,21 +86,21 @@ const menuOptions: MenuOption[] = [
         label: t('research.dashboard'),
         key: 'dashboard',
         icon: iconRender({ icon: 'material-symbols:dashboard' }),
-     
+
       },
       {
         label: t('common.users'),
         key: 'users',
         disabled: false,
         icon: iconRender({ icon: 'raphael:paper' }),
-    
+
 
       },
       {
         label: t('common.agriculturalExpert'),
-        key: 'agriculturalExpert',
+        key: 'Agri-Expert',
         icon: iconRender({ icon: 'mdi:account-student' }),
-        disabled: true,
+
 
 
       },
@@ -99,11 +108,11 @@ const menuOptions: MenuOption[] = [
         label: t('common.admins'),
         key: 'admins',
         icon: iconRender({ icon: 'mdi:account-student' }),
-        disabled: true,
+
 
 
       }
-    
+
     ]
   },
 
@@ -112,24 +121,25 @@ const menuOptions: MenuOption[] = [
     label: 'Public',
     key: 'public',
     children: [
-      {
-        label: t('admin.api'),
-        key: 'api',
-        disabled: false,
-        icon: iconRender({ icon: 'fa-solid:university' }),
-
-      },
-      {
-        label: t('admin.company'),
-        key: 'company',
-        disabled: false,
+    {
+        label: t('common.companes'),
+        key: 'companyai',
+     
         icon: iconRender({ icon: 'mingcute:department-fill' }),
 
       },
       {
-        label: t('admin.providers'),
+        label: t('common.modelsai'),
+        key: 'modelsai',
+    
+        icon: iconRender({ icon: 'fa-solid:university' }),
+
+      },
+
+      {
+        label: t('common.apiKeys'),
         key: 'major',
-        disabled:false,
+        disabled: false,
         icon: iconRender({ icon: 'material-symbols:merge-type' }),
 
       },
@@ -151,17 +161,17 @@ const menuOptions: MenuOption[] = [
 
     children: [
       {
-        label:  t('research.settings'),
+        label: t('research.settings'),
         key: 'Settings',
         icon: iconRender({ icon: 'fluent:settings-16-filled' }),
         disabled: true,
 
       },
       {
-        label:  t('admin.profile'),
+        label: t('admin.profile'),
         key: 'profile',
         icon: iconRender({ icon: 'gg:profile' }),
-      
+
 
       },
       {
@@ -180,16 +190,8 @@ const inverted = ref(false)
 </script>
 
 <template>
-   <NScrollbar class="">
-  <NMenu
-    :inverted="inverted"
-    ref="menuInstRef"
-    :accordion="accordion"
-    :collapsed-width="64"
-    :collapsed-icon-size="22"
-    :options="menuOptions"
-    @update:value="handleUpdateValue"
-  />
+  <NScrollbar class="">
+    <NMenu :inverted="inverted" ref="menuInstRef" :accordion="accordion" :collapsed-width="64" :collapsed-icon-size="22"
+      :options="menuOptions" @update:value="handleUpdateValue" />
   </NScrollbar>
 </template>
-

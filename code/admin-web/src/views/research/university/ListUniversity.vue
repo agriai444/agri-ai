@@ -52,7 +52,7 @@ function handleDeleteAction(row: Research.University) {
     onPositiveClick: async () => {
       try {
         deleteDialog.loading = true
-        await universityStore.deleteDataityAction(row.id!)
+        await universityStore.deleteDataAction(row.id!)
         message.success(t('chat.deleteSuccess'));
       } catch (error: any) {
         deleteDialog.loading = false
@@ -229,7 +229,7 @@ function deleteSelectedRows() {
       try {
         deleteDialog.loading = true;
         const deletePromises = checkedRowKeysRef.value.map((id) =>
-          universityStore.deleteDataityAction(id as unknown as number)
+          universityStore.deleteDataAction(id as unknown as number)
         );
         await Promise.all(deletePromises);
         message.success(t('chat.deleteSuccess'));

@@ -1,8 +1,10 @@
 declare namespace User {
 
+type Gender = 'Male' | 'Female' | 'Other'
+type UserType = 'Client'|  'Agri-Expert'| 'Admin'
 
     interface UserData {
-        id: number | null;
+        id: string | null;
         firstName: string | null;
         lastName: string | null;
         email: string | null;
@@ -10,8 +12,8 @@ declare namespace User {
         avatarUrl: string | null;
         dateOfBirth: string | null;
         state: boolean | null;
-        gender: string | null;
-        userType: string | null;
+        gender: Gender | null;
+        userType: UserType | null;
         country: string | null;
         createdAt: string | null;
         updatedAt: string | null;

@@ -68,7 +68,7 @@ async function signIn() {
         await authStore.Login(model.value.email!, model.value.password!);
         loading.value = false
         handleStart()
-        await router.push({ name: 'Chat', params: { uuid: '' } });
+        await router.push({ name: '/' });
         handleFinish()
 
     } catch (error: any) {
