@@ -13,7 +13,7 @@ declare namespace APIAI {
     }
   
     interface ModelAI {
-      id: string; // UUID
+      id?: string; // UUID
       companyId: string; // UUID referencing CompanyAI
       name: string;
       modelCode: string;

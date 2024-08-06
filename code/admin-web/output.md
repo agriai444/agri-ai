@@ -1,3 +1,39 @@
+
+
+this List.vue and Add.vue and Update.vue and  /home/mohammed/agri-ai/code/admin-web/src/store/modules/companyai/index.ts for CompanyAI now i want for  /home/mohammed/agri-ai/code/admin-web/src/store/modules/modelsai/index.ts ModelAI
+
+
+declare namespace APIAI {
+
+    type inputOutputData = 'Text' | 'Image' | 'Audio' | 'Video' | 'Documents'
+    interface CompanyAI {
+      id?: string; // UUID
+      name: string;
+      companyUrl?: string; // Optional
+      logoUrl?: string; // Optional
+      apiUrl: string;
+      isActivate: boolean;
+      createdAt: string; // Timestamp
+      updatedAt: string; // Timestamp
+    }
+  
+    interface ModelAI {
+      id: string; // UUID
+      companyId: string; // UUID referencing CompanyAI
+      name: string;
+      modelCode: string;
+      description?: string; // Optional
+      isActivate: boolean;
+      version?: string; // Optional
+      createdAt: string; // Timestamp
+      updatedAt: string; // Timestamp
+    }
+}
+
+
+# /home/mohammed/agri-ai/code/admin-web/src/views/admin/companyai/Add.vue
+
+```vue
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { NForm, NInput, NButton, FormInst, FormRules, NUpload, NSwitch, useMessage, NGrid, NFormItemGi, UploadCustomRequestOptions } from 'naive-ui';
@@ -189,3 +225,4 @@ function handleValidateButtonClick(e: MouseEvent) {
     </NForm>
   </div>
 </template>
+```

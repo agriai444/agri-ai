@@ -1,40 +1,27 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { NForm, NInput, NButton, FormInst, FormRules, NUpload, NSwitch, useMessage, NGrid, NFormItemGi, UploadCustomRequestOptions } from 'naive-ui';
+import { ref, computed, defineProps } from 'vue';
+import { NForm, NInput, NButton, FormInst, FormRules, NUpload, NSwitch, useMessage, NGrid, NFormItemGi, UploadCustomRequestOptions, UploadFileInfo } from 'naive-ui';
 import { t } from '@/locales';
 import { useCompanyStore } from '@/store';
 import { supabase } from '@/utils/supabase';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
-const { isMobile } = useBasicLayout()
-const span = computed(() => {
-  return isMobile ? 24 : 12
-})
+
+const props = defineProps<{ item: APIAI.CompanyAI }>();
+
+const { isMobile } = useBasicLayout();
+const span = computed(() => (isMobile ? 24 : 12));
+
 const companyStore = useCompanyStore();
 const message = useMessage();
 const formRef = ref<FormInst | null>(null);
 const loading = ref(false);
-const model = ref<APIAI.CompanyAI>(companyStore.initState());
+const originalModel = ref<APIAI.CompanyAI>({ ...props.item });
+const model = ref<APIAI.CompanyAI>({ ...props.item });
 
 const rules: FormRules = {
   name: [{ required: true, message: t('common.nameRequired'), trigger: ['input', 'blur'] }],
   apiUrl: [{ required: true, message: t('common.apiUrlRequired'), trigger: ['input', 'blur'] }]
 };
-
-
-
-async function handleAddData() {
-  try {
-    loading.value = true;
-    await companyStore.insertDataAction(model.value);
-    loading.value = false;
-    companyStore.showModelAdd = false;
-    message.success(t('common.addSuccess'));
-  } catch (error: any) {
-    loading.value = false;
-    console.error(t('common.addFailed'), error.message);
-    message.error(t('common.addFailed'), error.message);
-  }
-}
 
 const customRequest = async ({ file, data: dataParams, onFinish, onError, onProgress }: UploadCustomRequestOptions) => {
   try {
@@ -54,7 +41,7 @@ const customRequest = async ({ file, data: dataParams, onFinish, onError, onProg
     if (error) {
       if (error.statusCode === "409" && error.error === "Duplicate") {
         
-        model.value.logoUrl =file.name;
+        model.value.logoUrl = file.name;
         onFinish()
       } else {
         throw error;
@@ -72,15 +59,41 @@ const customRequest = async ({ file, data: dataParams, onFinish, onError, onProg
   }
 };
 
-function isButtonDisabled() {
-  return !model.value.name || !model.value.apiUrl || loading.value;
+const isButtonDisabled = computed(() => {
+  return loading.value || !model.value.name || !model.value.apiUrl || JSON.stringify(model.value) === JSON.stringify(originalModel.value);
+});
+
+
+
+const previewFileList = ref<UploadFileInfo[]>([
+    {
+        id: '',
+        name: model.value.logoUrl ?? '',
+        status: 'finished',
+        url: model.value.logoUrl
+    },
+])
+
+async function handleUpdateData() {
+  try {
+    loading.value = true;
+
+    await companyStore.updateDataAction(model.value);
+    loading.value = false;
+    companyStore.showModelUpdate = false;
+    message.success(t('common.updateSuccess'));
+  } catch (error: any) {
+    loading.value = false;
+    console.error(t('common.updateFailed'), error.message);
+    message.error(t('common.updateFailed'), error.message);
+  }
 }
 
 function handleValidateButtonClick(e: MouseEvent) {
   e.preventDefault();
   formRef.value?.validate((errors) => {
     if (!errors) {
-      handleAddData();
+      handleUpdateData();
     } else {
       message.error(t('auth.fillAllField'));
     }
@@ -91,7 +104,7 @@ function handleValidateButtonClick(e: MouseEvent) {
 <template>
   <div class="border-none shadow-none flex flex-col gap-2 p-2 rounded-lg">
     <div class="post-heading mb-1">
-      <div class="gtext text-2xl font-bold underlined">{{ t('common.addNew') }}</div>
+      <div class="gtext text-2xl font-bold underlined">{{ t('common.update') }}</div>
     </div>
     <NForm
       ref="formRef"
@@ -113,11 +126,12 @@ function handleValidateButtonClick(e: MouseEvent) {
               accept="image/*"
               list-type="image-card"
               :max="1"
+              path="logoUrl"
               :data="{
              
-                'bucket': 'company'
-              }"
-              path="logoUrl"
+             'bucket': 'company'
+           }"
+              :default-file-list="previewFileList"
               :custom-request="customRequest"
             >
             </NUpload>
@@ -129,10 +143,10 @@ function handleValidateButtonClick(e: MouseEvent) {
           >
             <NInput
               v-model:value="model.name"
-              @keyup.enter="handleValidateButtonClick"
               :placeholder="t('common.name')"
               clearable
               @keydown.enter.prevent
+                  @keyup.enter="handleValidateButtonClick"
             />
           </NFormItemGi>
           <NFormItemGi
@@ -141,25 +155,24 @@ function handleValidateButtonClick(e: MouseEvent) {
             :label="t('common.companyUrl')"
           >
             <NInput
-              @keyup.enter="handleValidateButtonClick"
               v-model:value="model.companyUrl"
               :placeholder="t('common.companyUrl')"
               clearable
               @keydown.enter.prevent
+                  @keyup.enter="handleValidateButtonClick"
             />
           </NFormItemGi>
-
           <NFormItemGi
             :span="span"
             path="apiUrl"
             :label="t('common.apiUrl')"
           >
             <NInput
-              @keyup.enter="handleValidateButtonClick"
               v-model:value="model.apiUrl"
               :placeholder="t('common.apiUrl')"
               clearable
               @keydown.enter.prevent
+                  @keyup.enter="handleValidateButtonClick"
             />
           </NFormItemGi>
           <NFormItemGi
@@ -180,10 +193,10 @@ function handleValidateButtonClick(e: MouseEvent) {
           style="width:100%;"
           size="large"
           :loading="loading"
-          :disabled="isButtonDisabled()"
+          :disabled="isButtonDisabled"
           @click="handleValidateButtonClick"
         >
-          {{ t('common.addNew') }}
+          {{ t('common.update') }}
         </NButton>
       </div>
     </NForm>

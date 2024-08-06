@@ -57,6 +57,11 @@ async function handleUpdateValue(key: string, item: MenuOption) {
       await router.push({ name: 'companyai' });
       handleFinish()
       break
+      case 'modelsai':
+      
+      await router.push({ name: 'modelsai' });
+      handleFinish()
+      break
     case 'profile':
       await router.push({ name: 'profile' });
       handleFinish()
@@ -78,12 +83,12 @@ const selectedKey = selectedKeyRef
 const menuOptions: MenuOption[] = [
   {
     type: 'group',
-    label: t('research.dashboard'),
+    label: t('common.dashboard'),
     key: 'Dashboard',
 
     children: [
       {
-        label: t('research.dashboard'),
+        label: t('common.dashboard'),
         key: 'dashboard',
         icon: iconRender({ icon: 'material-symbols:dashboard' }),
 
@@ -92,7 +97,7 @@ const menuOptions: MenuOption[] = [
         label: t('common.users'),
         key: 'users',
         disabled: false,
-        icon: iconRender({ icon: 'raphael:paper' }),
+        icon: iconRender({ icon: 'mdi:users' }),
 
 
       },
@@ -107,7 +112,7 @@ const menuOptions: MenuOption[] = [
       {
         label: t('common.admins'),
         key: 'admins',
-        icon: iconRender({ icon: 'mdi:account-student' }),
+        icon: iconRender({ icon: 'eos-icons:admin' }),
 
 
 
@@ -118,21 +123,21 @@ const menuOptions: MenuOption[] = [
 
   {
     type: 'group',
-    label: 'Public',
+    label: 'AI Settings',
     key: 'public',
     children: [
     {
         label: t('common.companes'),
         key: 'companyai',
      
-        icon: iconRender({ icon: 'mingcute:department-fill' }),
+        icon: iconRender({ icon: 'hugeicons:ai-network' }),
 
       },
       {
         label: t('common.modelsai'),
         key: 'modelsai',
     
-        icon: iconRender({ icon: 'fa-solid:university' }),
+        icon: iconRender({ icon: 'arcticons:ask-ai' }),
 
       },
 
@@ -140,35 +145,92 @@ const menuOptions: MenuOption[] = [
         label: t('common.apiKeys'),
         key: 'major',
         disabled: false,
-        icon: iconRender({ icon: 'material-symbols:merge-type' }),
+        icon: iconRender({ icon: 'game-icons:house-keys' }),
 
       },
+ 
+
+    ],
+  },
+  {
+    type: 'group',
+    label: t('common.notifications'),
+    key: 'notification',
+
+    children: [
       {
-        label: t('admin'),
-        key: 'cources',
-        disabled: true,
-        icon: iconRender({ icon: 'tdesign:course' }),
-
+        label: t('common.addNotification'),
+        key: 'notification',
+        icon: iconRender({ icon: 'ic:baseline-notification-add' }),
+       
       },
-
+      
+ 
     ],
   },
 
   {
     type: 'group',
-    label: t('research.settings'),
+    label: t('common.chatsManager'),
+    key: 'chats-user-ai',
+
+    children: [
+      {
+        label: t('common.chatsUserAI'),
+        key: 'chats-user-ai',
+        icon: iconRender({ icon: 'hugeicons:ai-chat-02' }),
+       
+      },
+      
+ 
+    ],
+  },
+
+  {
+    type: 'group',
+    label: t('common.plans'),
+    key: 'plans',
+
+    children: [
+      {
+        label: t('common.plans'),
+        key: 'Settings',
+        icon: iconRender({ icon: 'noto:package' }),
+       
+      },
+      {
+        label: t('common.plansFeather'),
+        key: 'profile',
+        icon: iconRender({ icon: 'mingcute:vip-2-fill' }),
+
+
+      },
+      {
+        label: t('common.advances'),
+        key: 'advances',
+        icon: iconRender({ icon: 'arcticons:advancedtaskkiller' }),
+        disabled: true,
+
+      },
+    ],
+  },
+
+
+  {
+    type: 'group',
+    label: t('common.settings'),
     key: 'settings',
 
     children: [
       {
-        label: t('research.settings'),
+        label: t('common.settingsAPP'),
         key: 'Settings',
-        icon: iconRender({ icon: 'fluent:settings-16-filled' }),
+        icon: iconRender({ icon: 'fmdi:settings-outline' }),
         disabled: true,
 
       },
       {
-        label: t('admin.profile'),
+        label: t('common.profile'),
         key: 'profile',
         icon: iconRender({ icon: 'gg:profile' }),
 
@@ -178,7 +240,7 @@ const menuOptions: MenuOption[] = [
         label: t('research.advances'),
         key: 'advances',
         icon: iconRender({ icon: 'arcticons:advancedtaskkiller' }),
-        disabled: true,
+     
 
       },
     ],

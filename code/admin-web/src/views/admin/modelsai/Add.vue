@@ -1,83 +1,85 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { NForm, NInput, NButton, FormInst, FormRules, NUpload, NSwitch, useMessage, NGrid, NFormItemGi, UploadCustomRequestOptions } from 'naive-ui';
+import { ref, computed, onMounted } from 'vue';
+import { NForm, NInput, NButton, FormInst, FormRules, NSwitch, NGrid, NFormItemGi, NSelect, useMessage } from 'naive-ui';
 import { t } from '@/locales';
-import { useCompanyStore } from '@/store';
-import { supabase } from '@/utils/supabase';
+import { useModelStore, useCompanyStore } from '@/store';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
-const { isMobile } = useBasicLayout()
+import { getImageUrl } from '@/utils/supabasehelper';
+
+const { isMobile } = useBasicLayout();
+
 const span = computed(() => {
-  return isMobile ? 24 : 12
-})
+  return isMobile ? 24 : 12;
+});
+
+const modelStore = useModelStore();
 const companyStore = useCompanyStore();
 const message = useMessage();
 const formRef = ref<FormInst | null>(null);
 const loading = ref(false);
-const model = ref<APIAI.CompanyAI>(companyStore.initState());
+const model = ref<APIAI.ModelAI>(modelStore.initState());
+
 
 const rules: FormRules = {
   name: [{ required: true, message: t('common.nameRequired'), trigger: ['input', 'blur'] }],
-  apiUrl: [{ required: true, message: t('common.apiUrlRequired'), trigger: ['input', 'blur'] }]
+  modelCode: [{ required: true, message: t('common.modelCodeRequired'), trigger: ['input', 'blur'] }],
+  companyId: [{ required: true, message: t('common.companyRequired'), trigger: ['input', 'blur'] }]
 };
 
+const companies = ref([]);
 
+async function fetchData(): Promise<void> {
+  try {
+    // loading.value = true;
+    await companyStore.fetchDataAction({ limit: 1000, offset: 0 });
+
+    companyStore.listCompanies = await Promise.all(companyStore.listCompanies.map(async (company) => {
+      if (company.logoUrl) {
+        try {
+          company.logoUrl = await getImageUrl(companyStore.bucket, company.logoUrl);
+        } catch (error) {
+          console.error(`Failed to fetch image for company ${company.name}:`, error);
+        }
+      }
+      return { ...company };
+    }));
+
+    companies.value = companyStore.listCompanies.map(company => ({
+      label: company.name,
+      value: company.id,
+      logoUrl: company.logoUrl // Optionally include the logo URL for display
+    }));
+  } catch (error: any) {
+    console.error(t('chat.dataFetchError'), error.message);
+  } finally {
+    // loading.value = false;
+  }
+}
+
+onMounted(fetchData);
 
 async function handleAddData() {
   try {
     loading.value = true;
-    await companyStore.insertDataAction(model.value);
+    console.log("model.value", model.value)
+    await modelStore.insertDataAction(model.value);
     loading.value = false;
-    companyStore.showModelAdd = false;
+    modelStore.showModelAdd = false;
     message.success(t('common.addSuccess'));
   } catch (error: any) {
     loading.value = false;
     console.error(t('common.addFailed'), error.message);
-    message.error(t('common.addFailed'), error.message);
+    message.error(t('common.addFailed'));
   }
 }
 
-const customRequest = async ({ file, data: dataParams, onFinish, onError, onProgress }: UploadCustomRequestOptions) => {
-  try {
-    if (!dataParams) {
-      throw new Error('dataParams is undefined');
-    }
-
-    const progressEvent = { loaded: 20, total: 100 };
-    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-    onProgress({ percent: percentCompleted });
-
-    const { data, error } = await supabase.storage.from(dataParams.bucket).upload(`${file.name}`, file.file!, {
-      cacheControl: '3600',
-      upsert: false
-    });
-
-    if (error) {
-      if (error.statusCode === "409" && error.error === "Duplicate") {
-        
-        model.value.logoUrl =file.name;
-        onFinish()
-      } else {
-        throw error;
-      }
-    }
-
-    if (data) {
-      model.value.logoUrl = data.path;
-      onFinish();
-    }
-  } catch (error: any) {
-    console.log(error);
-    message.error(error.message);
-    onError();
-  }
-};
-
 function isButtonDisabled() {
-  return !model.value.name || !model.value.apiUrl || loading.value;
+  return !model.value.name || !model.value.modelCode || !model.value.companyId || loading.value;
 }
 
 function handleValidateButtonClick(e: MouseEvent) {
   e.preventDefault();
+
   formRef.value?.validate((errors) => {
     if (!errors) {
       handleAddData();
@@ -106,21 +108,15 @@ function handleValidateButtonClick(e: MouseEvent) {
         >
           <NFormItemGi
             :span="span"
-            path="logoUrl"
-            :label="t('common.logoUrl')"
+            path="companyId"
+            :label="t('common.company')"
           >
-            <NUpload
-              accept="image/*"
-              list-type="image-card"
-              :max="1"
-              :data="{
-             
-                'bucket': 'company'
-              }"
-              path="logoUrl"
-              :custom-request="customRequest"
-            >
-            </NUpload>
+            <NSelect
+              v-model:value="model.companyId"
+              :options="companies"
+              :placeholder="t('common.selectCompany')"
+              clearable
+            />
           </NFormItemGi>
           <NFormItemGi
             :span="span"
@@ -137,13 +133,13 @@ function handleValidateButtonClick(e: MouseEvent) {
           </NFormItemGi>
           <NFormItemGi
             :span="span"
-            path="companyUrl"
-            :label="t('common.companyUrl')"
+            path="modelCode"
+            :label="t('common.modelCode')"
           >
             <NInput
               @keyup.enter="handleValidateButtonClick"
-              v-model:value="model.companyUrl"
-              :placeholder="t('common.companyUrl')"
+              v-model:value="model.modelCode"
+              :placeholder="t('common.modelCode')"
               clearable
               @keydown.enter.prevent
             />
@@ -151,17 +147,32 @@ function handleValidateButtonClick(e: MouseEvent) {
 
           <NFormItemGi
             :span="span"
-            path="apiUrl"
-            :label="t('common.apiUrl')"
+            path="description"
+            :label="t('common.description')"
           >
             <NInput
               @keyup.enter="handleValidateButtonClick"
-              v-model:value="model.apiUrl"
-              :placeholder="t('common.apiUrl')"
+              v-model:value="model.description"
+              :placeholder="t('common.description')"
               clearable
               @keydown.enter.prevent
             />
           </NFormItemGi>
+
+          <NFormItemGi
+            :span="span"
+            path="version"
+            :label="t('common.version')"
+          >
+            <NInput
+              @keyup.enter="handleValidateButtonClick"
+              v-model:value="model.version"
+              :placeholder="t('common.version')"
+              clearable
+              @keydown.enter.prevent
+            />
+          </NFormItemGi>
+
           <NFormItemGi
             :span="span"
             path="isActivate"

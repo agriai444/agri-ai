@@ -1,103 +1,85 @@
 <script setup lang='ts'>
-import { ref, h, onMounted, computed, reactive } from 'vue'
+import { ref, h, onMounted, computed, reactive } from 'vue';
 import {
   NSpace, NButton, NDataTable, DataTableBaseColumn,
-  useDialog, NResult,
-  DataTableRowKey, NModal,
-  useMessage, DataTableColumns,
-  NA,
-  NText,
-  NSwitch,
-  NAvatar,
-} from 'naive-ui'
-import { useCompanyStore } from '@/store'
+  useDialog, NResult, NModal, useMessage, DataTableColumns,
+  NA, NText, NSwitch, NAvatar,
+  DataTableRowKey
+} from 'naive-ui';
+import { useModelStore } from '@/store';
 import { t } from '@/locales';
-import { useIconRender } from '@/hooks/useIconRender'
+import { useIconRender } from '@/hooks/useIconRender';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import { SvgIcon } from '@/components/common';
-import Add from './Add.vue'
-import Update from './Update.vue'
+import Add from './Add.vue';
+import Update from './Update.vue';
 import { getImageUrl } from '@/utils/supabasehelper';
-const { iconRender } = useIconRender()
-const loadingActionDelete = ref(false)
-const loadingActionEdit = ref(false)
-const loading = ref(true)
-const error_get = ref<boolean>(false)
-const companyStore = useCompanyStore()
-const checkedRowKeysRef = ref<Array<string | number>>([])
-const { isMobile } = useBasicLayout()
-const dialog = useDialog()
+
+const { iconRender } = useIconRender();
+const loadingActionDelete = ref(false);
+const loadingActionEdit = ref(false);
+const loading = ref(true);
+const error_get = ref<boolean>(false);
+const modelStore = useModelStore();
+const checkedRowKeysRef = ref<Array<string | number>>([]);
+const { isMobile } = useBasicLayout();
+const dialog = useDialog();
 const message = useMessage();
-const rowEdit = ref<APIAI.CompanyAI | null>(null);
+const rowEdit = ref<APIAI.ModelAI | null>(null);
+
 // Compute the data for the current page
 const data = computed(() => {
   const start = (pagination.page - 1) * pagination.pageSize;
   const end = start + pagination.pageSize;
-  return companyStore.listCompanies.slice(start, end);
+  return modelStore.listModels.slice(start, end);
 });
 
 const pageSize = ref(10);
-const itemCount = computed(() => companyStore.countTotalData);
+const itemCount = computed(() => modelStore.countTotalData);
 const pagination = reactive({
   page: 1,
   pageCount: computed(() => Math.ceil(itemCount.value / pageSize.value)),
   pageSize: pageSize.value,
 });
 
-
-
-async function handleUpdate(row: APIAI.CompanyAI) {
-  companyStore.showModelUpdate = true;
+async function handleUpdate(row: APIAI.ModelAI) {
+  modelStore.showModelUpdate = true;
   rowEdit.value = row;
 }
 
-
-const mainColumns = reactive<DataTableBaseColumn<APIAI.CompanyAI>[]>([
+const mainColumns = reactive<DataTableBaseColumn<APIAI.ModelAI>[]>([
   {
     title: t('common.name'),
     key: 'name',
     align: 'center',
-    render(row: APIAI.CompanyAI) {
+    render(row: APIAI.ModelAI) {
       return h(NText, { strong: true }, { default: () => row.name });
     }
   },
   {
-    title: t('common.companyUrl'),
-    key: 'companyUrl',
+    title: t('common.modelCode'),
+    key: 'modelCode',
     align: 'center',
-    render(row: APIAI.CompanyAI) {
-      return row.companyUrl ? h(NA, { href: row.companyUrl, target: '_blank' }, { default: () => row.companyUrl }) : null;
+    render(row: APIAI.ModelAI) {
+      return h(NText, { type: 'info' }, { default: () => row.modelCode });
     },
     ellipsis: true
   },
   {
-    title: t('common.logoUrl'),
-    key: 'logoUrl',
+    title: t('common.description'),
+    key: 'description',
     align: 'center',
-    render(row: APIAI.CompanyAI) {
-      const hasLogoUrl = row.logoUrl !== null && row.logoUrl !== undefined && row.logoUrl.trim() !== '';
-
-      const defaultIcon = h(SvgIcon, {
-        icon: "mdi:company",
-        class: "text-lg text-primary"
-      });
-
-      return hasLogoUrl
-        ? h(NAvatar, {
-          round: true,
-          src: row.logoUrl,
-          size: "large"
-        })
-        : defaultIcon;
+    render(row: APIAI.ModelAI) {
+      return h(NText, {}, { default: () => row.description || 'N/A' });
     },
     ellipsis: true
   },
   {
-    title: t('common.apiUrl'),
-    key: 'apiUrl',
+    title: t('common.version'),
+    key: 'version',
     align: 'center',
-    render(row: APIAI.CompanyAI) {
-      return h(NText, { type: 'info' }, { default: () => row.apiUrl });
+    render(row: APIAI.ModelAI) {
+      return h(NText, {}, { default: () => row.version || 'N/A' });
     },
     ellipsis: true
   },
@@ -105,7 +87,7 @@ const mainColumns = reactive<DataTableBaseColumn<APIAI.CompanyAI>[]>([
     title: t('common.isActivate'),
     key: 'isActivate',
     align: 'center',
-    render(row: APIAI.CompanyAI) {
+    render(row: APIAI.ModelAI) {
       return h(NSwitch, { value: row.isActivate, disabled: true });
     }
   },
@@ -113,7 +95,7 @@ const mainColumns = reactive<DataTableBaseColumn<APIAI.CompanyAI>[]>([
     title: t('common.createdAt'),
     key: 'createdAt',
     align: 'center',
-    render(row: APIAI.CompanyAI) {
+    render(row: APIAI.ModelAI) {
       return h(NText, {}, { default: () => new Date(row.createdAt).toLocaleString() });
     }
   },
@@ -121,14 +103,13 @@ const mainColumns = reactive<DataTableBaseColumn<APIAI.CompanyAI>[]>([
     title: t('common.updatedAt'),
     key: 'updatedAt',
     align: 'center',
-    render(row: APIAI.CompanyAI) {
+    render(row: APIAI.ModelAI) {
       return h(NText, {}, { default: () => new Date(row.updatedAt).toLocaleString() });
     }
   }
 ]);
 
-
-const columns = reactive<DataTableColumns<APIAI.CompanyAI>>([
+const columns = reactive<DataTableColumns<APIAI.ModelAI>>([
   {
     type: 'selection',
   },
@@ -138,12 +119,10 @@ const columns = reactive<DataTableColumns<APIAI.CompanyAI>>([
     key: 'actions',
     align: 'center',
     width: 100,
-    render(row: APIAI.CompanyAI) {
+    render(row: APIAI.ModelAI) {
       return h(
         'div',
-        {
-          class: 'flex gap-1'
-        },
+        { class: 'flex gap-1' },
         [
           h(
             NButton,
@@ -173,7 +152,7 @@ const columns = reactive<DataTableColumns<APIAI.CompanyAI>>([
               style: "border-radius:100%",
               onClick: async () => {
                 try {
-                  handleDeleteAction(row)
+                  handleDeleteAction(row);
                 } catch (error: any) {
                   console.error(t('common.deleteFailed'), error.message);
                 }
@@ -191,24 +170,7 @@ async function fetchData(): Promise<void> {
   try {
     loading.value = true;
     const { page, pageSize } = pagination;
-    await companyStore.fetchDataAction({ limit: pageSize, offset: (page - 1) * pageSize });
-
-    // Resolve image URLs for each company
-    companyStore.listCompanies = await Promise.all(companyStore.listCompanies.map(async (company) => {
-      // Check if logoUrl is present
-      if (company.logoUrl) {
-        try {
-          company.logoUrl = await getImageUrl(companyStore.bucket ,company.logoUrl);
-        } catch (error) {
-          console.error(`Failed to fetch image for company ${company.name}:`, error);
-
-        }
-      }
-
-      return {
-        ...company
-      };
-    }));
+    await modelStore.fetchDataAction({ limit: pageSize, offset: (page - 1) * pageSize });
   } catch (error: any) {
     error_get.value = true;
     console.error(t('chat.dataFetchError'), error.message);
@@ -217,15 +179,12 @@ async function fetchData(): Promise<void> {
   }
 }
 
-
-
-
 onMounted(async () => {
-  await fetchData()
-})
+  await fetchData();
+});
+const rowKey = (row: APIAI.ModelAI) => row.id!;
 
-
-function handleDeleteAction(row: APIAI.CompanyAI) {
+function handleDeleteAction(row: APIAI.ModelAI) {
   const deleteDialog = dialog.warning({
     title: t('common.deleteConfirmation'),
     content: t('common.deleteConfirmationMessage'),
@@ -233,16 +192,14 @@ function handleDeleteAction(row: APIAI.CompanyAI) {
     negativeText: t('common.no'),
     onPositiveClick: async () => {
       try {
-        deleteDialog.loading = true
-        await companyStore.deleteDataAction(row.id!)
+        deleteDialog.loading = true;
+        await modelStore.deleteDataAction(row.id);
         message.success(t('common.deleteSuccess'));
-
-
 
         // Check if the current page is empty after deletion
         const start = (pagination.page - 1) * pagination.pageSize;
         const end = start + pagination.pageSize;
-        const currentPageData = companyStore.listCompanies.slice(start, end);
+        const currentPageData = modelStore.listModels.slice(start, end);
 
         // If current page is empty and it is not the first page, navigate to the previous page
         if (currentPageData.length === 0 && pagination.page > 1) {
@@ -251,18 +208,22 @@ function handleDeleteAction(row: APIAI.CompanyAI) {
 
         await fetchData();
       } catch (error: any) {
-        deleteDialog.loading = false
+        deleteDialog.loading = false;
         message.error(t('common.deleteFailed'));
       } finally {
-        deleteDialog.loading = false
+        deleteDialog.loading = false;
       }
     },
   });
 }
-const rowKey = (row: APIAI.CompanyAI) => row.id!;
+
+function handlePageChange(currentPage: number) {
+  pagination.page = currentPage;
+  fetchData();
+}
 
 function handleCheck(rowKeys: DataTableRowKey[]) {
-  checkedRowKeysRef.value = rowKeys
+  checkedRowKeysRef.value = rowKeys;
 }
 
 function deleteSelectedRows() {
@@ -275,11 +236,8 @@ function deleteSelectedRows() {
       try {
         deleteDialog.loading = true;
 
-        // Verify that IDs are correct
-        console.log('Selected Row Keys:', checkedRowKeysRef.value);
-
         // Convert IDs to string if necessary
-        const deletePromises = checkedRowKeysRef.value.map(id => companyStore.deleteDataAction(String(id)));
+        const deletePromises = checkedRowKeysRef.value.map(id => modelStore.deleteDataAction(String(id)));
         await Promise.all(deletePromises);
         message.success(t('common.deleteSuccess'));
 
@@ -288,10 +246,7 @@ function deleteSelectedRows() {
 
         const start = (pagination.page - 1) * pagination.pageSize;
         const end = start + pagination.pageSize;
-        const currentPageData = companyStore.listCompanies.slice(start, end);
-
-        // Debug current page data
-        console.log('Current Page Data:', currentPageData);
+        const currentPageData = modelStore.listModels.slice(start, end);
 
         // Navigate to the previous page if current page is empty
         if (currentPageData.length === 0 && pagination.page > 1) {
@@ -300,7 +255,6 @@ function deleteSelectedRows() {
 
         // Fetch data again to ensure correct display
         await fetchData();
-
       } catch (error: any) {
         console.error(t('common.deleteFailed'), error.message);
         message.error(t('common.deleteFailed'));
@@ -310,31 +264,22 @@ function deleteSelectedRows() {
     },
   });
 }
-
-
-
-function handlePageChange(currentPage: number) {
-  pagination.page = currentPage;
-  fetchData();
-}
 </script>
 
 <template>
   <div class="container_dashboard">
-
     <div class="header_dashboard">
-      {{ t('common.companes') }}
+      {{ t('common.models') }}
     </div>
     <div>
       <div class="flex gap-2 justify-end items-center my-2 mt-8">
         <NSpace vertical>
           <NSpace justify="space-between">
-
             <NButton
-              @click="companyStore.showModelAdd = true"
+              @click="modelStore.showModelAdd = true"
               type="primary"
             >
-              <div class="flex gap-2  items-center">
+              <div class="flex gap-2 items-center">
                 <SvgIcon
                   icon="mdi:add-bold"
                   class=" text-base"
@@ -357,7 +302,6 @@ function handlePageChange(currentPage: number) {
                 />
                 <div class="hidden md:block">{{ t('common.delete') }}</div>
               </div>
-
             </NButton>
           </NSpace>
           <NDataTable
@@ -389,17 +333,17 @@ function handlePageChange(currentPage: number) {
             </template>
           </NResult>
           <NModal
-            v-model:show="companyStore.showModelAdd"
-            :mask-closable=false
+            v-model:show="modelStore.showModelAdd"
+            :mask-closable="false"
             :auto-focus="false"
             preset="card"
             style="width: 95%; max-width: 800px;"
           >
-            <Add/>
+            <Add />
           </NModal>
           <NModal
-            v-model:show="companyStore.showModelUpdate"
-            :mask-closable=false
+            v-model:show="modelStore.showModelUpdate"
+            :mask-closable="false"
             :auto-focus="false"
             preset="card"
             style="width: 95%; max-width: 800px;"

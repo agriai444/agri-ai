@@ -60,10 +60,10 @@ const value = ref(1)
       </h1> -->
 
    <div class="flex items-center gap-6">
-<NBadge class="cursor-pointer"  :value="value" :max="99">
+<!-- <NBadge class="cursor-pointer"  :value="value" :max="99">
     <SvgIcon class="text-2xl text-primary" icon="ion:notifcations" />
 
-</NBadge>
+</NBadge> -->
     <div class="avatar placeholder cursor-pointer">
   <div class="bg-neutral text-neutral-content rounded-full w-8">
     <span class="text-2xl"> {{ name.charAt(0).toUpperCase() }}</span>

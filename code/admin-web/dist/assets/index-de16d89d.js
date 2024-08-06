@@ -1,1 +1,0 @@
-import{d as e,j as s,k as a,v as t,l as n,i as o,aw as c}from"./index-2c621654.js";const r={class:"container_dashboard"},_={class:"bg-blue-100 rounded-lg flex items-center justify-center"},m=e({__name:"index",setup(d){return(i,l)=>(o(),s("div",r,[a("div",_,[t(n(c))])]))}});export{m as default};

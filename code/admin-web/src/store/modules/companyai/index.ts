@@ -1,8 +1,7 @@
+import { deleteDataFromTable, fetchDataFromTable, getImageUrl, insertDataIntoTable, updateDataInTable } from '@/utils/supabasehelper';
 import { defineStore } from 'pinia';
-import {
-  fetchData, deleteData, updateData, insertData,
-  fetchTotalCount
-} from './helper';
+
+
 
 export function initState(): APIAI.CompanyAI {
   return {
@@ -15,6 +14,7 @@ export function initState(): APIAI.CompanyAI {
     updatedAt: new Date().toISOString()
   }
 }
+const tableName = 'ai_company';
 
 export const useCompanyStore = defineStore('company-store', {
   state: () => ({
@@ -23,67 +23,59 @@ export const useCompanyStore = defineStore('company-store', {
     loadingInit: false,
     showModelAdd: false,
     showModelUpdate: false,
-    countTotalData: null
+    countTotalData: 0,
+    bucket: 'company'
   }),
   actions: {
     initState(): APIAI.CompanyAI {
-      return {
-     
-        name: '',
-        companyUrl: '',
-        logoUrl: '',
-        apiUrl: '',
-        isActivate: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
-    },
-    async countTotalDataAction(): Promise<void> {
-      try {
-        // this.countTotalData = await fetchTotalCount();
-      } catch (error: any) {
-        throw error;
-      }
+      return initState()
     },
     async fetchDataAction({ limit, offset }: { limit: number; offset: number }): Promise<void> {
       try {
-        const result = await fetchData({ limit, offset });
-        const uniqueCompanies = result.filter(newCompany => !this.listCompanies.some(existingCompany => existingCompany.id === newCompany.id));
-
-        this.listCompanies = [...this.listCompanies, ...uniqueCompanies];
+        const { data, totalCount } = await fetchDataFromTable<APIAI.CompanyAI>(tableName, limit, offset);
+        this.listCompanies = data;
+        this.countTotalData = totalCount; 
       } catch (error: any) {
+        console.error('Error fetching companies:', error.message);
         throw error;
       }
     },
+
     async insertDataAction(newCompany: APIAI.CompanyAI): Promise<void> {
       try {
-        const insertedData = await insertData(newCompany);
-
+        let insertedData = await insertDataIntoTable<APIAI.CompanyAI>(tableName, newCompany);
+        if (insertedData.logoUrl) {
+          insertedData.logoUrl = await getImageUrl(this.bucket, insertedData.logoUrl);
+        }
         this.listCompanies = [insertedData, ...this.listCompanies];
+        this.countTotalData += 1;
       } catch (error: any) {
         throw error;
       }
     },
+
     async deleteDataAction(id: string): Promise<void> {
       try {
-        await deleteData(id);
-        const index = this.listCompanies.findIndex((company) => company.id === id);
-        if (index !== -1) {
-          this.listCompanies.splice(index, 1);
-        }
+        await deleteDataFromTable(tableName, id);
+        this.listCompanies = this.listCompanies.filter(company => company.id !== id);
+        this.countTotalData -= 1;
       } catch (error: any) {
         throw error;
       }
     },
-    async updateDataAction(payload: { id: string; updates: Partial<APIAI.CompanyAI> }): Promise<void> {
+
+    async updateDataAction(data: APIAI.CompanyAI): Promise<void> {
       try {
-        await updateData(payload.id, payload.updates);
-        this.listCompanies = this.listCompanies.map((company) =>
-          company.id === payload.id ? { ...company, ...payload.updates } : company
+        await updateDataInTable<APIAI.CompanyAI>(tableName, data);
+        if (data.logoUrl) {
+          data.logoUrl = await getImageUrl(this.bucket, data.logoUrl);
+        }
+        this.listCompanies = this.listCompanies.map(company =>
+          company.id === data.id ? { ...company, ...data } : company
         );
       } catch (error: any) {
         throw error;
       }
-    },
-  },
+    }
+  }
 });

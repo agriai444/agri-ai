@@ -94,6 +94,12 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true },
       },
       {
+        path: '/admin/modelsai',
+        name: 'modelsai',
+        component: () => import('@/views/admin/modelsai/List.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
         path: '/admin/api',
         name: 'api',
         component: () => import('@/views/admin/api/index.vue'),
