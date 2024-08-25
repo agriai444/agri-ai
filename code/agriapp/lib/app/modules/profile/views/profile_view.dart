@@ -1,107 +1,143 @@
+import 'package:agri_ai/config/translations/strings_enum.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../controllers/auth_controller.dart';
-import '../../../routes/app_pages.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:country_picker/country_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import '../controllers/profile_controller.dart';
 
 class ProfileView extends GetView<ProfileController> {
-  final authC = Get.find<AuthController>();
+  const ProfileView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Profile'),
-          centerTitle: true,
-          actions: [
-            TextButton(
-                onPressed: () async {
-                  await controller.logout();
-                
-                  Get.offAllNamed(Routes.AUTH_LOGIN);
-                },
-                child: const Text(
-                  "LOGOUT",
-                  style: TextStyle(color: Colors.white),
-                ))
-          ],
-        ),
-        body: FutureBuilder(
-            future: controller.getProfile(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              return ListView(
-                padding: const EdgeInsets.all(10),
-                children: [
-                  const SizedBox(
-                    height: 10,
+      appBar: AppBar(
+        title: Text(Strings.profile.tr),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.w),
+        child: Obx(() => Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 20.h),
+                TextField(
+                  controller: controller.firstNameC,
+                  decoration: InputDecoration(
+                    labelText: Strings.firstName.tr,
+                    prefixIcon: const Icon(Icons.person),
+                    errorText: controller.firstNameError.value,
                   ),
-                  Center(
-                    child: Text(
-                      controller.emailC.text,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
+                ),
+                SizedBox(height: 16.h),
+                TextField(
+                  controller: controller.lastNameC,
+                  decoration: InputDecoration(
+                    labelText: Strings.lastName.tr,
+                    prefixIcon: const Icon(Icons.person),
+                    errorText: controller.lastNameError.value,
                   ),
-                  const SizedBox(
-                    height: 20,
+                ),
+                SizedBox(height: 16.h),
+                // TextField(
+                //   controller: controller.dateOfBirthC,
+                //   decoration: InputDecoration(
+                //     labelText: Strings.dateOfBirth.tr,
+                //     prefixIcon: Icon(Icons.calendar_today),
+                //   ),
+                //   readOnly: true,
+                //   onTap: () => _selectDate(context),
+                // ),
+                // SizedBox(height: 16.h),
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    labelText: Strings.gender.tr,
+                    prefixIcon: const Icon(Icons.person_outline),
                   ),
-                  TextField(
-                    autocorrect: false,
-                    controller: controller.nameC2,
-                    textInputAction: TextInputAction.done,
-                    decoration: const InputDecoration(
-                      labelText: "Name",
-                      border: OutlineInputBorder(),
-                    ),
+                  value: controller.genderC.text.isEmpty
+                      ? null
+                      : controller.genderC.text,
+                  items: ['Male', 'Female', 'Other'].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    controller.genderC.text = newValue ?? '';
+                  },
+                ),
+                SizedBox(height: 16.h),
+                TextField(
+                  controller: controller.countryC,
+                  decoration: InputDecoration(
+                    labelText: Strings.country.tr,
+                    prefixIcon: const Icon(Icons.public),
                   ),
-                  const SizedBox(
-                    height: 20,
+                  readOnly: true,
+                  onTap: () {
+                    showCountryPicker(
+                      context: context,
+                      onSelect: (Country country) {
+                         controller.countryC.text = country.name;
+                        // Save country code for the database
+                        controller.selectedCountryCode = country.countryCode;
+                      },
+                    );
+                  },
+                ),
+                SizedBox(height: 20.h),
+                ElevatedButton(
+                  onPressed: controller.isLoading.value
+                      ? null
+                      : () => controller.updateProfile(),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white, 
+                 
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16.0), // Optional: Adjust padding
                   ),
-                  TextField(
-                    autocorrect: false,
-                    controller: controller.passwordC,
-                    textInputAction: TextInputAction.done,
-                    decoration: const InputDecoration(
-                      labelText: "New password",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Obx(() => ElevatedButton(
-                        onPressed: () async {
-                          if (controller.isLoading.isFalse) {
-                            if (controller.nameC.text ==
-                                    controller.nameC2.text &&
-                                controller.passwordC.text.isEmpty) {
-                              // Check if user have same name and not want to change password but they click the button
-                              Get.snackbar("Info", "There is no data to update",
-                                  borderWidth: 1,
-                                  borderColor: Colors.white,
-                                  barBlur: 100);
-                              return;
-                            }
-                            await controller.updateProfile();
-                            if (controller.passwordC.text.isNotEmpty &&
-                                controller.passwordC.text.length >= 6) {
-                              await controller.logout();
-                            
-                              Get.offAllNamed(Routes.AUTH_LOGIN);
-                            }
-                          }
-                        },
-                        child: Text(controller.isLoading.isFalse
-                            ? "UPDATE PROFILE"
-                            : "Loading..."),
-                      )),
-                ],
-              );
-            }));
+                  child: controller.isLoading.value
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: Colors
+                                .white, // Set the loading indicator color to white
+                          ),
+                        )
+                      : Text(
+                          Strings.updateProfile.tr,
+                          style: const TextStyle(
+                              color:
+                                  Colors.white), // Ensure text color is white
+                        ),
+                ),
+              ],
+            )),
+      ),
+    );
+  }
+
+  void _updateProfileImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      controller.updateProfileImage(image.path);
+    }
+  }
+
+  void _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      controller.dateOfBirthC.text = picked.toIso8601String().split('T')[0];
+    }
   }
 }

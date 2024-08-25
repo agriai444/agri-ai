@@ -7,3 +7,6 @@ get generate model with assets/models/question.json
 get generate model with assets/models/question_media.json
 get generate model with assets/models/answer.json
 get generate model with assets/models/app_setting.json
+ get generate model  with assets/models/notification_item.json
+ 
+flutterfire configure --project=flutter-firebase-agri-ai-de3e3

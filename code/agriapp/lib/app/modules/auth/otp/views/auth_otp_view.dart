@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import '../controllers/auth_otp_controller.dart';
 
 class AuthOtpView extends GetView<AuthOtpController> {
-  const AuthOtpView({Key? key}) : super(key: key);
+  const AuthOtpView({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,22 +1,42 @@
+import 'package:agri_ai/app/controllers/auth_controller.dart';
+import 'package:agri_ai/app/data/local/my_shared_pref.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../models/user_model.dart';
 
 class UserProvider extends GetConnect {
+    final SupabaseClient client = Supabase.instance.client;
   @override
   void onInit() {
-    httpClient.defaultDecoder = (map) {
-      if (map is Map<String, dynamic>) return User.fromJson(map);
-      if (map is List) return map.map((item) => User.fromJson(item)).toList();
-    };
-    httpClient.baseUrl = 'YOUR-API-URL';
+ 
   }
 
-  Future<User?> getUser(int id) async {
-    final response = await get('user/$id');
-    return response.body;
-  }
 
-  Future<Response<User>> postUser(User user) async => await post('user', user);
-  Future<Response> deleteUser(int id) async => await delete('user/$id');
+
+Future<void> updateFcmToken() async {
+  try {
+       var token = MySharedPref.getFcmToken();
+      //   Get.snackbar(
+      //   'Error',
+      // 'Error inserting answer: $token',
+      //   snackPosition: SnackPosition.BOTTOM,
+   
+      //   duration: const Duration(seconds: 30),
+      // );
+    await client
+        .from('users')
+        .update({
+          'fcm_token': token,
+        })
+        .eq('id', Get.find<AuthController>().getCurrentUserId());
+      
+
+  
+  } catch (e) {
+    print('An error occurred: $e');
+  }
+}
+
+
+
 }

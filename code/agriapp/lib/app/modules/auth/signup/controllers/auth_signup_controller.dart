@@ -1,8 +1,16 @@
+import 'package:agri_ai/app/components/gradient_underline_text.dart';
+import 'package:agri_ai/app/data/local/my_shared_pref.dart';
+import 'package:agri_ai/app/data/models/user_model.dart' as local_user;
+import 'package:agri_ai/app/data/local/my_hive.dart';
+import 'package:agri_ai/app/data/providers/app_setting_provider.dart';
+import 'package:agri_ai/app/routes/app_pages.dart';
+import 'package:agri_ai/config/translations/strings_enum.dart';
 import 'package:agri_ai/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 
 
 class AuthSignupController extends GetxController {
@@ -10,6 +18,7 @@ class AuthSignupController extends GetxController {
   RxBool isHidden = true.obs;
   RxBool showGenderDropdownMargin = false.obs;
 
+  RxString errorMessage = ''.obs; 
   PageController pageController = PageController();
   RxInt currentStep = 0.obs;
 
@@ -33,8 +42,11 @@ class AuthSignupController extends GetxController {
   FocusNode passwordFocus = FocusNode();
   FocusNode confirmPasswordFocus = FocusNode();
 
-  SupabaseClient client = supabaseClient!;
-
+  RxBool canProceedStep1 = false.obs;
+  RxBool canProceedStep2 = true.obs;
+  RxBool canProceedStep3 = false.obs; 
+   var actionWidget = Rxn<Widget>();
+ final AppSettingProvider appProvider = Get.find<AppSettingProvider>();
   @override
   void onInit() {
     super.onInit();
@@ -59,56 +71,77 @@ class AuthSignupController extends GetxController {
     emailC.addListener(validateEmail);
     passwordC.addListener(validatePassword);
     confirmPasswordC.addListener(validateConfirmPassword);
+
+    
   }
 
   void validateFirstName() {
     if (firstNameC.text.isEmpty) {
-      firstNameError.value = 'First Name cannot be empty';
+      firstNameError.value = Strings.firstNameEmpty.tr;
     } else {
       firstNameError.value = '';
     }
+    validateCanProceedStep1();
   }
 
   void validateLastName() {
     if (lastNameC.text.isEmpty) {
-      lastNameError.value = 'Last Name cannot be empty';
+      lastNameError.value = Strings.lastNameEmpty.tr;
     } else {
       lastNameError.value = '';
     }
+    validateCanProceedStep1();
   }
 
   void validateEmail() {
     if (!GetUtils.isEmail(emailC.text)) {
-      emailError.value = 'Invalid email format';
+      emailError.value = Strings.invalidEmailFormat.tr;
     } else {
       emailError.value = '';
     }
+      validateCanProceedStep3();
   }
 
   void validatePassword() {
     if (passwordC.text.length < 8) {
-      passwordError.value = 'Password must be at least 8 characters';
+      passwordError.value = Strings.passwordTooShort.tr;
     } else {
       passwordError.value = '';
     }
+      validateCanProceedStep3();
   }
 
   void validateConfirmPassword() {
     if (passwordC.text != confirmPasswordC.text) {
-      confirmPasswordError.value = 'Passwords do not match';
+      confirmPasswordError.value = Strings.passwordsDoNotMatch.tr;
     } else {
       confirmPasswordError.value = '';
     }
+      validateCanProceedStep3();
   }
 
-  bool canProceed() {
-    if (currentStep.value == 0) {
-      return firstNameError.value.isEmpty && lastNameError.value.isEmpty;
-    } else if (currentStep.value == 1) {
-      return genderC.text.isNotEmpty;
-    }
-    return true;
+
+  void validateCanProceedStep1() {
+    canProceedStep1.value = firstNameC.text.isNotEmpty && lastNameC.text.isNotEmpty;
   }
+
+   void validateCanProceedStep3() {
+    canProceedStep3.value = emailError.value.isEmpty &&
+        passwordError.value.isEmpty &&
+        confirmPasswordError.value.isEmpty &&
+        emailC.text.isNotEmpty &&
+        passwordC.text.isNotEmpty &&
+        confirmPasswordC.text.isNotEmpty;
+  }
+
+bool canProceed() {
+  if (currentStep.value == 0) {
+    return firstNameC.text.isNotEmpty && lastNameC.text.isNotEmpty;
+  } else if (currentStep.value == 1) {
+    return genderC.text.isNotEmpty;
+  }
+  return true;
+}
 
   bool canSubmit() {
     return emailError.value.isEmpty &&
@@ -117,7 +150,9 @@ class AuthSignupController extends GetxController {
         !isLoading.value;
   }
 
-  void nextPage() {
+  Future<void> nextPage() async {
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
+       await Future.delayed(const Duration(milliseconds: 50));
     if (currentStep.value < 2) {
       currentStep.value++;
       pageController.nextPage(
@@ -133,246 +168,86 @@ class AuthSignupController extends GetxController {
     }
   }
 
-  Future<void> signUp() async {
+ Future<void> signUp() async {
     if (canSubmit()) {
       isLoading.value = true;
+ errorMessage.value = ''; 
+      // Set default values for gender and country if they are not set
+      final gender = genderC.text.isEmpty ? 'Male' : genderC.text;
+      final country = countryC.text.isEmpty ? '' : countryC.text;
+
       try {
-        AuthResponse res = await client.auth.signUp(
+        var token = MySharedPref.getFcmToken();
+        AuthResponse res = await supabase.auth.signUp(
           email: emailC.text,
           password: passwordC.text,
           data: {
             'first_name': firstNameC.text,
             'last_name': lastNameC.text,
+             'email': emailC.text,
             'avatar_url': '',
             'state': true,
-            'gender': genderC.text,
+            'gender': gender,
             'user_type': 'Client',
-            'country': countryC.text,
+            'country': country,
+            'fcm_token':token
           },
         );
+
         isLoading.value = false;
 
-        Get.defaultDialog(
-          barrierDismissible: false,
-          title: "Registration success",
-          middleText:
-              "Please confirm email: ${res.user!.email} ${res.user?.userMetadata}",
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-                Get.back();
-              },
-              child: const Text("OK"),
-            )
-          ],
+        // Create a User object from the response data
+        local_user.User newUser = local_user.User(
+          id: res.user!.id,
+          firstName: firstNameC.text,
+          lastName: lastNameC.text,
+          email: emailC.text,
+          gender: gender,
+          userType: 'Client',
+          country: country,
+          createdAt: DateTime.now().toString(),
+          updatedAt: DateTime.now().toString(),
         );
-      } catch (e) {
+
+        // Save the user to Hive
+        bool saved = await MyHive.saveUserToHive(newUser);
+
+        if (saved) {
+           await appProvider.checkAndFetchClientConversation();
+         
+           Get.offAllNamed(Routes.HOME);
+        } else {
+           errorMessage.value = Strings.failedToSaveUser.tr;
+     
+        }
+      } on AuthException catch (e) {
+      isLoading.value = false;
+
+ if (e.statusCode == '422') {
+        errorMessage.value = Strings.emailAlreadyRegistered.tr;
+        // Add the GestureDetector widget for navigating to the login page
+        actionWidget.value = GestureDetector(
+          onTap: () => Get.toNamed('/login'),
+          child: GradientUnderlineText(
+            text: Strings.login.tr,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.green[400]
+            ),
+          ),
+        );
+      } else {
+        errorMessage.value = '${Strings.registrationFailed.tr}\n${e.message}';
+      }
+  
+    } catch (e) {
         isLoading.value = false;
-        Get.defaultDialog(
-          barrierDismissible: false,
-          title: "Registration Failed",
-          middleText: e.toString(),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              child: const Text("OK"),
-            )
-          ],
-        );
+        errorMessage.value = Strings.registrationFailed.tr + e.toString();
+       
       }
     } else {
-      Get.snackbar("ERROR", "Please fill all fields correctly");
+      errorMessage.value = Strings.pleaseFillFields.tr;
+      
     }
   }
 }
-
-// class AuthSignupController extends GetxController {
-//   RxBool isLoading = false.obs;
-//   RxBool isHidden = true.obs;
-//   RxBool showGenderDropdownMargin = false.obs;
-
-//   PageController pageController = PageController();
-//   RxInt currentStep = 0.obs;
-
-//   TextEditingController firstNameC = TextEditingController();
-//   TextEditingController lastNameC = TextEditingController();
-//   // TextEditingController dateOfBirthC = TextEditingController();
-//   TextEditingController countryC = TextEditingController();
-//   TextEditingController genderC = TextEditingController();
-//   TextEditingController emailC = TextEditingController();
-//   TextEditingController passwordC = TextEditingController();
-//   TextEditingController confirmPasswordC = TextEditingController();
-
-//   RxString firstNameError = ''.obs;
-//   RxString lastNameError = ''.obs;
-//   RxString emailError = ''.obs;
-//   RxString passwordError = ''.obs;
-//   RxString confirmPasswordError = ''.obs;
-
-//   FocusNode firstNameFocus = FocusNode();
-//   FocusNode lastNameFocus = FocusNode();
-//   FocusNode emailFocus = FocusNode();
-//   FocusNode passwordFocus = FocusNode();
-//   FocusNode confirmPasswordFocus = FocusNode();
-
-//   // SupabaseClient client = Supabase.instance.client;
-//   SupabaseClient client = supabaseClient!;
-//   @override
-//   void onInit() {
-//     super.onInit();
-//     firstNameC.addListener(validateFirstName);
-//     lastNameC.addListener(validateLastName);
-//     emailC.addListener(validateEmail);
-//     passwordC.addListener(validatePassword);
-//     confirmPasswordC.addListener(validateConfirmPassword);
-//     // dateOfBirthC.addListener(validateDateOfBirth);
-//   }
-
-//   void validateFirstName() {
-//     if (firstNameC.text.isEmpty) {
-//       firstNameError.value = 'First Name cannot be empty';
-//     } else {
-//       firstNameError.value = '';
-//     }
-//   }
-
-//   void validateLastName() {
-//     if (lastNameC.text.isEmpty) {
-//       lastNameError.value = 'Last Name cannot be empty';
-//     } else {
-//       lastNameError.value = '';
-//     }
-//   }
-
-//   void validateEmail() {
-//     if (!GetUtils.isEmail(emailC.text)) {
-//       emailError.value = 'Invalid email format';
-//     } else {
-//       emailError.value = '';
-//     }
-//   }
-
-//   void validatePassword() {
-//     if (passwordC.text.length < 8) {
-//       passwordError.value = 'Password must be at least 8 characters';
-//     } else {
-//       passwordError.value = '';
-//     }
-//   }
-
-//   void validateConfirmPassword() {
-//     if (passwordC.text != confirmPasswordC.text) {
-//       confirmPasswordError.value = 'Passwords do not match';
-//     } else {
-//       confirmPasswordError.value = '';
-//     }
-//   }
-
-//   bool canProceed() {
-//     if (currentStep.value == 0) {
-//       return firstNameError.value.isEmpty && lastNameError.value.isEmpty;
-//     } else if (currentStep.value == 1) {
-//       return genderC.text.isNotEmpty;
-//     }
-//     return true;
-//   }
-
-//   bool canSubmit() {
-//     return emailError.value.isEmpty &&
-//         passwordError.value.isEmpty &&
-//         confirmPasswordError.value.isEmpty &&
-//         !isLoading.value;
-//   }
-
-//   void nextPage() {
-//     if (currentStep.value < 2 && canProceed()) {
-//       currentStep.value++;
-//       pageController.nextPage(
-//           duration: const Duration(milliseconds: 300), curve: Curves.ease);
-//     }
-//   }
-
-//   void previousPage() {
-//     if (currentStep.value > 0) {
-//       currentStep.value--;
-//       pageController.previousPage(
-//           duration: const Duration(milliseconds: 300), curve: Curves.ease);
-//     }
-//   }
-
-//   Future<void> signUp() async {
-//     if (canSubmit()) {
-//       isLoading.value = true;
-//       try {
-//         // String formattedDateOfBirth;
-
-//         // try {
-//         //   // Parse the input date
-//         //   DateTime parsedDate = DateFormat('MM-dd-yyyy').parse(dateOfBirthC.text);
-//         //   // Format the date to the required format
-//         //   formattedDateOfBirth = DateFormat('MM-dd-yyyy').format(parsedDate);
-//         // } catch (parseError) {
-//         //   isLoading.value = false;
-//         //   Get.snackbar("ERROR", "Invalid date format. Please use MM-dd-yyyy.");
-//         //   return;
-//         // }
-
-//         // // Debugging: Print date values
-//         // print("Date of Birth (Input): ${dateOfBirthC.text}");
-//         // print("Date of Birth (Formatted): $formattedDateOfBirth");
-
-//         AuthResponse res = await client.auth.signUp(
-//           email: emailC.text,
-//           password: passwordC.text,
-//           data: {
-//             'first_name': firstNameC.text,
-//             'last_name': lastNameC.text,
-//             'avatar_url': '',
-//             'state': true,
-//             'gender': genderC.text,
-//             'user_type': 'Client',
-//             'country': countryC.text,
-//           },
-//         );
-//         isLoading.value = false;
-
-//         Get.defaultDialog(
-//           barrierDismissible: false,
-//           title: "Registration success",
-//           middleText:
-//               "Please confirm email: ${res.user!.email} ${res.user?.userMetadata}",
-//           actions: [
-//             OutlinedButton(
-//               onPressed: () {
-//                 Get.back();
-//                 Get.back();
-//               },
-//               child: const Text("OK"),
-//             )
-//           ],
-//         );
-//       } catch (e) {
-//         isLoading.value = false;
-//         Get.defaultDialog(
-//           barrierDismissible: false,
-//           title: "Registration Failed",
-//           middleText: e.toString(),
-//           actions: [
-//             OutlinedButton(
-//               onPressed: () {
-//                 Get.back();
-//               },
-//               child: const Text("OK"),
-//             )
-//           ],
-//         );
-       
-//       }
-//     } else {
-//       Get.snackbar("ERROR", "Please fill all fields correctly");
-//     }
-//   }
-// }

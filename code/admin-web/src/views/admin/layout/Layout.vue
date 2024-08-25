@@ -1,13 +1,10 @@
 <script setup lang='ts'>
 import { computed } from 'vue'
 import { NLayout, NLayoutContent } from 'naive-ui'
-import { useRouter } from 'vue-router'
 import Sider from './sider/index.vue'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
-import { MainHeader } from '@/components/common/index'
 import HeaderComponent from '../components/Header/index.vue'
 import { useAppStore } from '@/store'
-const router = useRouter()
 const appStore = useAppStore()
 const { isMobile } = useBasicLayout()
 const collapsed = computed(() => appStore.siderCollapsed)
@@ -32,7 +29,7 @@ const getContainerClass = computed(() => {
       <NLayout class="z-40  transition" :class="getContainerClass" has-sider>
         <Sider />
         <NLayoutContent class="h-full">
-          <HeaderComponent/>
+          <HeaderComponent />
           <RouterView  v-slot="{ Component, route }">
               <component :is="Component" :key="route.fullPath" />  
           </RouterView>

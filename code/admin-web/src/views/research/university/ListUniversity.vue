@@ -6,7 +6,7 @@ import {
   DataTableRowKey, NModal,
   useMessage, DataTableFilterState, DataTableColumns,
 } from 'naive-ui'
-import { useUniversityStore } from '@/store'
+import { useUsersStore } from '@/store'
 import { t } from '@/locales';
 import { useIconRender } from '@/hooks/useIconRender'
 import { useBasicLayout } from '@/hooks/useBasicLayout';
@@ -21,13 +21,13 @@ const loadingActionDelete = ref(false)
 const loadingActionEdit = ref(false)
 const loading = ref(true)
 const error_get = ref<boolean>(false)
-const universityStore = useUniversityStore()
+const universityStore = useUsersStore()
 const checkedRowKeysRef = ref<Array<string | number>>([])
 const { isMobile } = useBasicLayout()
 const dialog = useDialog()
 const message = useMessage();
 const rowEdit = ref<Research.University | null>(null);
-const data = computed(() => universityStore.listUniversity)
+const data = computed(() => universityStore.listUsers)
 const pageSize:number = 3
 const pages = computed(() => universityStore.countTotalData)
 const pagination = reactive({
@@ -52,7 +52,7 @@ function handleDeleteAction(row: Research.University) {
     onPositiveClick: async () => {
       try {
         deleteDialog.loading = true
-        await universityStore.deleteUniversityAction(row.id!)
+        await universityStore.deleteDataAction(row.id!)
         message.success(t('chat.deleteSuccess'));
       } catch (error: any) {
         deleteDialog.loading = false
@@ -149,7 +149,7 @@ const columns = reactive<DataTableColumns<Research.University>>([
 
 async function getDataAsync() {
   try {
-    await universityStore.fetchUniversitiesAction({ limit: pageSize, offset: 1 })
+    await universityStore.fetchDataAction({ limit: pageSize, offset: 1 })
     loading.value = true
     loading.value = false
     error_get.value = false
@@ -229,7 +229,7 @@ function deleteSelectedRows() {
       try {
         deleteDialog.loading = true;
         const deletePromises = checkedRowKeysRef.value.map((id) =>
-          universityStore.deleteUniversityAction(id as unknown as number)
+          universityStore.deleteDataAction(id as unknown as number)
         );
         await Promise.all(deletePromises);
         message.success(t('chat.deleteSuccess'));

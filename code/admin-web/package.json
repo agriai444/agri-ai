@@ -1,11 +1,11 @@
 {
-  "name": "rand-chat",
+  "name": "Agricultural-Expert",
   "version": "2.11.0",
   "private": false,
-  "description": "RandChat",
+  "description": "Agricultural Expert",
   "author": "",
   "keywords": [
-    "RandChat",
+    "Agricultural Expert",
     "gpt",
     "chatbot",
     "vue"

@@ -7,20 +7,20 @@ import { ResearchLayout } from '@/views/research/layout'
 import { AdminLayout } from '@/views/admin/layout'
 
 const routes: RouteRecordRaw[] = [
-  {
-    path: '/chat',
-    name: 'Root',
-    component: ChatLayout,
-    redirect: '/chat',
-    children: [
-      {
-        path: '/chat/:uuid?',
-        name: 'Chat',
-        component: () => import('@/views/chat/index.vue'),
-        meta: { requiresAuth: true },
-      },
-    ],
-  },
+  // {
+  //   path: '/chat',
+  //   name: 'Root',
+  //   component: ChatLayout,
+  //   redirect: '/chat',
+  //   children: [
+  //     {
+  //       path: '/chat/:uuid?',
+  //       name: 'Chat',
+  //       component: () => import('@/views/chat/index.vue'),
+  //       meta: { requiresAuth: true },
+  //     },
+  //   ],
+  // },
 
 
   {
@@ -68,7 +68,19 @@ const routes: RouteRecordRaw[] = [
     name: 'admin',
     component: AdminLayout,
     children: [
-
+      {
+        path: '/admin/dashboard',
+        name: 'dashboard',
+        component: () => import('@/views/admin/dashboard/index.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: '/admin/users/:userType?',
+        name: 'users',
+        component: () => import('@/views/admin/users/List.vue'),
+        meta: { requiresAuth: true },
+      
+      },
       {
         path: '/admin/profile',
         name: 'profile',
@@ -76,23 +88,39 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true },
       },
       {
-        path: '/models',
-        name: 'adminModels',
-        component: () => import('@/views/admin/models/index.vue'),
-        // meta: { requiresAuth: true },
+        path: '/admin/companyai',
+        name: 'companyai',
+        component: () => import('@/views/admin/companyai/List.vue'),
+        meta: { requiresAuth: true },
+      },
+
+      {
+        path: '/admin/modelsai',
+        name: 'modelsai',
+        component: () => import('@/views/admin/modelsai/List.vue'),
+        meta: { requiresAuth: true },
       },
       {
-        path: '/admin/api',
-        name: 'api',
-        component: () => import('@/views/admin/api/index.vue'),
-        // meta: { requiresAuth: true },
+        path: '/admin/settingsapp',
+        name: 'settingsapp',
+        component: () => import('@/views/admin/settings/index.vue'),
+        meta: { requiresAuth: true },
       },
       {
-        path: '/admin/company',
-        name: 'company',
-        component: () => import('@/views/admin/company/index.vue'),
-        // meta: { requiresAuth: true },
+        path: '/admin/chat',
+        name: 'chat',
+        component: ChatLayout,
+        redirect: '/admin/chat',
+        children: [
+          {
+            path: ':uuid?',
+            name: 'Chat',
+            component: () => import('@/views/chat/index.vue'),
+            meta: { requiresAuth: true },
+          },
+        ],
       },
+   
     ],
 
   },
@@ -174,6 +202,11 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: false },
   },
 
+  {
+    path: '/admin',
+    name: 'notFound',
+    redirect: '/admin/dashboard',
+  },
   {
     path: '/:pathMatch(.*)*',
     name: 'notFound',

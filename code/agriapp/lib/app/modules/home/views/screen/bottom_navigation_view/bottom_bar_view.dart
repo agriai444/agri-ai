@@ -1,21 +1,17 @@
-import 'dart:math' as math;
+import 'package:agri_ai/config/theme/app_theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../fitness_app_theme.dart';
+
 import '../models/tabIcon_data.dart';
-import '../../../../../../main.dart';
 import 'package:flutter/material.dart';
-
-import '../models/tabIcon_data.dart';
-
 class BottomBarView extends StatefulWidget {
   const BottomBarView(
-      {Key? key, this.tabIconsList, this.changeIndex, this.addClick})
-      : super(key: key);
+      {super.key, this.tabIconsList, this.changeIndex, this.addClick});
 
   final Function(int index)? changeIndex;
   final Function()? addClick;
   final List<TabIconData>? tabIconsList;
+  
   @override
   _BottomBarViewState createState() => _BottomBarViewState();
 }
@@ -36,6 +32,9 @@ class _BottomBarViewState extends State<BottomBarView>
 
   @override
   Widget build(BuildContext context) {
+    // Ensure that widget.tabIconsList has at least 4 items
+    final tabIconsList = widget.tabIconsList ?? [];
+
     return Stack(
       alignment: AlignmentDirectional.bottomCenter,
       children: <Widget>[
@@ -45,7 +44,7 @@ class _BottomBarViewState extends State<BottomBarView>
             return Transform(
               transform: Matrix4.translationValues(0.0, 0.0, 0.0),
               child: PhysicalShape(
-                color: FitnessAppTheme.white,
+                color: AppTheme.white,
                 elevation: 16.0,
                 clipper: TabClipper(),
                 child: Column(
@@ -57,40 +56,36 @@ class _BottomBarViewState extends State<BottomBarView>
                             const EdgeInsets.only(left: 8, right: 8, top: 4),
                         child: Row(
                           children: <Widget>[
-                            Expanded(
+                            if (tabIconsList.isNotEmpty) Expanded(
                               child: TabIcons(
-                                  tabIconData: widget.tabIconsList?[0],
+                                  tabIconData: tabIconsList[0],
                                   removeAllSelect: () {
-                                    setRemoveAllSelection(
-                                        widget.tabIconsList?[0]);
-                                    widget.changeIndex!(0);
+                                    setRemoveAllSelection(tabIconsList[0]);
+                                    widget.changeIndex?.call(0);
                                   }),
                             ),
-                            Expanded(
+                            if (tabIconsList.length > 1) Expanded(
                               child: TabIcons(
-                                  tabIconData: widget.tabIconsList?[1],
+                                  tabIconData: tabIconsList[1],
                                   removeAllSelect: () {
-                                    setRemoveAllSelection(
-                                        widget.tabIconsList?[1]);
-                                    widget.changeIndex!(1);
+                                    setRemoveAllSelection(tabIconsList[1]);
+                                    widget.changeIndex?.call(1);
                                   }),
                             ),
-                            Expanded(
+                            if (tabIconsList.length > 2) Expanded(
                               child: TabIcons(
-                                  tabIconData: widget.tabIconsList?[2],
+                                  tabIconData: tabIconsList[2],
                                   removeAllSelect: () {
-                                    setRemoveAllSelection(
-                                        widget.tabIconsList?[2]);
-                                    widget.changeIndex!(2);
+                                    setRemoveAllSelection(tabIconsList[2]);
+                                    widget.changeIndex?.call(2);
                                   }),
                             ),
-                            Expanded(
+                            if (tabIconsList.length > 3) Expanded(
                               child: TabIcons(
-                                  tabIconData: widget.tabIconsList?[3],
+                                  tabIconData: tabIconsList[3],
                                   removeAllSelect: () {
-                                    setRemoveAllSelection(
-                                        widget.tabIconsList?[3]);
-                                    widget.changeIndex!(3);
+                                    setRemoveAllSelection(tabIconsList[3]);
+                                    widget.changeIndex?.call(3);
                                   }),
                             ),
                           ],
@@ -126,11 +121,11 @@ class _BottomBarViewState extends State<BottomBarView>
 
 
 class TabIcons extends StatefulWidget {
-  const TabIcons({Key? key, this.tabIconData, this.removeAllSelect})
-      : super(key: key);
+  const TabIcons({super.key, this.tabIconData, this.removeAllSelect});
 
   final TabIconData? tabIconData;
   final Function()? removeAllSelect;
+
   @override
   _TabIconsState createState() => _TabIconsState();
 }
@@ -160,7 +155,7 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
     return AspectRatio(
       aspectRatio: 1,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8), // Large left and right padding
+        padding: const EdgeInsets.symmetric(horizontal: 8), // Large left and right padding
         child: InkWell(
           splashColor: Colors.transparent,
           focusColor: Colors.transparent,
@@ -178,20 +173,31 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
                 Container(
                   decoration: BoxDecoration(
                     color: widget.tabIconData!.isSelected
-                        ? FitnessAppTheme.nearlyDarkBlue.withOpacity(0.1)
+                        ? AppTheme.nearlyDarkGreen.withOpacity(0.1)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(8.r),
                   ),
-                  padding: EdgeInsets.all(8),
-                  child: Icon(
-                    widget.tabIconData!.isSelected
-                        ? widget.tabIconData!.selectedIcon
-                        : widget.tabIconData!.icon,
-                    size: 24,
-                    color: widget.tabIconData!.isSelected
-                        ? FitnessAppTheme.nearlyDarkBlue
-                        : FitnessAppTheme.nearlyBlack,
-                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: widget.tabIconData!.imagePath != null
+                      ? Image.asset(
+                          widget.tabIconData!.isSelected
+                              ? widget.tabIconData!.imageSelectedPath!
+                              : widget.tabIconData!.imagePath!,
+                          width: 24,
+                          height: 24,
+                          color: widget.tabIconData!.isSelected
+                              ? AppTheme.nearlyDarkGreen
+                              : AppTheme.nearlyBlack,
+                        )
+                      : Icon(
+                          widget.tabIconData!.isSelected
+                              ? widget.tabIconData!.selectedIcon
+                              : widget.tabIconData!.icon,
+                          size: 24,
+                          color: widget.tabIconData!.isSelected
+                              ? AppTheme.nearlyDarkGreen
+                              : AppTheme.nearlyBlack,
+                        ),
                 ),
                 SizedBox(height: 1.h),
                 Text(
@@ -199,8 +205,8 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
                   style: TextStyle(
                     fontSize: 12,
                     color: widget.tabIconData!.isSelected
-                        ? FitnessAppTheme.nearlyDarkBlue
-                        : FitnessAppTheme.nearlyBlack,
+                        ? AppTheme.nearlyDarkGreen
+                        : AppTheme.nearlyBlack,
                   ),
                 ),
               ],
@@ -211,6 +217,7 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
     );
   }
 }
+
 
 class TabClipper extends CustomClipper<Path> {
   @override

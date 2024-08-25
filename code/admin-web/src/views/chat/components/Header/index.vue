@@ -102,13 +102,13 @@ const showNotification = ref(false)
 
 </NBadge>  -->
 
-<Notification/>
-      <button @click="handleAdd" :disabled="loadingMessage"        
+<!-- <Notification/> -->
+      <!-- <button @click="handleAdd" :disabled="loadingMessage"        
        :class="{ 'pointer-events-none': loadingMessage, 'opacity-50': loadingMessage }">
           <span class="text-[1.5rem]  dark:text-white">
             <SvgIcon icon="material-symbols:chat-add-on" class="text-2xl md:text-3xl" />
           </span>
-        </button>
+        </button> -->
 
      
      

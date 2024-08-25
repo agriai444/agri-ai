@@ -214,29 +214,29 @@ function handleExport() {
 
 const options = computed(() => {
     const common = [
-        {
-            label: t('chat.convertTo'),
-            key: 'convertTo',
-            icon: iconRender({ icon: 'lets-icons:export-duotone' }),
-            children: [
-                {
-                    disabled: false,
-                    label: t('chat.convertToPDF'),
-                    key: 'convertToPDF',
-                    icon: iconRender({ icon: 'vscode-icons:file-type-pdf2' }),
-                },
-                {
-                    label: t('chat.convertToDocx'),
-                    key: 'convertToDocx',
-                    icon: iconRender({ icon: 'vscode-icons:file-type-word' }),
-                },
-                {
-                    label: t('chat.convertToPPTX'),
-                    key: 'convertToPPTX',
-                    icon: iconRender({ icon: 'vscode-icons:file-type-powerpoint2' }),
-                },
-            ],
-        },
+        // {
+        //     label: t('chat.convertTo'),
+        //     key: 'convertTo',
+        //     icon: iconRender({ icon: 'lets-icons:export-duotone' }),
+        //     children: [
+        //         {
+        //             disabled: false,
+        //             label: t('chat.convertToPDF'),
+        //             key: 'convertToPDF',
+        //             icon: iconRender({ icon: 'vscode-icons:file-type-pdf2' }),
+        //         },
+        //         {
+        //             label: t('chat.convertToDocx'),
+        //             key: 'convertToDocx',
+        //             icon: iconRender({ icon: 'vscode-icons:file-type-word' }),
+        //         },
+        //         {
+        //             label: t('chat.convertToPPTX'),
+        //             key: 'convertToPPTX',
+        //             icon: iconRender({ icon: 'vscode-icons:file-type-powerpoint2' }),
+        //         },
+        //     ],
+        // },
 
     ];
 
@@ -244,11 +244,11 @@ const options = computed(() => {
 
     if (props.type === 'conversation') {
         convOptions = [
-            {
-                label: props.conv?.isPin ? t('chat.unPin') : t('chat.pin'),
-                key: 'pin',
-                icon: iconRender({ icon: 'mdi:pin' }),
-            },
+            // {
+            //     label: props.conv?.isPin ? t('chat.unPin') : t('chat.pin'),
+            //     key: 'pin',
+            //     icon: iconRender({ icon: 'mdi:pin' }),
+            // },
             {
                 label: t('common.delete'),
                 key: 'delete',

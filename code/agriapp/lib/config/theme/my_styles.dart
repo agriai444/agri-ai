@@ -253,24 +253,26 @@ class MyStyles {
     );
   }
 
-  // Input decoration theme
-  static InputDecorationTheme getInputDecorationTheme({required bool isLightTheme}) {
-    return InputDecorationTheme(
-      border: getTextFieldBorder(isLightTheme: isLightTheme),
-      focusedBorder: getTextFieldFocusedBorder(isLightTheme: isLightTheme),
-      hintStyle: TextStyle(
-        fontWeight: FontWeight.normal, // Ensures hint text is not bold
-        color: isLightTheme ? LightThemeColors.hintColor : DarkThemeColors.hintColor,
-      ),
-      labelStyle: TextStyle(
-        fontWeight: FontWeight.normal, // Ensures label text is not bold
-        color: isLightTheme ? LightThemeColors.labelColor : DarkThemeColors.labelColor,
-      ),
-      errorStyle: const TextStyle(
-        fontWeight: FontWeight.normal,
-        color: Colors.red,
-      ),
-      // Add more styles if needed
-    );
-  }
+static InputDecorationTheme getInputDecorationTheme({required bool isLightTheme}) {
+  return InputDecorationTheme(
+    border: getTextFieldBorder(isLightTheme: isLightTheme),
+    focusedBorder: getTextFieldFocusedBorder(isLightTheme: isLightTheme),
+    hintStyle: TextStyle(
+      fontWeight: FontWeight.normal, // Ensures hint text is not bold
+      color: isLightTheme ? LightThemeColors.hintColor : DarkThemeColors.hintColor,
+    ),
+    labelStyle: TextStyle(
+      fontWeight: FontWeight.normal, // Ensures label text is not bold
+      color: isLightTheme ? LightThemeColors.labelColor : DarkThemeColors.labelColor,
+    ),
+    errorStyle: const TextStyle(
+      fontWeight: FontWeight.normal,
+      color: Colors.red,
+    ),
+    filled: true, // Enables background color
+       fillColor: isLightTheme ? LightThemeColors.textFieldBackground : DarkThemeColors.textFieldBackground,
+    // Add more styles if needed
+  );
+}
+
 }

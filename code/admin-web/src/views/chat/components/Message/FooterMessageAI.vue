@@ -217,7 +217,7 @@ onUnmounted(() => {
         />
       </button>
 
-      <template v-if="!item.inversion && !item.loading && !item.error && item.text !== ''">
+      <!-- <template v-if="!item.inversion && !item.loading && !item.error && item.text !== ''">
         <button
           type="button"
           @click="handleLike(item.id!, false)"
@@ -241,7 +241,7 @@ onUnmounted(() => {
             class="text-lg md:text-xl"
           />
         </button>
-      </template>
+      </template> -->
 
       <button
         v-if="isShowTranslate"

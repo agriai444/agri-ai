@@ -10,6 +10,10 @@ export const useAppStore = defineStore('app-store', {
       this.siderCollapsed = collapsed
       this.recordState()
     },
+    setSiderCollapsedChat(collapsed: boolean) {
+      this.siderCollapsedChat = collapsed
+      this.recordState()
+    },
 
     setTheme(theme: Theme) {
       this.theme = theme

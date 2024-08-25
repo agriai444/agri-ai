@@ -1,13 +1,18 @@
+import 'package:agri_ai/config/translations/strings_enum.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 
 class FeaturesListWidget extends StatelessWidget {
   final List<String> features = [
-    'Professional planting advice',
-    'Detailed plant care tutorials',
-    'Highly accurate plant identifier',
-    'Quick diagnosis & instant solutions',
+  //   Strings.chatAIExpert.tr,
+  // Strings.chatHumanExpert.tr,
+  Strings.aiAdvice.tr,
+  Strings.humanAdvice.tr,
+  Strings.chatHumanExpert.tr,
   ];
+
+   FeaturesListWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +25,7 @@ class FeaturesListWidget extends StatelessWidget {
 class FeatureItem extends StatelessWidget {
   final String text;
 
-  const FeatureItem({Key? key, required this.text}) : super(key: key);
+  const FeatureItem({super.key, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +33,8 @@ class FeatureItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
-          Icon(Icons.check_circle, color: Colors.green),
-          SizedBox(width: 10),
+          const Icon(Icons.check_circle, color: Colors.green),
+          const SizedBox(width: 10),
           Expanded(child: Text(text)),
         ],
       ),

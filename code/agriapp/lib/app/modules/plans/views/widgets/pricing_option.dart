@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PricingOptionsWidget extends StatelessWidget {
   const PricingOptionsWidget({super.key});
@@ -38,35 +39,37 @@ class PricingOption extends StatelessWidget {
   final String? savings;
 
   const PricingOption({
-    Key? key,
+    super.key,
     required this.title,
     this.subtitle,
     required this.price,
     this.isPopular = false,
     this.isHighlighted = false,
     this.savings,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 150,
+      height: 150.h,
+      width: 100.w,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         border: Border.all(color: isHighlighted ? Colors.green : Colors.grey),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
+            mainAxisAlignment:  MainAxisAlignment.spaceBetween,
         children: [
-          if (isPopular) const Text('POPULAR', style: TextStyle(color: Colors.green)),
+          // if (isPopular) const Text('POPULAR', style: TextStyle(color: Colors.green)),
           Text(title, style:  const TextStyle(fontWeight: FontWeight.bold)),
           if (subtitle != null) 
           Text(subtitle!),
-          const SizedBox(width: 10),
+
           Text(price),
-         const SizedBox(width: 10),
-          if (savings != null)
-            Text(savings!, style: const TextStyle(color: Colors.green)),
+
+          // if (savings != null)
+          //   Text(savings!, style: const TextStyle(color: Colors.green)),
         ],
       ),
     );

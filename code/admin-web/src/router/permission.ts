@@ -7,7 +7,7 @@ export function setupPageGuard(router: Router) {
     if (to.meta.requiresAuth && !isAuthenticated) {
       next({ name: 'auth' })
     } else if (isAuthenticated && ['auth','signup', 'login', 'otp'].includes(to.name as string)) {
-      next({ name: 'Chat' })
+      next({ name: 'dashboard' })
     } else {
       next()
     }

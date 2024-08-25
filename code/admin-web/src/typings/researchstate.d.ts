@@ -1,13 +1,13 @@
 
 declare namespace ResearchState {
 
-    interface University {
-        listUniversity:Research.University[]
-        universityInfo:Research.University
+    interface Users {
+        listUsers:User.UserData[]
+        usersInfo:User.UserData
         loadingInit:boolean
         showModelAdd:boolean
         showModelUpdate:boolean
-        countTotalData:number | null
+        countTotalData:number
     }
 
     type College = {
@@ -31,7 +31,7 @@ declare namespace ResearchState {
 
     interface Student {
         id: string | null;
-        university_info: University;
+        university_info: Users;
         university_id: string;
         original_name: string;
         fake_name: string;
@@ -96,7 +96,7 @@ declare namespace ResearchState {
     type Research = {
         id: string;
         student_info?: Student[];
-        university_info: University;
+        university_info: Users;
         major?: Major;
         college?: College;
         fake_title:string;

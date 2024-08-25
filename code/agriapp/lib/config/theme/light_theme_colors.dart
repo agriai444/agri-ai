@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 class LightThemeColors
 {
   // PRIMARY
-  static const Color primaryColor = Color.fromARGB(255, 12, 12, 12);
-
+  // static const Color primaryColor = Color.fromARGB(255, 12, 12, 12); 
+ static const Color primaryColor = Color(0xff33004d40);
   // SECONDARY COLOR
   static const Color accentColor = Color(0xFFD9EDE1);
 
@@ -23,7 +23,7 @@ class LightThemeColors
   static const Color iconColor = Colors.black;
 
   //BUTTON
-  static const Color buttonColor = Color.fromARGB(255, 125, 223, 138);
+  static const Color buttonColor = Color(0xff132137);
   static const Color buttonTextColor = Colors.white;
   static const Color buttonDisabledColor = Colors.grey;
   static const Color buttonDisabledTextColor = Colors.black;
@@ -46,8 +46,10 @@ class LightThemeColors
   static const Color listTileSubtitleColor = Color(0xFF575757);
   static const Color listTileBackgroundColor = Color(0xFFF8F8F8);
   static const Color listTileIconColor = Color(0xFF575757);
-  static const Color borderColor = Color(0xFFB0B0B0);
-    static const Color hintColor = Color(0xFF9E9E9E);
+
+  
+  static const Color borderColor = Color(0xFF40A76A);//Color(0xFFB0B0B0);
+  static const Color hintColor = Color(0xFF9E9E9E);
   static const Color labelColor = Color(0xFF000000); 
   
 
@@ -60,4 +62,5 @@ class LightThemeColors
   static const Color employeeListItemNameColor = Color(0xFF4A4A4A);
   static const Color employeeListItemSubtitleColor = Color(0xFFA1A4B1);
   static const Color employeeListItemIconsColor = Color(0xFFA1A4B1);
+  static const Color textFieldBackground = Color(0xFFE0E0E0);
 }

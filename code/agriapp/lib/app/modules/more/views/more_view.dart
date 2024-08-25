@@ -1,18 +1,24 @@
 // more_view.dart
 import 'package:agri_ai/app/controllers/auth_controller.dart';
+import 'package:agri_ai/app/data/local/my_hive.dart';
+import 'package:agri_ai/app/data/models/user_model.dart' as local_user;
 import 'package:agri_ai/app/modules/more/views/widgets/menu_item_widget.dart';
 import 'package:agri_ai/app/routes/app_pages.dart';
+import 'package:agri_ai/config/translations/strings_enum.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../controllers/more_controller.dart';
+// more_view.dart
 
 class MoreView extends GetView<MoreController> {
   final AuthController authController = Get.find<AuthController>();
 
+   MoreView({super.key});
+
   @override
   Widget build(BuildContext context) {
-       final MoreController controller = Get.put(MoreController());
+    final MoreController controller = Get.put(MoreController());
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -25,42 +31,33 @@ class MoreView extends GetView<MoreController> {
               SizedBox(height: 20.h),
               MenuItemWidget(
                 icon: Icons.person,
-                title: 'Profile'.tr,
+                title: Strings.profile.tr,
                 onTap: () {
-                  Get.to(Routes.PROFILE);
+                  Get.toNamed(Routes.PROFILE);
                 },
               ),
               MenuItemWidget(
                 icon: Icons.settings,
-                title: 'Settings'.tr,
+                title: Strings.settings.tr,
                 onTap: () {
-                  // Handle settings tap
+                  Get.toNamed(Routes.SETTINGS);
                 },
               ),
               MenuItemWidget(
                 icon: Icons.star,
-                title: 'Rate our app'.tr,
+                title: Strings.rateOurApp.tr,
                 onTap: controller.rateApp,
               ),
               MenuItemWidget(
                 icon: Icons.share,
-                title: 'Share the app'.tr,
+                title: Strings.shareTheApp.tr,
                 onTap: controller.shareApp,
               ),
-              // MenuItemWidget(
-              //   icon: Icons.phone,
-              //   title: 'Contact us'.tr,
-              //   onTap: () {
-              //     // Handle contact us tap
-              //   },
-              // ),
-
               MenuItemWidget(
                 icon: Icons.logout,
-                title: 'Logout'.tr,
+                title: Strings.logout.tr,
                 onTap: () async {
-                  await authController.logout();
-                
+                  await authController.logout(context);
                 },
                 textColor: Colors.red,
                 iconColor: Colors.red,
@@ -74,21 +71,30 @@ class MoreView extends GetView<MoreController> {
   }
 }
 
+
 class UserProfileWidget extends StatelessWidget {
-  const UserProfileWidget({Key? key}) : super(key: key);
+  const UserProfileWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final local_user.User? currentUser = MyHive.getCurrentUser();
+
     return Column(
       children: [
+        SizedBox(height: 20.h),
         CircleAvatar(
           radius: 50.r,
           backgroundColor: Colors.grey[300],
-          child: Icon(Icons.person, size: 50.r, color: Colors.grey[600]),
+          backgroundImage: currentUser?.avatarUrl != null && currentUser!.avatarUrl!.isNotEmpty
+              ? NetworkImage(currentUser.avatarUrl!)
+              : null,
+          child: currentUser?.avatarUrl == null || currentUser!.avatarUrl!.isEmpty
+              ? Icon(Icons.person, size: 50.r, color: Colors.grey[600])
+              : null,
         ),
         SizedBox(height: 10.h),
         Text(
-          'Mohammed Foud',
+          '${currentUser?.firstName ?? ''} ${currentUser?.lastName ?? ''}',
           style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
         ),
       ],

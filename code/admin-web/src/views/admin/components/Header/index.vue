@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import { computed, nextTick, ref } from 'vue'
-import { HoverButton, SvgIcon } from '@/components/common'
-import { useAppStore, useChatStore, useUserStore } from '@/store'
+import { computed, ref } from 'vue'
+import {  SvgIcon, LanguageSelect } from '@/components/common'
+import { useAppStore, useUserStore } from '@/store'
 import { t } from '@/locales';
-import { useBasicLayout } from '@/hooks/useBasicLayout'
-import {  NBadge } from 'naive-ui'
+
 interface Props {
   usingContext: boolean
 
@@ -52,23 +51,26 @@ const value = ref(1)
     </a>
       </div>
  
-      <!-- <h1
+      <h1
         class="flex-1 px-4 pr-6 overflow-hidden cursor-pointer select-none text-ellipsis whitespace-nowrap"
-        @dblclick="onScrollToTop"
+       
       >
-        {{ currentChatHistory?.title ?? '' }} 
-      </h1> -->
+        <!-- {{ currentChatHistory?.title ?? '' }}  -->
+      </h1>
+   
+    
 
-   <div class="flex items-center gap-6">
-<NBadge class="cursor-pointer"  :value="value" :max="99">
+   <div class="flex justify-end gap-2">
+<!-- <NBadge class="cursor-pointer"  :value="value" :max="99">
     <SvgIcon class="text-2xl text-primary" icon="ion:notifcations" />
 
-</NBadge>
-    <div class="avatar placeholder cursor-pointer">
+</NBadge> -->
+    <!-- <div class="avatar placeholder cursor-pointer">
   <div class="bg-neutral text-neutral-content rounded-full w-8">
     <span class="text-2xl"> {{ name.charAt(0).toUpperCase() }}</span>
   </div>
-</div> 
+</div>  -->
+<LanguageSelect/>
         <!-- <HoverButton @click="handleAdd">
           <span class="text-[1.5rem]  dark:text-white">
             <SvgIcon icon="ci:chat-add" />

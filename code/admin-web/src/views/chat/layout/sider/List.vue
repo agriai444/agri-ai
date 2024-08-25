@@ -21,7 +21,7 @@ async function getDataAsync() {
     chatStore.loadingConversationsText = true
     //{ limit: 10 , offset: 1 }
    await chatStore.getListConversationAction();
-  //  console.log(chatStore.listConversation[0])
+
   } catch (error) {
   console.log(error)
   } finally {
@@ -34,7 +34,7 @@ onMounted(async () => {
 })
 
 async function handleSelect(conv:Chat.ResConv) {
-  chatStore.handelSelectAction(conv)
+  chatStore.handelSelectAction(conv.id)
   if (isMobile.value)
     appStore.setSiderCollapsed(true)
 }

@@ -1,9 +1,0 @@
-{
-    "id": "UUID",
-    "question_id": "UUID",
-    "user_id": "UUID",
-    "content": "String",
-    "created_at": "DateTime",
-    "updated_at": "DateTime"
-  }
-  

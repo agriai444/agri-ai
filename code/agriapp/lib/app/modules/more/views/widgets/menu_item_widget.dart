@@ -10,13 +10,13 @@ class MenuItemWidget extends StatelessWidget {
   final Color? iconColor;
 
   const MenuItemWidget({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
     required this.onTap,
     this.textColor,
     this.iconColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

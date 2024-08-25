@@ -30,7 +30,7 @@ class LocalizationService extends Translations {
   static Map<String,TextStyle> supportedLanguagesFontsFamilies = {
     // todo add your English font families (add to assets/fonts, pubspec and name it here) default is poppins for english and cairo for arabic
     'en' : const TextStyle(fontFamily: 'Poppins'),
-    'ar': const TextStyle(fontFamily: 'Cairo'),
+    'ar': const TextStyle(fontFamily: 'Amiri'),
   };
 
   @override

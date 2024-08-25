@@ -8,6 +8,7 @@ export type Language = 'zh-CN' |'ar-DZ'| 'zh-TW' | 'en-US' | 'ko-KR' | 'ru-RU'
 
 export interface AppState {
   siderCollapsed: boolean
+  siderCollapsedChat:boolean
   theme: Theme
   language: Language
   labelPlacement:string
@@ -17,6 +18,7 @@ export interface AppState {
 export function defaultSetting(): AppState {
   return { 
     siderCollapsed: false,
+    siderCollapsedChat: false,
      theme: 'light',
       language: 'en-US',
       labelPlacement:"top"

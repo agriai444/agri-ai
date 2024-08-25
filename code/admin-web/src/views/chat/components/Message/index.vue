@@ -97,7 +97,7 @@ const getTotalItemCount = computed(() => props.item.messageAi.length);
     <div 
     :class="type !== 'research' ? 'bg-blue-100 dark:bg-gray-800 px-2 py-0' : ''">
    
-      <MessageAI v-if="type === 'text' && !currentMessageAI.error" :item="currentMessageAI" />
+      <MessageAI v-if="(type === 'text' || type === 'AI' || type === 'Agri-Expert' ) && !currentMessageAI.error" :item="currentMessageAI" />
       <MessageResearch
       :itemUser="item.messageUser"
        v-if="type === 'research' && !currentMessageAI.error" 
@@ -113,7 +113,7 @@ const getTotalItemCount = computed(() => props.item.messageAi.length);
     class="flex flex-row gap-2 justify-between items-center mx-4  md:gap-1 py-2">
    
  <div class="flex justify-center items-center gap-1">
-        <button
+        <!-- <button
         v-if="!loadingMessage && !currentMessageAI.error && type !== 'image'"
         class="p-2 bg-blue-100 dark:bg-gray-900  dark:hover:bg-gray-600  rounded-full hover:bg-blue-300"
           @click="handleRegenerate()"
@@ -122,7 +122,7 @@ const getTotalItemCount = computed(() => props.item.messageAi.length);
           class="text-base bounce-in-fwd"
           icon="pajamas:retry"
         />
-      </button>
+      </button> -->
   
   
       <div  v-if="(props.type === 'image' && props.item.messageAi.length > itemsPerPage) || ((props.type === 'text' || props.type === 'research') && props.item.messageAi.length > 1) "     class="flex flex-row gap-1 justify-end items-center">
@@ -146,11 +146,11 @@ const getTotalItemCount = computed(() => props.item.messageAi.length);
       <!-- Display current item index and total count -->
    
 
-    <expoortSelect 
+    <!-- <expoortSelect 
      v-if="type !== 'image' && !currentMessageAI.loading && !currentMessageAI.error && currentMessageAI.text !== ''" 
     :item="item" 
     :isResearch="true"
-      type="chat" />
+      type="chat" /> -->
     </div>
   </div>
 </template>

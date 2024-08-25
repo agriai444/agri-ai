@@ -1,3 +1,4 @@
+
 export function camelToSnake(obj: Record<string, any>): Record<string, any> {
   const snakeObj: Record<string, any> = {};
 
@@ -10,7 +11,7 @@ export function camelToSnake(obj: Record<string, any>): Record<string, any> {
 
   return snakeObj;
 }
-export  function snakeToCamel<T extends Record<string, any>>(obj: T): T {
+export  function snakeToCamel(obj: Record<string, any>): Record<string, any> {
   const camelObj: Record<string, any> = {};
 
   for (const key in obj) {

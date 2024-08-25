@@ -1,5 +1,7 @@
+import 'package:agri_ai/app/components/error_message.dart';
 import 'package:agri_ai/app/components/gradient_text.dart';
 import 'package:agri_ai/app/components/gradient_underline_text.dart';
+import 'package:agri_ai/config/translations/strings_enum.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -35,14 +37,30 @@ class AuthSignupView extends GetView<AuthSignupController> {
                   ),
                 ),
                 SizedBox(height: 30.h),
-                const Column(
+
+                 Container(
+                padding: const EdgeInsets.only(
+                  left: 20.0,
+                  right: 20.0,
+                  top: 16,
+                  bottom: 16,
+                ),
+                child:  Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    GradientText(text: 'Create'),
-                    GradientText(text: 'Account'),
+                    GradientText(text: Strings.create.tr),
+                    GradientText(text: Strings.account.tr),
                   ],
                 ),
-                SizedBox(height: 30.h),
+              ),
+
+                 Obx(() => ErrorMessage(
+                    message: controller.errorMessage.value,
+                    isVisible: controller.errorMessage.isNotEmpty,
+                     actionWidget: controller.actionWidget.value
+                  )),
+                 
+                SizedBox(height: 20.h),
                 
                 ConstrainedBox(
                   constraints: BoxConstraints(
@@ -58,8 +76,6 @@ class AuthSignupView extends GetView<AuthSignupController> {
                     ],
                   ),
                 ),
-
-              
               ],
             ),
           ),
@@ -84,7 +100,7 @@ class StepOne extends StatelessWidget {
             focusNode: controller.firstNameFocus,
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
-              labelText: 'First Name',
+              labelText: Strings.firstName.tr,
               prefixIcon: const Icon(Icons.person),
               errorText: controller.firstNameError.value.isEmpty ? null : controller.firstNameError.value,
             ),
@@ -94,41 +110,51 @@ class StepOne extends StatelessWidget {
             controller: controller.lastNameC,
             focusNode: controller.lastNameFocus,
             decoration: InputDecoration(
-              labelText: 'Last Name',
+              labelText: Strings.lastName.tr,
               prefixIcon: const Icon(Icons.person),
               errorText: controller.lastNameError.value.isEmpty ? null : controller.lastNameError.value,
             ),
           )),
           SizedBox(height: 20.h),
           Obx(() => ElevatedButton(
-            onPressed: controller.canProceed() ? controller.nextPage : null,
-            child: Text("Next"),
+            onPressed: controller.canProceedStep1() ? controller.nextPage : null,
+            child: Text(Strings.next.tr),
           )),
 
-   SizedBox(height: 20.h),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Already have an account? ',
-                    style: TextStyle(
-                      color: Colors.grey,
-                   
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => Get.toNamed('/login'), 
-                    child: GradientUnderlineText(
-                      text: 'Login',
-                      style: TextStyle(
-                  
-                      fontWeight: FontWeight.bold,
-                    ),
-                    ),
-                  ),
-                ],
+          SizedBox(height: 20.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                Strings.alreadyHaveAccount.tr,
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
+              GestureDetector(
+                onTap: () => Get.toNamed('/login'),
+                child: GradientUnderlineText(
+                  text: Strings.login.tr,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // SizedBox(height: 10.h),
+          // const OrDivider(),
+          // SizedBox(height: 20.h),
+          // SocialMediaButtons(
+          //   onGooglePressed: () {
+          //     // Add Google login logic here
+          //   },
+          //   onFacebookPressed: () {
+          //     // Add Facebook login logic here
+          //   },
+          // ),
         ],
       ),
     );
@@ -145,32 +171,11 @@ class StepTwo extends StatelessWidget {
       padding: EdgeInsets.all(16.0.h),
       child: Column(
         children: [
-          // TextField(
-          //   controller: controller.dateOfBirthC,
-          //   decoration:  const InputDecoration(
-          //     labelText: 'Date of Birth',
-          //     prefixIcon: Icon(Icons.calendar_today),
-          //   ),
-          //   readOnly: true,
-          //   onTap: () async {
-          //     DateTime? pickedDate = await showDatePicker(
-          //       context: context,
-          //       initialDate: DateTime.now(),
-          //       firstDate: DateTime(1900),
-          //       lastDate: DateTime.now(),
-          //     );
-          //     if (pickedDate != null) {
-          //       String formattedDate = DateFormat('MM-dd-yyyy').format(pickedDate);
-          //       controller.dateOfBirthC.text = formattedDate;
-          //     }
-          //   },
-          // ),
-          // SizedBox(height: 16.h),
           TextField(
             controller: controller.countryC,
-            decoration: const InputDecoration(
-              labelText: 'Country',
-              prefixIcon: Icon(Icons.public),
+            decoration: InputDecoration(
+              labelText: Strings.country.tr,
+              prefixIcon: const Icon(Icons.public),
             ),
             readOnly: true,
             onTap: () {
@@ -187,9 +192,9 @@ class StepTwo extends StatelessWidget {
             duration: const Duration(milliseconds: 300),
             margin: controller.showGenderDropdownMargin.value ? EdgeInsets.only(bottom: 20.h) : EdgeInsets.zero,
             child: DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                labelText: 'Gender',
-                prefixIcon: Icon(Icons.person_outline),
+              decoration: InputDecoration(
+                labelText: Strings.gender.tr,
+                prefixIcon: const Icon(Icons.person_outline),
               ),
               value: controller.genderC.text.isEmpty ? 'Male' : controller.genderC.text,
               items: ['Male', 'Female', 'Other'].map((String value) {
@@ -205,10 +210,10 @@ class StepTwo extends StatelessWidget {
             ),
           )),
           SizedBox(height: 20.h),
-          Obx(() => ElevatedButton(
-            onPressed: controller.canProceed() ? controller.nextPage : null,
-            child: Text("Next"),
-          )),
+         ElevatedButton(
+            onPressed:  controller.nextPage ,
+            child: Text(Strings.next.tr),
+          ),
         ],
       ),
     );
@@ -229,7 +234,7 @@ class StepThree extends StatelessWidget {
             controller: controller.emailC,
             focusNode: controller.emailFocus,
             decoration: InputDecoration(
-              labelText: 'Email',
+              labelText: Strings.email.tr,
               prefixIcon: const Icon(Icons.email),
               errorText: controller.emailError.value.isEmpty ? null : controller.emailError.value,
             ),
@@ -240,7 +245,7 @@ class StepThree extends StatelessWidget {
             focusNode: controller.passwordFocus,
             obscureText: controller.isHidden.value,
             decoration: InputDecoration(
-              labelText: 'Password',
+              labelText: Strings.password.tr,
               prefixIcon: const Icon(Icons.lock),
               suffixIcon: IconButton(
                 icon: Icon(
@@ -257,15 +262,15 @@ class StepThree extends StatelessWidget {
             focusNode: controller.confirmPasswordFocus,
             obscureText: controller.isHidden.value,
             decoration: InputDecoration(
-              labelText: 'Confirm Password',
+              labelText: Strings.confirmPassword.tr,
               prefixIcon: const Icon(Icons.lock),
               errorText: controller.confirmPasswordError.value.isEmpty ? null : controller.confirmPasswordError.value,
             ),
           )),
           SizedBox(height: 20.h),
           Obx(() => ElevatedButton(
-            onPressed: controller.canSubmit() ? controller.signUp : null,
-            child: Text(controller.isLoading.isFalse ? 'REGISTER' : 'Loading...'),
+            onPressed: controller.canProceedStep3() ? controller.signUp : null,
+            child: Text(controller.isLoading.isFalse ? Strings.register.tr : Strings.loading.tr),
           )),
         ],
       ),

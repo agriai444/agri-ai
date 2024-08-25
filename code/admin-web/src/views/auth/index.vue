@@ -2,7 +2,7 @@
 import { LogoApp } from '@/components/common';
 import { t } from '@/locales'
 import { useRouter } from 'vue-router'
-import { useLoadingBar, NButton, NDivider } from 'naive-ui'
+import { useLoadingBar } from 'naive-ui'
 import PolicyCollection from './PolicyCollection.vue'
 import { ref } from 'vue';
 const router = useRouter()
@@ -26,9 +26,9 @@ function handleFinish() {
 <template>
   <div class="grid grid-cols-1 md:grid-cols-2 h-full dark:text-white">
 
-    <div class="bg-red-200 hidden  md:flex md:flex-col md:gap-4 md:justify-center md:items-center">
+    <div class="bg-red-200 hidden   md:flex md:flex-col md:gap-4 md:justify-center md:items-center">
       <LogoApp :size="90" />
-      <div class="font-bold gtext text-5xl">{{ t('common.nameApp') }}</div>
+      <div class="font-bold p-4 gtext text-5xl">{{ t('common.nameApp') }}</div>
     </div>
 
 
@@ -44,16 +44,14 @@ function handleFinish() {
               {{ t('auth.login') }}
             </button>
 
-            <button class="btn btn-primary w-48" @click="() => goTo('/auth/signup')">
+            <!-- <button class="btn btn-primary w-48" @click="() => goTo('/auth/signup')">
               {{ t('auth.signUp') }}
-            </button>
+            </button> -->
 
           </div>
         </div>
-
-
         <div class="place-self-center ">
-    <PolicyCollection/>
+    <!-- <PolicyCollection/> -->
     </div>
 
 </div>

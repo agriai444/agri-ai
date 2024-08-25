@@ -1,0 +1,162 @@
+
+    <footer
+      class="mx-2 lg:mx-44 bg-blue-100 border-0 border-blue-900 dark:bg-blue-950 bg-blue-0 p-2 mb-1 rounded-lg"
+      :class="footerClass"
+    >
+
+
+      <template v-if="typeService === 'text' && modelInfo.isWebSearch">
+        <div class="flex  justify-end  gap-1">
+          <div>{{ t('chat.includeWebSearch') }}</div>
+          <NSwitch v-model:value="isWebSearch" />
+        </div>
+      </template>
+
+      <div
+        v-if="!dataSources.length && !loadingChat"
+        class=" grid grid-cols-3 gap-1 rounded-lg my-1"
+      >
+        <SelectService />
+        <SelectLang />
+        <!-- <SelectModel /> -->
+        <template v-if="typeService !== 'image'">
+          <SelectModel />
+        </template>
+        <!-- <div class="col-span-3">
+          <SelectSystemPromt />
+        </div> -->
+      </div>
+
+    
+
+      <div class="flex  items-center gap-1">
+
+        <template v-if="typeService === 'text' && modelInfo.isAllowImage">
+          <div>
+            <div class="cursor-pointer">
+          
+              <NUpload
+                accept="image/*"
+                :max="1"
+                path="image"
+                :list-type="uploadListType"
+                :data="{
+                  'folder': folder,
+                  'bucket': bucket
+                }"
+                :custom-request="customRequest"
+                @before-upload="beforeUpload"
+                @remove="removeImage"
+            
+               
+              >
+            
+              <SvgIcon
+                v-if="uploadListType !== 'image-card'"
+                icon="mdi:image-add"
+                class="h-5 w-5 md:w-7 md:h-7"
+              />
+              </NUpload> 
+            </div>
+          </div>
+        </template>
+        <!-- <button
+              class="rounded-full flex items-center justify-center"
+             
+              @click="handleSubmit"
+            >
+          
+            </button> -->
+        <UploadImage/>
+
+        <div class="w-full">
+          <NAutoComplete
+            v-model:value="prompt"
+            :options="searchOptions"
+            :render-label="renderOption"
+          >
+            <template #default="{ handleInput, handleBlur, handleFocus }">
+              <NInput
+                ref="inputRef"
+                :dir="lang === 'ar' ? 'rtl' : 'ltr'"
+                v-model:value="prompt"
+                type="textarea"
+                :placeholder="placeholder"
+                :autosize="{ minRows: 2, maxRows: isMobile ? 4 : 6 }"
+                @input="handleInput"
+                @focus="handleFocus"
+                @blur="handleBlur"
+                @keypress="handleEnter"
+               
+                round
+              
+                clearable
+              />
+              <!-- 
+               :maxlength="maxlength" 
+               show-count -->
+            </template>
+
+          </NAutoComplete>
+        </div>
+     
+        <!-- :class="isSpeechRecognitionActive ? 'start-speech' : ''" -->
+        <div class="flex flex-col gap-1">
+
+      
+
+          <div class="cursor-pointer">
+            <div :class="isSpeechRecognitionActive ? 'start-speech' : ''">
+              <button
+                v-if="prompt === '' && !loadingMessage"
+                class="p-2 rounded-full bg-blue-600 flex items-center justify-center"
+                @click="startSpeechRecognition"
+              >
+
+                <SvgIcon
+                  icon="fluent:mic-32-filled"
+                  class="h-5 w-5 text-white"
+                />
+              </button>
+            </div>
+
+            <!-- <VueSpeechRecognition
+  lang="String"
+  continuous="Boolean"
+  interim-results="Boolean"
+  max-alternatives="Number"
+/> -->
+
+
+            <button
+              v-if="!loadingMessage && prompt !== ''"
+              class="p-2 rounded-full bg-blue-600 flex items-center justify-center disabled:bg-blue-100"
+              :disabled="buttonDisabled"
+              @click="handleSubmit"
+            >
+              <SvgIcon
+                icon="ic:baseline-send"
+                class="h-5 w-5 text-white"
+              />
+            </button>
+
+            <button
+              v-if="loadingMessage"
+              @click="handleStop"
+              class="p-2 rounded-full bg-warning flex items-center justify-center"
+            >
+              <SvgIcon
+                icon="ri:stop-circle-line"
+                class="h-5 w-5 text-white"
+              />
+            </button>
+          </div>
+        </div>
+
+      </div>
+      <div class="flex justify-center text-xs   items-center">
+          {{ t('chat.underChat') }}
+        </div>
+
+
+    </footer>

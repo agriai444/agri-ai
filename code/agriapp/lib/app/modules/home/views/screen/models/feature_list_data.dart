@@ -1,3 +1,6 @@
+import 'package:agri_ai/config/translations/strings_enum.dart';
+import 'package:get/get.dart';
+
 class FeatureListData {
   FeatureListData({
     this.imagePath = '',
@@ -13,20 +16,21 @@ class FeatureListData {
   String endColor;
   String? description;
 
-  static List<FeatureListData> tabIconsList = <FeatureListData>[
-    FeatureListData(
-      imagePath: 'assets/fitness_app/chat_ai.png',
-      titleTxt: 'Chat AI Agricultural Expert',
-      description: 'Get instant advice from our AI expert.',
-      startColor: '#FA7D82',
-      endColor: '#FFB295',
-    ),
-    FeatureListData(
-      imagePath: 'assets/fitness_app/chat_human.png',
-      titleTxt: 'Chat Human Agricultural Expert',
-      description: 'Talk to a human expert for personalized advice.',
-      startColor: '#738AE6',
-      endColor: '#5C5EDD',
-    ),
-  ];
+    static List<FeatureListData> tabIconsList = <FeatureListData>[
+      FeatureListData(
+        imagePath: 'assets/images/chat_ai.png',
+        titleTxt: Strings.chatAIExpert.tr,
+        description: Strings.aiAdvice.tr,
+        startColor: '#FA7D82',
+        endColor: '#FFB295',
+      ),
+      FeatureListData(
+        imagePath: 'assets/images/chat_human.png',
+        titleTxt: Strings.chatHumanExpert.tr,
+        description: Strings.humanAdvice.tr,
+        startColor: '#738AE6',
+        endColor: '#5C5EDD',
+      ),
+    ];
+
 }

@@ -6,8 +6,17 @@ export interface UserInfo {
     user: User | null
     session: Session | null
     avatar: string
-    name: string
-    description: string
+    fristName: string
+    description?: string
+    lastName?: string;
+    avatarUrl?: string;
+    dateOfBirth?: string; 
+    state?: boolean;
+    gender?: 'Male' | 'Female' | 'Other';
+    userType?: 'Client' | 'Agri-Expert' | 'Admin';
+    country?: string;
+    createdAt?: string; 
+    updatedAt?: string; 
 }
 
 export interface UserState {
@@ -21,7 +30,7 @@ export function defaultSetting(): UserState {
     session: null,
     user: null,
     avatar: '',
-    name: 'Demo User',
+    fristName: 'Demo User',
     description: 'Your Freedom',
   }
   return {

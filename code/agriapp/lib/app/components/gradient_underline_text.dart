@@ -7,7 +7,7 @@ class GradientUnderlineText extends StatelessWidget {
   final double underlineHeight;
 
   const GradientUnderlineText({
-    Key? key,
+    super.key,
     required this.text,
     this.style,
     this.gradient = const LinearGradient(
@@ -16,7 +16,7 @@ class GradientUnderlineText extends StatelessWidget {
       end: Alignment.centerRight,
     ),
     this.underlineHeight = 2.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

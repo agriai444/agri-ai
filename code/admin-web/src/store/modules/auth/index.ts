@@ -4,8 +4,9 @@ import { store } from '@/store/helper'
 // import { fetchSession } from '@/api'
 import { supabase } from '@/utils/supabase'
 import { AuthError, Session, User } from '@supabase/supabase-js'
-import { useUserStore, useChatStore } from '@/store'
+import { useUserStore, useChatStore, useUsersStore } from '@/store'
 import { get, post, del } from '@/utils/request'
+import { camelToSnake } from '@/utils/functions'
 export interface AuthState {
   token: string | undefined
   error: AuthError | null;
@@ -40,43 +41,63 @@ export const useAuthStore = defineStore('auth-store', {
 
   actions: {
 
-    async signUp(firstName: string, lastName: string, email: string, password: string): Promise<void> {
+    async signUp(userData: User.UserData): Promise<void> {
       try {
-        const { data, error } = await supabase.auth.signUp({ email, password });
 
-        if (error) {
-          throw error;
+        if (!userData.email || !userData.password) {
+          throw new Error('Email and password are required');
         }
+        const snakeData =[userData].map(camelToSnake);
+        
+        console.log(userData)
+          const { data, error } = await supabase.auth.signUp({
+            email: userData.email,
+            password: userData.password,
+            options: {
+              data: snakeData[0],
+            }
+         
+          }
+          
+          );
 
-
-        // User exists, but is fake. See https://supabase.com/docs/reference/javascript/auth-signup
-        if (data.user && data.user.identities && data.user.identities.length === 0) {
-          console.log("data.user", data.user)
-          const authError = {
-            name: "AuthApiError",
-            message: "User already exists",
-          };
-          try {
-            await this.Login(email, password)
-
-          } catch (error) {
-            this.error = error as AuthError;
+          if (error) {
             throw error;
           }
 
-          // throw authError as AuthError;
-        } else {
-          // if(){
-           
-          // }
-          console.log("data.user", data.user)
-          // await this.reSendVerifyOTP(email)
-          const userStore = useUserStore()
-          userStore.updateUserInfo({ user: data.user, session: data.session, name: (firstName + " " + lastName) })
 
-        }
+          // User exists, but is fake. See https://supabase.com/docs/reference/javascript/auth-signup
+          if (data.user && data.user.identities && data.user.identities.length === 0) {
+            console.log("data.user", data.user)
+            const authError = {
+              name: "AuthApiError",
+              message: "User already exists",
+            };
+            try {
+              await this.Login(userData.email, userData.password)
 
-        this.error = null;
+            } catch (error) {
+              this.error = error as AuthError;
+              throw error;
+            }
+
+            // throw authError as AuthError;
+          } else {
+            // if(){
+
+            // }
+            const usersStore = useUsersStore()
+            console.log("data.user", data.user)
+            userData.id = data.user?.id!
+            usersStore.listUsers.unshift(userData)
+            // await this.reSendVerifyOTP(email)
+            // const userStore = useUserStore()
+            // userStore.updateUserInfo({ user: data.user, session: data.session, name: (firstName + " " + lastName) })
+
+          }
+
+          this.error = null;
+      
       } catch (error) {
         this.error = error as AuthError;
         throw error;
@@ -91,11 +112,15 @@ export const useAuthStore = defineStore('auth-store', {
           throw error;
         }
 
-        if (data){
+        if (data) {
+          if(data.user.user_metadata.user_type == 'Admin'){
           const userStore = useUserStore()
           userStore.updateUserInfo({ user: data.user, session: data.session })
           this.error = null;
+        }else{
+          throw new Error('The User not Invalid ');
         }
+      }
 
       } catch (error) {
         this.error = error as AuthError;
@@ -110,7 +135,7 @@ export const useAuthStore = defineStore('auth-store', {
         if (error) {
           throw error;
         }
-        
+
         console.log("data:", data)
         console.log("data:", data)
         const userStore = useUserStore()
@@ -134,7 +159,7 @@ export const useAuthStore = defineStore('auth-store', {
         }
 
         if (data) {
-       
+
           // const userStore = useUserStore()
           // userStore.updateUserInfo({ user: data.user, session: data.session })
 
@@ -167,6 +192,24 @@ export const useAuthStore = defineStore('auth-store', {
       }
     },
 
+    async refreshToken() {
+
+      const userStore = useUserStore();
+      const refreshToken = userStore.userInfo.session?.access_token;
+      if (!refreshToken) {
+        throw new Error('No refresh token available');
+      }
+
+      const { data, error } = await supabase.auth.refreshSession({ refresh_token: refreshToken });
+
+      if (error) {
+        throw new Error('Unable to refresh token');
+      }
+
+
+      userStore.updateUserInfo({ user: data.user, session: data.session })
+
+    },
     isAuthenticated(): boolean {
       const userStore = useUserStore()
       return userStore.userInfo.user !== null && userStore.userInfo.session !== null;

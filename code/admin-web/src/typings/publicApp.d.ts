@@ -1,6 +1,31 @@
 declare namespace PublicApp {
 
-    type TypeService = "text" | "image" | "research" | "video" | "audio";
+
+    type AppSetting = {
+        id:string
+     defaultAiModel: APIAI.ModelAI
+     defaultMessage: string
+     termsOfUseUrl: string
+     privacyPolicyUrl: string
+     urlGooglplay?: string; 
+     urlAppstore?: string;
+     urlFacebook?: string;
+     urlYoutube?: string;
+     urlWhatsapp?: string;
+     email?: string;
+     urlInstagram?: string;
+     urlTiktok?: string;
+     phoneNumber?: string;
+     createdAt: string
+     updatedAt: string
+    }
+
+
+
+
+
+
+    type TypeService = "text" | "image" | "research" | "video" | "audio" | 'AI' | 'Agri-Expert';
     type TypeServiceText = "research" | "present" | "cv";
     type TypeAdded = 'default' | 'personal';
     type STATE = 'Running' | 'Busy' | 'Stopped' | 'Unknown';

@@ -1,8 +1,0 @@
-{
-    "id": "UUID",
-    "user_id": "UUID",
-    "title": "String",
-    "created_at": "DateTime",
-    "updated_at": "DateTime"
-}
-  

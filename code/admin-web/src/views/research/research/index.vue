@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { ref, h, onMounted, computed, defineAsyncComponent, reactive, defineComponent, render } from 'vue'
 import { NCollapse, NButton, NCollapseItem, NAvatar, useDialog, useMessage, NBadge, NTooltip, DataTableColumns } from 'naive-ui'
-import { useUniversityStore } from '@/store'
+import { useUsersStore } from '@/store'
 import { t } from '@/locales';
 import { useIconRender } from '@/hooks/useIconRender'
 import { TableColumns } from 'naive-ui/es/data-table/src/interface';
@@ -18,7 +18,7 @@ const { iconRender } = useIconRender()
 const loadingActionDelete = ref(false)
 const loadingActionEdit = ref(false)
 const loading = ref(true)
-const universityStore = useUniversityStore()
+const universityStore = useUsersStore()
 const checkedRowKeysRef = ref<Array<string | number>>([])
 const { isMobile } = useBasicLayout()
 const show = ref(false)

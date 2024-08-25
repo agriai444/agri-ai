@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { h, VNodeChild, ref, computed } from 'vue';
 import { NButton, NSelect, SelectOption } from 'naive-ui';
-import { useUtilStore,  useUniversityStore  } from '@/store';
+import { useUtilStore,  useUsersStore  } from '@/store';
 import { SvgIcon } from '@/components/common';
 import { t } from '@/locales';
 const utilStore = useUtilStore();
-const universityStore = useUniversityStore()
+const universityStore = useUsersStore()
 interface Props {
   filterable?: boolean;
   multiple?: boolean;

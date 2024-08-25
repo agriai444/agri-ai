@@ -14,6 +14,12 @@ abstract class Routes {
   static const CHAT_AGRI_CHAT = _Paths.CHAT_AGRI_CHAT;
   static const PLANS = _Paths.PLANS;
   static const MORE = _Paths.MORE;
+  static const SETTINGS = _Paths.SETTINGS;
+  static const LIST_NOTIFICATION = _Paths.LIST_NOTIFICATION;
+  static const ERROR_LAUNCH = _Paths.ERROR_LAUNCH;
+
+
+
 }
 
 abstract class _Paths {
@@ -29,4 +35,10 @@ abstract class _Paths {
   static const CHAT_AGRI_CHAT = '/agri-chat';
   static const PLANS = '/plans';
   static const MORE = '/more';
+  static const SETTINGS = '/settings';
+  static const LIST_NOTIFICATION = '/list-notification';
+  static const ERROR_LAUNCH = '/error-launch';
+
+ 
+
 }

@@ -6,18 +6,18 @@ class GradientText extends StatelessWidget {
   final FontWeight fontWeight;
 
   const GradientText({
-    Key? key,
+    super.key,
     required this.text,
     this.fontSize = 40,
     this.fontWeight = FontWeight.bold,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return ShaderMask(
       blendMode: BlendMode.srcIn,
       shaderCallback: (Rect bounds) {
-        return LinearGradient(
+        return const LinearGradient(
           colors: [
             Color(0xFF00D1B2),
             Color(0xFF00B8A9),

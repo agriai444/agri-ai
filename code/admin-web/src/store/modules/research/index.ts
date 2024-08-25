@@ -2,7 +2,7 @@
 
 import { defineStore } from 'pinia';
 import { fetchUniversities, deleteUniversity, updateUniversity, insertUniversity } from './helper';
-import { useUniversityStore } from  '@/store'
+import { useUsersStore } from  '@/store'
 function defaultDoucementOptions(): Research.DoucementOptions {
 
   return {
@@ -36,7 +36,7 @@ function defaultUniversityOptions(): Research.University {
   }
 }
  function defaultResearchOptions(): Research.Research{
-  const universityStore = useUniversityStore()
+  const universityStore = useUsersStore()
   let result: Research.University[] = [];
   try {
     // await universityStore.fetchUniversitiesAction();

@@ -56,9 +56,9 @@ const handleUpdateValue = (key: string) => {
   }
 }
 
-const labelTextChat = computed(() => t('chat.chatText'))
-const labelImageChat = computed(() => t('chat.chatImage'))
-const labelResearchChat = computed(() => t('chat.research'))
+const labelTextChat = computed(() => t('chat.chatAI'))
+// const labelImageChat = computed(() => t('chat.chatImage'))
+const labelResearchChat = computed(() => t('chat.agriExpert'))
 
 const loadingConversations = computed(() => chatStore.loadingConversationsText || chatStore.loadingConversationsImage)
 const dataSources = computed(() => chatStore.listConversation)
@@ -67,26 +67,26 @@ const nextText = ref<string | null>(null)
 const nextImage = ref<string | null>(null)
 const nextResearch = ref<string | null>(null)
 const lengthListChatText = computed(() => chatStore.lengthListChatText - 1)
-const lengthListChatImage = computed(() => chatStore.lengthListChatImage - 1)
-const lengthListChatResearch = computed(() => chatStore.lengthListChatResearch)
+// const lengthListChatImage = computed(() => chatStore.lengthListChatImage - 1)
+// const lengthListChatResearch = computed(() => chatStore.lengthListChatResearch)
 
 const nextOffsetText = computed(() => extractUrlParams(nextText.value!).offset as unknown as number)
-const nextOffsetImage = computed(() => extractUrlParams(nextImage.value!).offset as unknown as number)
-const nextOffsetResearch = computed(() => extractUrlParams(nextResearch.value!).offset as unknown as number)
+// const nextOffsetImage = computed(() => extractUrlParams(nextImage.value!).offset as unknown as number)
+// const nextOffsetResearch = computed(() => extractUrlParams(nextResearch.value!).offset as unknown as number)
 
 async function fetchData({ limit = 20, offset = 1, type = 'text' }: { limit?: number; offset?: number, type?: PublicApp.TypeService } = {}) {
   try {
-    const result = await chatStore.getListConversationAction({ offset: offset, type: type });
-    if (type === 'text') {
-      chatStore.lengthListChatText = result.count;
-      nextText.value = result.next;
-    } else if (type === 'image') {
-      chatStore.lengthListChatImage = result.count;
-      nextImage.value = result.next;
-    } else if (type === 'research') {
-      chatStore.lengthListChatResearch = result.count;
-      nextResearch.value = result.next;
-    }
+    await chatStore.getListConversationAction({ offset: offset, type: type });
+    // if (type === 'text') {
+    //   chatStore.lengthListChatText = result.count;
+    //   nextText.value = result.next;
+    // } else if (type === 'image') {
+    //   chatStore.lengthListChatImage = result.count;
+    //   nextImage.value = result.next;
+    // } else if (type === 'research') {
+    //   chatStore.lengthListChatResearch = result.count;
+    //   nextResearch.value = result.next;
+    // }
   } catch (error: any) {
     message.error(t('chat.errorGetData', error.message));
     throw error;
@@ -124,13 +124,14 @@ async function loadMore(type: PublicApp.TypeService) {
   if (type === 'text') {
     next = nextText.value
     offset = nextOffsetText.value || 1
-  } else if (type === 'image') {
-    next = nextImage.value
-    offset = nextOffsetImage.value || 1
-  } else if (type === 'research') {
-    next = nextResearch.value
-    offset = nextOffsetResearch.value || 1
-  }
+  } 
+  // else if (type === 'image') {
+  //   next = nextImage.value
+  //   offset = nextOffsetImage.value || 1
+  // } else if (type === 'research') {
+  //   next = nextResearch.value
+  //   offset = nextOffsetResearch.value || 1
+  // }
 
   if (next) {
     try {
@@ -145,9 +146,9 @@ async function loadMore(type: PublicApp.TypeService) {
 }
 
 function getBothType() {
-  initData('image');
+  // initData('image');
   initData('text');
-  initData('research');
+  // initData('research');
 }
 
 onMounted(async () => {
@@ -215,45 +216,45 @@ const groupByDate = (conversations: any) => {
 };
 
 const menuOptions = computed(() => {
-  const textChatOptions = groupByDate(filterConversationByType('text'));
-  const researchChatOptions = groupByDate(filterConversationByType('research'));
-  const imageChatOptions = groupByDate(filterConversationByType('image'));
-  const favoriteChatOptions = groupByDate(filterConversationByFavorite());
+  const textChatOptions =  groupByDate(filterConversationByType('AI'));
+  const researchChatOptions = groupByDate(filterConversationByType('Agri-Expert'));
+  // const imageChatOptions = groupByDate(filterConversationByType('image'));
+  // const favoriteChatOptions = groupByDate(filterConversationByFavorite());
 
   const options = [{
     label: labelTextChat.value,
-    key: 'text',
+    key: 'AI',
     icon: iconRender({
       icon: 'material-symbols:chat'
     }),
     disabled: false,
     children: textChatOptions,
   },
-  {
-    label: labelResearchChat.value,
-    key: 'research',
-    icon: iconRender({ icon: 'raphael:paper' }),
-    disabled: false,
-    children: researchChatOptions,
-  },
-  {
-    label: labelImageChat.value,
-    key: 'image',
-    icon: iconRender({
-      icon: 'line-md:image'
-    }),
-    disabled: false,
-    children: imageChatOptions,
-  },
-  {
-    label: 'Favorite',
-    key: 'favorite-chat',
-    disabled: false,
-    icon: iconRender({
-      icon: 'mdi:book-favorite'
-    }),
-    children: favoriteChatOptions,
-  },
+    {
+      label: labelResearchChat.value,
+      key: 'Agri-Expert',
+      icon: iconRender({ icon: 'raphael:paper' }),
+      disabled: false,
+      children: researchChatOptions,
+    },
+    // {
+    //   label: labelImageChat.value,
+    //   key: 'image',
+    //   icon: iconRender({
+    //     icon: 'line-md:image'
+    //   }),
+    //   disabled: false,
+    //   children: imageChatOptions,
+    // },
+    // {
+    //   label: 'Favorite',
+    //   key: 'favorite-chat',
+    //   disabled: false,
+    //   icon: iconRender({
+    //     icon: 'mdi:book-favorite'
+    //   }),
+    //   children: favoriteChatOptions,
+    // },
   ];
   return options.filter(option => option.children.length > 0);
 });
@@ -299,17 +300,17 @@ function getIcon(option: PublicApp.TypeService) {
   return icon;
 }
 
-function getCountBadge(type:PublicApp.TypeService){
-  switch(type){
+function getCountBadge(type: PublicApp.TypeService) {
+  switch (type) {
     case 'text':
       return lengthListChatText.value
       break
-    case 'image':
-    return lengthListChatImage.value
-    break
-    case 'research':
-    return lengthListChatResearch.value
-    break
+    // case 'image':
+    //   return lengthListChatImage.value
+    //   break
+    // case 'research':
+    //   return lengthListChatResearch.value
+    //   break
   }
 }
 </script>
@@ -349,6 +350,7 @@ function getCountBadge(type:PublicApp.TypeService){
 
         </button>
       </div>
+     {{dataSources}}
     </template>
 
     <template v-if="!dataSources.length && !errorGetData">
@@ -406,13 +408,14 @@ function getCountBadge(type:PublicApp.TypeService){
 
 
 
-            <div class="flex flex-col gap-2 item-center justify-center">
-              <div
+           <div class="flex flex-col gap-2 item-center justify-center">
+           
+            <div
                 v-if="option.children && option.children.length > 0"
                 v-for="(child, childIndex) in option.children"
                 :key="childIndex"
               >
-
+              <!-- <ElementConv :element="getConversationById(child.id)!" /> -->
                 <div class="text-sm text-primary dark:text-white p-1">{{ child.label }}</div>
                 <template v-for="(subChild, subChildIndex) in child.children">
                   <div
@@ -420,10 +423,10 @@ function getCountBadge(type:PublicApp.TypeService){
                     @click="handleUpdateValue(subChild.key)"
                   >
 
-                    <ElementConv :element="getConversationById(subChild.key)" />
+                    <ElementConv :element="getConversationById(subChild.key)!" />
                   </div>
                 </template>
-              </div>
+              </div> 
 
               <div class="pt-2 flex justify-center">
                 <NButton

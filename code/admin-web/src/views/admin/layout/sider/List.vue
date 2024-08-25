@@ -30,37 +30,49 @@ function handleFinish() {
 async function handleUpdateValue(key: string, item: MenuOption) {
   handleStart()
 
-  
+
   switch (key) {
     case 'dashboard':
-      await router.push({ name: '' });
-      handleFinish() 
+      await router.push({ name: 'dashboard' });
+      handleFinish()
       break
-      case 'users':
-      await router.push({ name: 'users' });
-      handleFinish() 
+    case 'users':
+      await router.push({ name: 'users', params: { userType: 'Client' } });
+      handleFinish()
       break
-    case 'api':
-      await router.push({ name: 'api' });
-      handleFinish() 
+    case 'Agri-Expert':
+      await router.push({ name: 'users', params: { userType: 'Agri-Expert' } });
+      handleFinish()
       break
-    case 'company':
-      await router.push({ name: 'company' });
-      handleFinish() 
+    case 'admins':
+      await router.push({ name: 'users', params: { userType: 'Admin' } });
+      handleFinish()
       break
-      case 'profile':
+    case 'companyai':
+      await router.push({ name: 'companyai' });
+      handleFinish()
+      break
+    case 'modelsai':
+      await router.push({ name: 'modelsai' });
+      handleFinish()
+      break
+    case 'chat':
+      await router.push({ name: 'chat' });
+      handleFinish()
+      break
+    case 'profile':
       await router.push({ name: 'profile' });
-      handleFinish() 
+      handleFinish()
       break
-      case 'gen-research':
-      await router.push({ name: 'gen-research' });
-      handleFinish() 
+    case 'settingsapp':
+      await router.push({ name: 'settingsapp' });
+      handleFinish()
       break
-      case 'major':
+    case 'major':
       await router.push({ name: 'major' });
-      handleFinish() 
+      handleFinish()
       break
-      
+
   }
 
 }
@@ -69,100 +81,161 @@ const selectedKey = selectedKeyRef
 const menuOptions: MenuOption[] = [
   {
     type: 'group',
-    label: t('research.dashboard'),
+    label: t('common.dashboard'),
     key: 'Dashboard',
 
     children: [
       {
-        label: t('research.dashboard'),
+        label: t('common.dashboard'),
         key: 'dashboard',
         icon: iconRender({ icon: 'material-symbols:dashboard' }),
-     
-      },
-      {
-        label: t('admin.users'),
-        key: 'users',
-        disabled: false,
-        icon: iconRender({ icon: 'raphael:paper' }),
-    
 
       },
       {
-        label: t('admin.admin'),
-        key: 'students',
+        label: t('common.users'),
+        key: 'users',
+        disabled: false,
+        icon: iconRender({ icon: 'mdi:users' }),
+
+
+      },
+      {
+        label: t('common.agriculturalExpert'),
+        key: 'Agri-Expert',
         icon: iconRender({ icon: 'mdi:account-student' }),
-        disabled: true,
+
+
+
+      },
+      {
+        label: t('common.admins'),
+        key: 'admins',
+        icon: iconRender({ icon: 'eos-icons:admin' }),
+
 
 
       }
-    
+
     ]
   },
 
   {
     type: 'group',
-    label: 'Public',
+    label: 'AI Settings',
     key: 'public',
     children: [
       {
-        label: t('admin.api'),
-        key: 'api',
-        disabled: false,
-        icon: iconRender({ icon: 'fa-solid:university' }),
+        label: t('common.companes'),
+        key: 'companyai',
+
+        icon: iconRender({ icon: 'hugeicons:ai-network' }),
 
       },
       {
-        label: t('admin.company'),
-        key: 'company',
-        disabled: false,
-        icon: iconRender({ icon: 'mingcute:department-fill' }),
+        label: t('common.modelsai'),
+        key: 'modelsai',
+
+        icon: iconRender({ icon: 'arcticons:ask-ai' }),
 
       },
+
+      // {
+      //   label: t('common.apiKeys'),
+      //   key: 'major',
+      //   disabled: false,
+      //   icon: iconRender({ icon: 'game-icons:house-keys' }),
+
+      // },
+
+
+    ],
+  },
+  // {
+  //   type: 'group',
+  //   label: t('common.notifications'),
+  //   key: 'notification',
+
+  //   children: [
+  //     {
+  //       label: t('common.addNotification'),
+  //       key: 'notification',
+  //       icon: iconRender({ icon: 'ic:baseline-notification-add' }),
+
+  //     },
+
+
+  //   ],
+  // },
+
+  {
+    type: 'group',
+    label: t('common.chatsManager'),
+    key: 'chats-user-ai',
+
+    children: [
       {
-        label: t('admin.providers'),
-        key: 'major',
-        disabled:false,
-        icon: iconRender({ icon: 'material-symbols:merge-type' }),
+        label: t('common.chatsUser'),
+        key: 'chat',
+        icon: iconRender({ icon: 'bx:chat' }),
 
       },
-      {
-        label: t('admin'),
-        key: 'cources',
-        disabled: true,
-        icon: iconRender({ icon: 'tdesign:course' }),
 
-      },
+      // {
+      //   label: t('common.chatsUserAgri'),
+      //   key: 'chatAgri',
+      //   icon: iconRender({ icon: 'bx:chat' }),
+
+      // },
+
 
     ],
   },
 
+  // {
+  //   type: 'group',
+  //   label: t('common.plans'),
+  //   key: 'plans',
+
+  //   children: [
+  //     {
+  //       label: t('common.plans'),
+  //       key: 'Settings',
+  //       icon: iconRender({ icon: 'noto:package' }),
+
+  //     },
+  //     {
+  //       label: t('common.plansFeather'),
+  //       key: 'profile',
+  //       icon: iconRender({ icon: 'mingcute:vip-2-fill' }),
+
+
+  //     },
+ 
+  //   ],
+  // },
+
+
   {
     type: 'group',
-    label: t('research.settings'),
+    label: t('common.settings'),
     key: 'settings',
 
     children: [
       {
-        label:  t('research.settings'),
-        key: 'Settings',
-        icon: iconRender({ icon: 'fluent:settings-16-filled' }),
-        disabled: true,
-
-      },
-      {
-        label:  t('admin.profile'),
-        key: 'profile',
-        icon: iconRender({ icon: 'gg:profile' }),
+        label: t('common.settingsAPP'),
+        key: 'settingsapp',
+        icon: iconRender({ icon: 'mdi:settings-outline' }),
       
 
       },
       {
-        label: t('research.advances'),
-        key: 'advances',
-        icon: iconRender({ icon: 'arcticons:advancedtaskkiller' }),
-        disabled: true,
+        label: t('common.profile'),
+        key: 'profile',
+        icon: iconRender({ icon: 'gg:profile' }),
+
 
       },
+ 
     ],
   }
 ];
@@ -172,16 +245,15 @@ const inverted = ref(false)
 </script>
 
 <template>
-   <NScrollbar class="">
-  <NMenu
-    :inverted="inverted"
-    ref="menuInstRef"
-    :accordion="accordion"
-    :collapsed-width="64"
-    :collapsed-icon-size="22"
-    :options="menuOptions"
-    @update:value="handleUpdateValue"
-  />
+  <NScrollbar class="">
+    <NMenu
+      :inverted="inverted"
+      ref="menuInstRef"
+      :accordion="accordion"
+      :collapsed-width="64"
+      :collapsed-icon-size="22"
+      :options="menuOptions"
+      @update:value="handleUpdateValue"
+    />
   </NScrollbar>
 </template>
-

@@ -3,7 +3,7 @@ import { useAuthStore } from '@/store'
 import applyCaseMiddleware from 'axios-case-converter';
 // export const baseURL = "import.meta.env.VITE_GLOB_API_URL"; 
 // export const baseURL = "http://127.0.0.1:8000/api/"
-export const baseURL = "https://randai09078-randdaj.hf.space/api/"
+export const baseURL = ""
 
 const service = applyCaseMiddleware(axios.create({
   baseURL:baseURL,

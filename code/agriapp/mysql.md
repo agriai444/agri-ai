@@ -47,25 +47,25 @@ SECURITY DEFINER SET search_path = ''
 AS $$
 BEGIN
   INSERT INTO public.users (
-    id, 
-    first_name, 
-    last_name, 
-    avatar_url, 
+    id,
+    first_name,
+    last_name,
+    avatar_url,
 
-    state, 
-    gender, 
-    user_type, 
+    state,
+    gender,
+    user_type,
     country
   )
   VALUES (
-    new.id, 
-    new.raw_user_meta_data ->> 'first_name', 
-    new.raw_user_meta_data ->> 'last_name', 
+    new.id,
+    new.raw_user_meta_data ->> 'first_name',
+    new.raw_user_meta_data ->> 'last_name',
     new.raw_user_meta_data ->> 'avatar_url',
 
     COALESCE((new.raw_user_meta_data ->> 'state')::BOOLEAN, TRUE),
     COALESCE(new.raw_user_meta_data ->> 'gender', 'Male'),
-    new.raw_user_meta_data ->> 'user_type', 
+    new.raw_user_meta_data ->> 'user_type',
     new.raw_user_meta_data ->> 'country'
   );
   RETURN new;
@@ -78,6 +78,73 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
+
+
+
+
+
+
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+  conv_id UUID;
+BEGIN
+  -- Generate a UUID for the conversation ID
+  conv_id := gen_random_uuid();
+
+  -- Insert into the users table
+  INSERT INTO public.users (
+    id,
+    first_name,
+    last_name,
+    email,
+    avatar_url,
+    state,
+    gender,
+    user_type,
+    country,
+    conv_agri_id
+  )
+  VALUES (
+    new.id,
+    new.raw_user_meta_data ->> 'first_name',
+    new.raw_user_meta_data ->> 'last_name',
+    new.raw_user_meta_data ->> 'email',
+    new.raw_user_meta_data ->> 'avatar_url',
+    COALESCE((new.raw_user_meta_data ->> 'state')::BOOLEAN, TRUE),
+    COALESCE(new.raw_user_meta_data ->> 'gender', 'Male'),
+    new.raw_user_meta_data ->> 'user_type',
+    new.raw_user_meta_data ->> 'country',
+    conv_id 
+  );
+
+  -- Check if the user is a Client
+  IF new.raw_user_meta_data ->> 'user_type' = 'Client' THEN
+    -- Insert into the conversation table with a specific title for Agricultural Expert
+    INSERT INTO public.conversation (
+      id,
+      user_id,
+      title,
+      created_at,
+      updated_at,
+      type
+    )
+    VALUES (
+      conv_id,               
+      new.id,                
+      new.raw_user_meta_data ->> 'first_name', 
+      NOW(),
+      NOW(),
+      'Agri-Expert'          
+    );
+  END IF;
+
+  RETURN new;
+END;
+$$;
 
 
 
@@ -196,11 +263,19 @@ CREATE INDEX idx_ai_model_company_id ON public.ai_model(company_id);
 
 
 
-
-
-
-
-
+CREATE TABLE IF NOT EXISTS public.users (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  first_name VARCHAR(50) NOT NULL,
+  last_name VARCHAR(50) NOT NULL,
+  avatar_url TEXT,
+  date_of_birth DATE,
+  state BOOLEAN DEFAULT TRUE,
+  gender VARCHAR(10) CHECK (gender IN ('Male', 'Female', 'Other')) NOT NULL DEFAULT 'Male',
+  user_type VARCHAR(20) CHECK (user_type IN ('Client', 'Agri-Expert', 'Admin')) NOT NULL,
+  country VARCHAR(50) ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 
 
 -- Conversation Table
@@ -211,6 +286,17 @@ CREATE TABLE IF NOT EXISTS public.conversation (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Question Table
+CREATE TABLE IF NOT EXISTS public.question (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  conversation_id UUID REFERENCES public.conversation(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+
 
 COMMENT ON TABLE public.conversation IS 'Tracks conversations between users and AI or agricultural experts.';
 
@@ -232,14 +318,35 @@ CREATE TRIGGER update_conversation_timestamp BEFORE UPDATE ON public.conversatio
 CREATE INDEX idx_conversation_user_id ON public.conversation(user_id);
 
 
+ALTER TABLE public.conversation
+ADD COLUMN type VARCHAR(20) CHECK (type IN ('AI', 'Agri-Expert')) NOT NULL DEFAULT 'AI';
+
+
+ALTER TABLE public.answer
+ADD COLUMN status VARCHAR(20) CHECK (status IN ('pending', 'completed', 'rejected') OR status IS NULL);
 
 
 
 
 
+-- answer Media Table
+CREATE TABLE IF NOT EXISTS public.answer_media (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  answer_id UUID REFERENCES public.answer(id) ON DELETE CASCADE,
+  media_url TEXT NOT NULL,
+  media_type VARCHAR(40) CHECK (media_type IN ('Image', 'Audio', 'Video', 'Documents')) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 
+COMMENT ON TABLE public.answer_media IS 'Stores media entries associated with answers.';
+ALTER TABLE public.answer_media ENABLE ROW LEVEL SECURITY;
 
+CREATE TRIGGER update_answer_media_timestamp BEFORE UPDATE ON public.answer_media
+  FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 
+CREATE POLICY "Users can manage answer_media in their conversations." ON public.answer_media
+  FOR ALL USING (true);
 
 
 
@@ -252,6 +359,15 @@ CREATE TABLE IF NOT EXISTS public.question (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+
+
+CREATE VIEW conversation_with_questions AS
+SELECT c.*
+FROM conversation c
+JOIN question q ON c.id = q.conversation_id
+WHERE c.type = 'Agri-Expert';
+
 
 COMMENT ON TABLE public.question IS 'Logs questions within a conversation.';
 
@@ -295,8 +411,73 @@ CREATE TRIGGER update_question_media_timestamp BEFORE UPDATE ON public.question_
 -- Create index on conversation_id for question table
 CREATE INDEX idx_question_conversation_id ON public.question(conversation_id);
 
--- Create index on question_id for question_media table
-CREATE INDEX idx_question_media_question_id ON public.question_media(question_id);
+
+
+
+Chat APP like whatsapp i want all feather execpt i have only one room for users write full schema coorect
+
+CREATE TABLE IF NOT EXISTS public.users (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  first_name VARCHAR(50) NOT NULL,
+  last_name VARCHAR(50) NOT NULL,
+  avatar_url TEXT,
+  date_of_birth DATE,
+  state BOOLEAN DEFAULT TRUE,
+  gender VARCHAR(10) CHECK (gender IN ('Male', 'Female', 'Other')) NOT NULL DEFAULT 'Male',
+  user_type VARCHAR(20) CHECK (user_type IN ('Client', 'Agri-Expert', 'Admin')) NOT NULL,
+  country VARCHAR(50) ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- message Table
+CREATE TABLE IF NOT EXISTS public.message (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  room_id UUID REFERENCES public.users(room_id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+);
+
+COMMENT ON TABLE public.message IS 'Logs messages within a conversation.';
+
+-- Enable Row Level Security
+ALTER TABLE public.message ENABLE ROW LEVEL SECURITY;
+
+-- Policies
+
+CREATE POLICY "Users can manage thier own messages." ON public.message
+  FOR ALL USING (true);
+
+-- Trigger for updating timestamps
+CREATE TRIGGER update_message_timestamp BEFORE UPDATE ON public.message
+  FOR EACH ROW EXECUTE FUNCTION update_timestamp();
+
+-- Create index on question_id
+CREATE INDEX idx_message_question_id ON public.message(question_id);
+
+
+--  Media Data Table
+CREATE TABLE IF NOT EXISTS public.media_data (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  question_id UUID REFERENCES public.question(id) ON DELETE CASCADE,
+  media_url TEXT NOT NULL,
+  media_type VARCHAR(40) CHECK (media_type IN ('Image', 'Audio', 'Video', 'Documents')) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+COMMENT ON TABLE public.media_data IS 'Stores media entries associated with questions.';
+
+-- Enable Row Level Security
+ALTER TABLE public.media_data ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage media." ON public.media_data
+  FOR ALL USING (true);
+
+-- Create index on question_id for media_data table
+CREATE INDEX idx_media_data_question_id ON public.media_data(question_id);
+
+
 
 
 
@@ -352,18 +533,32 @@ CREATE INDEX idx_answer_question_id ON public.answer(question_id);
 
 
 
+CREATE TABLE IF NOT EXISTS public.notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title VARCHAR(255) NOT NULL,
+  text TEXT NOT NULL,
+image VARCHAR(255),
+name VARCHAR(255),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+COMMENT ON TABLE public.notifications IS 'Stores notifications for users.';
+
+
+CREATE POLICY "admin users can manage app notifications." ON public.notifications
+  FOR ALL USING (true);
+
 
 
 
 -- App Setting Table
 CREATE TABLE IF NOT EXISTS public.app_setting (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   default_ai_model UUID REFERENCES public.ai_model(id),
   default_message TEXT,
-  api_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
 
 COMMENT ON TABLE public.app_setting IS 'Stores application-wide settings, including default AI model and messages.';
 
@@ -381,23 +576,10 @@ CREATE POLICY "Authenticated users can manage app settings." ON public.app_setti
 CREATE TRIGGER update_app_setting_timestamp BEFORE UPDATE ON public.app_setting
   FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 
+
+
+
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### Subscriptions and Payments
 
@@ -444,15 +626,12 @@ CREATE TABLE IF NOT EXISTS public.payments (
 COMMENT ON TABLE public.payments IS 'Logs payments made by users for their subscriptions.';
 ```
 
-
-
 ### Notifications and Settings
 
 ```sql
 -- Notifications
 CREATE TABLE IF NOT EXISTS public.notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
   title VARCHAR(100) NOT NULL,
   message TEXT NOT NULL,
   is_read BOOLEAN DEFAULT FALSE,
@@ -460,6 +639,7 @@ CREATE TABLE IF NOT EXISTS public.notifications (
 );
 
 COMMENT ON TABLE public.notifications IS 'Stores notifications for users.';
+CREATE INDEX idx_notifications_user_id ON public.notifications(user_id);
 
 
 
@@ -500,7 +680,6 @@ COMMENT ON TABLE public.agricultural_experts IS 'Stores information about agricu
 CREATE INDEX idx_user_subscriptions_user_id ON public.user_subscriptions(user_id);
 CREATE INDEX idx_payments_user_id ON public.payments(user_id);
 
-CREATE INDEX idx_notifications_user_id ON public.notifications(user_id);
 
 
 CREATE TRIGGER update_subscription_timestamp BEFORE UPDATE ON public.user_subscriptions

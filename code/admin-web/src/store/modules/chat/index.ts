@@ -10,7 +10,10 @@ import {
 import { router } from '@/router'
 import { useUserStore } from '@/store';
 import { get, del, put } from '@/utils/request'
-
+import { fetchDataFromTable } from '@/utils/supabasehelper';
+import { supabase } from '@/utils/supabase';
+import { snakeToCamel } from '@/utils/functions';
+const tableName = 'conversation';
 export const useChatStore = defineStore('chat-store', {
   state: (): Chat.ChatState => defaultState(),
   getters: {
@@ -71,31 +74,45 @@ export const useChatStore = defineStore('chat-store', {
       }
     },
 
-    async getListConversationAction({ limit = 20, offset = 1, type = 'text' }: { limit?: number; offset?: number, type?: PublicApp.TypeService } = {}): Promise<Chat.GeneralApiResponsePaginate<Chat.ResConv>> {
+    async getListConversationAction({ limit = 20, offset = 1, type = 'text' }: { limit?: number; offset?: number, type?: PublicApp.TypeService } = {}): Promise<void>  {
       try {
-        const userStore = useUserStore();
-        const userId: string = userStore.userInfo!.user!.id!;
-        const data = {
-          limit: limit,
-          offset: offset,
-          userId: userId,
-          type: type
-        };
-      
-        const result = await get<Chat.GeneralApiResponsePaginate<Chat.ResConv>>({
-          url: 'conversation/',
-          data
-        });
-
-
-        const uniqueIds = new Set<string>(this.listConversation.map(item => item.id));
-        const uniqueResult = result.results.filter(item => !uniqueIds.has(item.id));
-        this.listConversation = [...this.listConversation, ...uniqueResult];
-        return result
+        const { data, totalCount } = await fetchDataFromTable<Chat.ResConv>(tableName, limit, offset);
+     
+        this.listConversation = data.map((item, index) => ({
+          ...item,
+         
+          chat:[]
+        }));
+        console.log("this.listConversation", this.listConversation)
+        this.lengthListChatText = totalCount;
       } catch (error: any) {
-        console.log("error conversation", error);
+        console.error('Error fetching models:', error.message);
         throw error;
       }
+      // try {
+      //   const userStore = useUserStore();
+      //   const userId: string = userStore.userInfo!.user!.id!;
+      //   const data = {
+      //     limit: limit,
+      //     offset: offset,
+      //     userId: userId,
+      //     type: type
+      //   };
+      
+      //   const result = await get<Chat.GeneralApiResponsePaginate<Chat.ResConv>>({
+      //     url: 'conversation/',
+      //     data
+      //   });
+
+
+      //   const uniqueIds = new Set<string>(this.listConversation.map(item => item.id));
+      //   const uniqueResult = result.results.filter(item => !uniqueIds.has(item.id));
+      //   this.listConversation = [...this.listConversation, ...uniqueResult];
+      //   return result
+      // } catch (error: any) {
+      //   console.log("error conversation", error);
+      //   throw error;
+      // }
 
     },
 
@@ -233,65 +250,112 @@ export const useChatStore = defineStore('chat-store', {
       }
     },
 
-    async getListChatAction(): Promise<void> {
+    async getListChatAction() {
       try {
-        const userStore = useUserStore();
-        const userId: string = userStore.userInfo!.user!.id!;
         const conversationId = this.currentConversation.id
-        if (!this.currentConversation.chat || this.currentConversation.chat.length === 0) {
-          if (conversationId) {
-            const existingConversation = this.listConversation.find(conv => conv.id === conversationId);
+        
+        // Fetch questions and their related answers
+        const { data: questions, error: questionError } = await supabase
+          .from('question')
+          .select('*, answers:answer(*)') // Fetching related answers
+          .eq('conversation_id', conversationId)
 
-            if (!existingConversation) {
-
-              try {
-             
-                await this.getConversationAction(conversationId);
-             
-              } catch (error: any) {
-                console.log("Error fetching conversation details:", error.message);
-                throw error;
-              }
-            }
-
-            let conversation = this.listConversation.find((conv) => conv.id === this.currentConversation.id);
-            if (conversation) {
-
-              this.currentConversation = { ...conversation }
-
-            }
-            
-            try {
-              const data = {
-                conversationId: conversationId,
-              };
-              const url = this.currentConversation.type === 'image' ? 'images/' : 'messages/';
-              const result = await get<Chat.Item[]>({
-                url: url,
-                data,
-              });
-              if (conversationId === this.currentConversation.id) {
-              
-             const index =    this.listConversation.findIndex((conv) => conv.id === this.currentConversation.id);
-             this.listConversation[index].chat = result
-                this.currentConversation.chat = result;
-              }
-              else {
-          
-                this.currentConversation.chat = [];
-              }
-
-
-            } catch (error: any) {
-              console.log("error", error.message);
-              throw error;
-            }
-          }
+        if (questionError) {
+          throw questionError
         }
-      } catch (error: any) {
-        console.log("error", error.message);
-        throw error;
+
+        // Transform data
+        const camelData = questions.map(question => ({
+          messageUser: {
+            id: question.id,
+            text: question.content,
+            createdAt: question.created_at,
+            updatedAt: question.updated_at,
+            type: 'text',
+          },
+          messageAi: question.answers.map(answer => ({
+            id: answer.id,
+            text: answer.content,
+            createdAt: answer.created_at,
+            updatedAt: answer.updated_at,
+            type: 'text',
+          })),
+          currentIndex: 0, // assuming a default value for currentIndex
+        }))
+
+        console.log('camelData', camelData)
+
+        // Update the conversation
+        const index = this.listConversation.findIndex(conv => conv.id === this.currentConversation.id)
+        if (index !== -1) {
+          this.listConversation[index].chat = camelData
+        }
+        this.currentConversation.chat = camelData
+
+      } catch (error:any) {
+        console.error('Error fetching chat data:', error.message)
+        throw error
       }
+  
+    
+      // try {
+      //   const userStore = useUserStore();
+      //   const userId: string = userStore.userInfo!.user!.id!;
+      //   const conversationId = this.currentConversation.id
+      //   if (!this.currentConversation.chat || this.currentConversation.chat.length === 0) {
+      //     if (conversationId) {
+      //       const existingConversation = this.listConversation.find(conv => conv.id === conversationId);
+
+      //       if (!existingConversation) {
+
+      //         try {
+             
+      //           await this.getConversationAction(conversationId);
+             
+      //         } catch (error: any) {
+      //           console.log("Error fetching conversation details:", error.message);
+      //           throw error;
+      //         }
+      //       }
+
+      //       let conversation = this.listConversation.find((conv) => conv.id === this.currentConversation.id);
+      //       if (conversation) {
+
+      //         this.currentConversation = { ...conversation }
+
+      //       }
+            
+      //       try {
+      //         const data = {
+      //           conversationId: conversationId,
+      //         };
+      //         const url = this.currentConversation.type === 'image' ? 'images/' : 'messages/';
+      //         const result = await get<Chat.Item[]>({
+      //           url: url,
+      //           data,
+      //         });
+      //         if (conversationId === this.currentConversation.id) {
+              
+      //        const index =    this.listConversation.findIndex((conv) => conv.id === this.currentConversation.id);
+      //        this.listConversation[index].chat = result
+      //           this.currentConversation.chat = result;
+      //         }
+      //         else {
+          
+      //           this.currentConversation.chat = [];
+      //         }
+
+
+      //       } catch (error: any) {
+      //         console.log("error", error.message);
+      //         throw error;
+      //       }
+      //     }
+      //   }
+      // } catch (error: any) {
+      //   console.log("error", error.message);
+      //   throw error;
+      // }
     },
 
 

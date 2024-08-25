@@ -4,9 +4,9 @@ import { NForm,  NInput, NButton, FormInst, UploadCustomRequestOptions } from 'n
 import { t } from '@/locales';
 import { useMessage, NSelect, NModal, NGrid, NFormItemGi, NUpload, NSwitch } from 'naive-ui';
 import countryList, { Country } from 'country-list';
-import { useUniversityStore } from '@/store'
+import { useUsersStore } from '@/store'
 import { supabase} from '@/utils/supabase';
-const universityStore = useUniversityStore()
+const universityStore = useUsersStore()
 interface Props {
   visible: boolean
 }
@@ -46,7 +46,7 @@ const bucket:string = 'research';
 async function handleAddUniversity() {
   try {
     loading.value = true;
-    const insertedUniversity = await universityStore.insertUniversityAction(model.value);
+    const insertedUniversity = await universityStore.insertDataAction(model.value);
     loading.value = false;
     show.value = false;
     message.success('Done Inserted');

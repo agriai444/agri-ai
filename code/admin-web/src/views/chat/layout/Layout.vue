@@ -23,7 +23,7 @@ const getContainerClass = computed(() => {
 </script>
 
 <template>
-  <div class="h-full  dark:bg-[#24272e] transition-all">
+  <div class="h-[800px] mt-6 mx-8 border-blue-500 border-2 rounded-md dark:bg-[#24272e] transition-all">
     <div class="h-full overflow-hidden" :class="getMobileClass">
       <NLayout class="z-40  transition" :class="getContainerClass" has-sider>
         <Sider />

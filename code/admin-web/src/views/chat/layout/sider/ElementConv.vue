@@ -23,7 +23,7 @@ const tooltip = ref(true)
 async function handleSelect(conv: Chat.ResConv) {
 
   await chatStore.resetController()
-  // chatStore.handelSelectAction(conv.id)
+  chatStore.handelSelectAction(conv.id)
   if (isMobile.value)
     appStore.setSiderCollapsed(true)
     tooltip.value = false
@@ -122,7 +122,7 @@ function handleExport(event?: MouseEvent) {
 
 
       <div class="flex items-center">
-        <template v-if="item.isPin">
+        <!-- <template v-if="item.isPin">
           <button>
             <SvgIcon
               icon="mdi:pin"
@@ -130,7 +130,7 @@ function handleExport(event?: MouseEvent) {
               @click="handlePin(item.id, !item.isPin, $event)"
             />
           </button>
-        </template>
+        </template> -->
 
         <template v-if="isActive">
           <template v-if="item.isEdit">
@@ -139,13 +139,13 @@ function handleExport(event?: MouseEvent) {
             </button>
           </template>
           <template v-else>
-            <button>
+            <!-- <button>
               <SvgIcon
               v-if="!loadingMessage"
                 icon="material-symbols:edit"
                 @click="handleEdit(true, item, $event)"
             />
-          </button>
+          </button> -->
 
           <div  @click="handleExport($event)">
             <expoortSelect

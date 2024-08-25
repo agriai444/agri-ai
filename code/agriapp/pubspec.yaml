@@ -21,8 +21,8 @@ dependencies:
   hive_flutter: ^1.1.0 # make it easy to use hive (no need for path provider)
   shared_preferences: ^2.2.3 # shared preferences persistence key value store
 
-  # firebase_core: ^3.0.0 # to initialize firebase services
-  # firebase_messaging: ^15.0.0 # fcm services
+  firebase_core: ^3.0.0 # to initialize firebase services
+  firebase_messaging: ^15.0.0 # fcm services
   awesome_notifications: ^0.9.3+1 # notifications services (will be used for fcm)
 
   flutter_launcher_icons: # change app icon
@@ -46,6 +46,30 @@ dependencies:
   image_picker: ^1.1.2
   flutter_markdown: ^0.7.3
   uuid: ^4.4.2
+  http: ^1.2.2
+  social_media_recorder: ^1.1.13
+  voice_message_package: ^2.2.1
+  sizer: ^2.0.15
+  file_picker: ^8.0.7
+  flutter_chat_ui: ^1.6.14
+  open_filex: ^4.4.0
+  settings_ui: ^2.0.2
+  camerawesome: ^2.0.0-dev.1
+  flutter_stripe: ^11.0.0
+  camera: ^0.10.5+4
+  emoji_picker_flutter: ^1.6.1
+  eva_icons_flutter: ^3.1.0
+  jiffy: ^6.2.1
+  path: ^1.8.3
+  path_provider: ^2.1.1
+  socket_io_client: ^2.0.3+1
+  video_player: ^2.7.1
+  skeletonizer: ^1.4.2
+  speech_to_text: ^6.6.0
+  google_generative_ai: ^0.4.5
+  restart_app: ^1.2.1
+
+ 
   
 dependency_overrides:
   watcher: ^1.1.0
@@ -79,7 +103,6 @@ flutter:
     - assets/vectors/
     - assets/fonts/
     - assets/introduction_animation/
-    - assets/fitness_app/
     - .env
 
   fonts:
@@ -100,6 +123,18 @@ flutter:
         - asset: assets/fonts/Cairo-SemiBold.ttf
           weight: 900
 
+    - family: Amiri
+      fonts:
+        - asset: assets/fonts/Amiri/Amiri-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Amiri/Amiri-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Amiri/Amiri-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Amiri/Amiri-BoldItalic.ttf
+          weight: 700
+          style: italic
 
 flutter_rename_app_plus3:
   application_name: Agricultural Expert

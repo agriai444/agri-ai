@@ -23,7 +23,8 @@ async function getChat() {
 }
 
 onBeforeMount(async () => {
-  chatStore.currentConversation.id = uuid
+  console.log("uuid")
+  chatStore.currentConversation.id = uuid ?? ''
   await getChat()
 })
 

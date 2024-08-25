@@ -7,6 +7,7 @@ export interface SettingsState {
   temperature: number
   top_p: number
   isEmojis?:boolean
+  settings?:PublicApp.AppSetting
 }
 
 export function defaultSetting(): SettingsState {

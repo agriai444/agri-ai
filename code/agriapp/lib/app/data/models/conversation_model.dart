@@ -4,6 +4,11 @@ class Conversation {
   String? title;
   String? createdAt;
   String? updatedAt;
+  String? type;
+  bool? isPin;
+  dynamic isLike;
+  bool? isEdit;
+  bool? isFavorite;
   List<Question>? question;
 
   Conversation(
@@ -12,6 +17,11 @@ class Conversation {
       this.title,
       this.createdAt,
       this.updatedAt,
+      this.type,
+      this.isPin,
+      this.isLike,
+      this.isEdit,
+      this.isFavorite,
       this.question});
 
   Conversation.fromJson(Map<String, dynamic> json) {
@@ -20,6 +30,11 @@ class Conversation {
     title = json['title'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    type = json['type'];
+    isPin = json['is_pin'];
+    isLike = json['is_like'];
+    isEdit = json['is_edit'];
+    isFavorite = json['is_favorite'];
     if (json['question'] != null) {
       question = <Question>[];
       json['question'].forEach((v) {
@@ -35,6 +50,11 @@ class Conversation {
     data['title'] = title;
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
+    data['type'] = type;
+    data['is_pin'] = isPin;
+    data['is_like'] = isLike;
+    data['is_edit'] = isEdit;
+    data['is_favorite'] = isFavorite;
     if (question != null) {
       data['question'] = question?.map((v) => v.toJson()).toList();
     }
@@ -139,24 +159,41 @@ class Answer {
   String? questionId;
   String? content;
   bool? isLoading;
+  bool? isError;
+  dynamic isLike;
+  String? status;
   String? createdAt;
   String? updatedAt;
+  List<AnswerMedia>? answerMedia;
 
   Answer(
       {this.id,
       this.questionId,
       this.content,
       this.isLoading,
+      this.isError,
+      this.isLike,
+      this.status,
       this.createdAt,
-      this.updatedAt});
+      this.updatedAt,
+      this.answerMedia});
 
   Answer.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     questionId = json['question_id'];
     content = json['content'];
     isLoading = json['isLoading'];
+    isError = json['is_error'];
+    isLike = json['is_like'];
+    status = json['status'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    if (json['answer_media'] != null) {
+      answerMedia = <AnswerMedia>[];
+      json['answer_media'].forEach((v) {
+        answerMedia?.add(AnswerMedia.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -165,6 +202,49 @@ class Answer {
     data['question_id'] = questionId;
     data['content'] = content;
     data['isLoading'] = isLoading;
+    data['is_error'] = isError;
+    data['is_like'] = isLike;
+    data['status'] = status;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    if (answerMedia != null) {
+      data['answer_media'] = answerMedia?.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class AnswerMedia {
+  String? id;
+  String? answerId;
+  String? mediaUrl;
+  String? mediaType;
+  String? createdAt;
+  String? updatedAt;
+
+  AnswerMedia(
+      {this.id,
+      this.answerId,
+      this.mediaUrl,
+      this.mediaType,
+      this.createdAt,
+      this.updatedAt});
+
+  AnswerMedia.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    answerId = json['answer_id'];
+    mediaUrl = json['media_url'];
+    mediaType = json['media_type'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final data = <String, dynamic>{};
+    data['id'] = id;
+    data['answer_id'] = answerId;
+    data['media_url'] = mediaUrl;
+    data['media_type'] = mediaType;
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
     return data;

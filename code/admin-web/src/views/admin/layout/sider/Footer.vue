@@ -18,11 +18,11 @@ const show = ref(false)
         
       </div>
 
-    <HoverButton @click="show = true">
+    <!-- <HoverButton @click="show = true">
       <span class="text-xl text-[#4f555e] dark:text-white">
         <SvgIcon icon="ri:settings-4-line" />
       </span>
-    </HoverButton>
+    </HoverButton> -->
 
-    <Setting v-if="show" v-model:visible="show" />
+    <!-- <Setting v-if="show" v-model:visible="show" /> -->
 </footer></template>
