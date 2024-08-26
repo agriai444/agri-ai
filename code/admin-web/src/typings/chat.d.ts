@@ -1,5 +1,24 @@
 declare namespace Chat {
   //   listModel: Model.ResModel[]
+
+  type Media = {
+    id?: string;
+    mediaUrl?: string;
+    mediaType?: string;
+    createdAt?: string;
+    updatedAt?: string;
+  };
+
+  type QuestionMedia = Media & {
+    questionId?: string;
+  };
+
+  type AnswerMedia = Media & {
+    answerId?: string;
+  };
+  type CountTotal = {
+    countTotalData
+  }
   type ChatState = {
     listConversation: ResConv[]
     currentConversation: ResConv
@@ -12,6 +31,12 @@ declare namespace Chat {
     isErrorResponse: boolean
     listModel: ModelAI[]
     currentPromptUser:string
+    loadingCon: {
+      [K in PublicApp.TypeService]: boolean;
+    };
+    itemCount: {
+      [K in PublicApp.TypeService]: number;
+    };
     lengthListChatText:number
     lengthListChatImage:number
     lengthListChatResearch:number
@@ -49,6 +74,7 @@ declare namespace Chat {
     createdAt?: string;
     updatedAt?: string;
     inversion?: boolean;
+    questionMedia?:QuestionMedia[]
   };
 
   type MessageAI = {
@@ -64,6 +90,7 @@ declare namespace Chat {
     createdAt?:string;
     updatedAt?: string;
     isShowOrignalText?:boolean
+    answerMedia:AnswerMedia[]
   };
 
 

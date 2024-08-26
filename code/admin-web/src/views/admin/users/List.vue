@@ -3,7 +3,7 @@ import { ref, h, onMounted, computed, reactive } from 'vue'
 import {
   NSpace, NButton, NDataTable, DataTableBaseColumn,
   useDialog, NEmpty, NResult,
-  DataTableRowKey, NModal,
+  DataTableRowKey, NModal,NBreadcrumb,NBreadcrumbItem,
   useMessage, DataTableFilterState, DataTableColumns,
 } from 'naive-ui'
 import { useUsersStore } from '@/store'
@@ -16,6 +16,7 @@ import { SvgIcon } from '@/components/common';
 import Add from './Add.vue'
 import Update from './Update.vue'
 import { useRoute } from 'vue-router';
+import { getImageUrl } from '@/utils/supabasehelper';
 
 const { iconRender } = useIconRender()
 const route = useRoute()
@@ -32,10 +33,11 @@ const dialog = useDialog()
 const message = useMessage();
 const rowEdit = ref<User.UserData | null>(null);
 
-  const data = computed(() => {
+const data = computed(() => {
   const start = (pagination.page - 1) * pagination.pageSize;
   const end = start + pagination.pageSize;
-  return usersStore.listUsers.slice(start, end).filter(user => user.userType === userType);
+  return usersStore.listUsers.filter(user => user.userType === userType).slice(start, end);
+ 
 });
 
 const pageSize = ref(10);
@@ -47,7 +49,20 @@ const pagination = reactive({
 });
 
 
-
+const title = computed(() => {
+ 
+ switch (userType) {
+   case 'Client':
+     return t('common.users');
+   case 'Agri-Expert':
+     return t('common.agriculturalExpert');
+   case 'Admin':
+     return t('common.admins');
+   default:
+     return ''
+ 
+}
+})
 function handleDeleteAction(row: User.UserData) {
   const deleteDialog = dialog.warning({
     title: t('chat.deleteConfirmation'),
@@ -70,12 +85,12 @@ function handleDeleteAction(row: User.UserData) {
 }
 
 async function handleUpdate(row: User.UserData) {
-  usersStore.showModelUpdate = true;
+  usersStore.showUpdate = true;
   rowEdit.value = row;
 }
 
 const mainColumn = reactive<DataTableBaseColumn<User.UserData>>({
-  title: t('common.users'),
+  title: title.value,
   key: 'users',
   render(row: User.UserData) {
     return h(
@@ -111,7 +126,7 @@ const columns = reactive<DataTableColumns<User.UserData>>([
             {
               strong: true,
               tertiary: true,
-              disabled:true,
+              disabled:false,
               size: 'small',
               loading: loadingActionEdit.value,
               style: "border-radius:100%",
@@ -169,9 +184,26 @@ async function fetchData(): Promise<void> {
   try {
     loading.value = true;
     const { page, pageSize } = pagination;
-    // await usersStore.fetchDataAction({ limit: pageSize, offset: (page - 1) * pageSize, userType: userType });
-    await usersStore.fetchDataAction({  limit: 1000, offset: 0 , userType: userType });
+    await usersStore.fetchDataAction({ limit: pageSize, offset: (page - 1) * pageSize, userType: userType });
+    // await usersStore.fetchDataAction({  limit: 1000, offset: 0 , userType: userType });
     
+    // Resolve image URLs for each company
+    usersStore.listUsers = await Promise.all(usersStore.listUsers.map(async (user) => {
+      // Check if logoUrl is present
+      if (user.avatarUrl && user.avatarUrl != '') {
+        try {
+          user.avatarUrl = await getImageUrl(usersStore.bucket ,user.avatarUrl);
+        } catch (error) {
+          console.error(`Failed to fetch image for user ${user.firstName}:`, error);
+
+        }
+      }
+
+      return {
+        ...user
+      };
+    }));
+
         loading.value = false
     error_get.value = false
 
@@ -205,7 +237,7 @@ async function fetchData(): Promise<void> {
 
 onMounted(async () => {
   await fetchData();
-  console.log(data.value)
+
 })
 const dataTableInstRef = ref(null)
 const dataTableInst = dataTableInstRef
@@ -268,18 +300,31 @@ function handlePageChange(currentPage: number) {
   fetchData();
 }
 
+const breadcrumbs = computed(() => {
+  return [
+    { label: 'Home', to: '/' },
+    { label: route.params.userType === 'Client' ? 'Users' : route.params.userType, to: '/users' },
+    { label: usersStore.showAdd ? 'Add' : usersStore.showUpdate ? 'Edit' : 'List', to: null }
+  ];
+});
 </script>
 <template>
   <div class="container_dashboard">
 
     <div class="header_dashboard">
-      {{ t('common.users') }}
+      {{ title }}
     </div>
 
+    <!-- <NBreadcrumb>
+      <NBreadcrumbItem v-for="(item, index) in breadcrumbs" :key="index" :to="item.to">
+        {{ item.label }}
+      </NBreadcrumbItem>
+    </NBreadcrumb> -->
 
-    <div class="flex gap-2 justify-end items-center my-2">
+<!-- <template> -->
+    <div  class="flex gap-2 justify-end items-center my-2">
       <NButton
-        @click="usersStore.showModelAdd = true"
+        @click="usersStore.showAdd = true; usersStore.showList = false;"
         type="primary"
       >
         <div class="flex gap-2  items-center">
@@ -387,30 +432,38 @@ function handlePageChange(currentPage: number) {
         </template>
       </NSpace>
     </div>
-  </div>
+  <!-- </template> -->
 
-  <div>
+
+  <!-- <template v-if="usersStore.showAdd" >
+      <Add  userType="userType" />
+    </template>
+    <template v-if="usersStore.showUpdate" >
+      <Update  :item="rowEdit!" />
+    </template> -->
+
     <NModal
-      v-model:show="usersStore.showModelAdd"
+      v-model:show="usersStore.showAdd"
       :mask-closable=false
       :auto-focus="false"
       preset="card"
       style="width: 95%; max-width: 640px;"
     >
       <Add :userType="userType" />
-    </NModal>
-    <NModal
-      v-model:show="usersStore.showModelUpdate"
+    </NModal> 
+   
+  <NModal
+      v-model:show="usersStore.showUpdate"
       :mask-closable=false
       :auto-focus="false"
       preset="card"
       style="width: 95%; max-width: 640px;"
     >
-      <Update :row="rowEdit!" />
+      <Update :item="rowEdit!" />
     </NModal>
 
-  </div>
-
+ 
+</div>
 </template>
 
 <style scoped>

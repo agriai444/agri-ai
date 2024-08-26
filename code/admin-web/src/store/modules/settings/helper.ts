@@ -8,6 +8,8 @@ export interface SettingsState {
   top_p: number
   isEmojis?:boolean
   settings?:PublicApp.AppSetting
+  privacyPolicyEn:string
+  privacyPolicyAr:string
 }
 
 export function defaultSetting(): SettingsState {
@@ -15,7 +17,9 @@ export function defaultSetting(): SettingsState {
     systemMessage: '',
     temperature: 0.8,
     top_p: 1,
-    isEmojis:false
+    isEmojis:false,
+    privacyPolicyEn:'',
+    privacyPolicyAr:''
   }
 }
 

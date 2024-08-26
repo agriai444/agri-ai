@@ -35,6 +35,7 @@ const { isMobile } = useBasicLayout()
 // const { addChat, updateChat, updateChatSome, getChatByUuidAndIndex } = useChat()
 const { scrollRef, scrollToBottom, scrollToBottomIfAtBottom } = useScroll()
 const { usingContext, toggleUsingContext } = useUsingContext()
+const listConv = computed(() => chatStore.listConversation);
 const controller = computed(() => chatStore.controller);
 const modelInfo = computed(() => chatStore.currentConversation.modelInfo);
 const typeService = computed(() => chatStore.currentConversation.type);
@@ -509,6 +510,7 @@ const maxlength =  computed(() => {
 </script>
 
 <template>
+
   <div class="flex  flex-col h-full w-full dark:bg-violet-950 ">
     <HeaderComponent
       :using-context="usingContext"
@@ -561,6 +563,7 @@ const maxlength =  computed(() => {
           <StepResearch/> && typeService !== 'research'
         </template> -->
           <template v-else>
+          
             <div>
               <!-- <StepResearch/> -->
               <div

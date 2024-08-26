@@ -1,1 +1,0 @@
-import{_ as o}from"./AddUniversity.vue_vue_type_script_setup_true_lang-82be5d59.js";import"./index-1cb71b58.js";import"./Grid-21e37177.js";import"./FormItemGridItem-4af6fd44.js";import"./FormItem-50f38bb6.js";import"./Upload-49d6de9f.js";import"./Switch-3e2d018f.js";export{o as default};

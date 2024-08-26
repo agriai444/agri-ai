@@ -25,7 +25,7 @@ async function handleAddUniversity() {
     loading.value = true;
     await universityStore.insertDataAction(model.value);
     loading.value = false;
-    universityStore.showModelAdd = false
+    universityStore.showAdd = false
     message.success(t('common.addSuccess'));
   } catch (error: any) {
     loading.value = false;

@@ -74,13 +74,13 @@ watch(
       <main class="flex flex-col  flex-1 min-h-0">
 
       <div class="flex flex-col px-4 py-2  justify-center items-center ">
-          <NButton class="btn btn-outline btn-primary dark:text-white " dashed block @click="handleAdd" :disabled="loadingMessage" >
-            <div class="flex flex-row  justify-start  items-center gap-2 w-full">
+          
+           
               <LogoApp :size="35" />
-              <!-- <div class=""> {{ $t('chat.newChatButton') }}</div> -->
+              <!-- <div class=""> {{ $t('chat.newChatButton') }}</div> @click="handleAdd" :disabled="loadingMessage"-->
               <!-- <SvgIcon icon="ri:chat-new-fill" /> -->
-            </div>
-          </NButton>
+        
+          
         </div> 
 
 

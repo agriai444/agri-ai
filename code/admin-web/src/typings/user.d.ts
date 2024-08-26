@@ -10,6 +10,7 @@ type UserType = 'Client'|  'Agri-Expert'| 'Admin'
         email: string | null;
         password: string | null;
         avatarUrl: string | null;
+      
         dateOfBirth: string | null;
         state: boolean | null;
         gender: Gender | null;

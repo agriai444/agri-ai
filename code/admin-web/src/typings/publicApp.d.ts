@@ -16,6 +16,7 @@ declare namespace PublicApp {
      urlInstagram?: string;
      urlTiktok?: string;
      phoneNumber?: string;
+     version?: string; 
      createdAt: string
      updatedAt: string
     }

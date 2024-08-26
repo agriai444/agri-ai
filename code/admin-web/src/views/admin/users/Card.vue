@@ -4,6 +4,10 @@ import { useUserStore } from '@/store'
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import { NTooltip, NAvatar, NBadge, NEllipsis } from 'naive-ui'
 import { t } from '@/locales';
+import defaultavatarAdmin from '@/assets/supportIcon.png'
+import defaultavatarClient from '@/assets/boy.png'
+import defaultavatarAgri from '@/assets/gardener.png'
+
 const objStore = useUserStore()
 import { SvgIcon } from '@/components/common';
 import { supabaseUrlImage } from '@/utils/supabase';
@@ -14,7 +18,22 @@ interface Props {
 
 const props = defineProps<Props>()
 const row = computed(() => props.row)
-const fullUrlImage = `${supabaseUrlImage}/${bucket}/${row.value.avatarUrl}`
+const fullUrlImage = computed(() => {
+  if (row.value.avatarUrl) {
+    return row.value.avatarUrl
+  } else {
+    switch (row.value.userType) {
+      case 'Client':
+        return defaultavatarClient
+      case 'Agri-Expert':
+        return defaultavatarAgri
+      case 'Admin':
+        return defaultavatarAdmin
+      default:
+        return ''
+    }
+  }
+})
 
 
 const badgeType = row.value.state ? 'success' : 'error';
@@ -30,6 +49,7 @@ const { isMobile } = useBasicLayout()
     >
       <NAvatar
         round
+        
         size="medium"
         :src="fullUrlImage"
       />

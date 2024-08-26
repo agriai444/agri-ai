@@ -6,6 +6,7 @@ import TextComponent from './Text.vue'
 import { SvgIcon } from '@/components/common'
 import { t } from '@/locales'
 import { copyToClip } from '@/utils/copy'
+import ImageGrid from './ImageGrid.vue'
 import { useChatStore } from '@/store'
 interface Props {
   item: Chat.MessageUser
@@ -70,10 +71,16 @@ const imageUrl =  computed(() => `${supabaseUrlImage}/${bucket}/${props.item.ima
     :loading="false"
     :as-raw-text="asRawText"
   />
+  <template v-if="item.questionMedia && item.questionMedia.length > 0">
+  <div>
+          <ImageGrid :mediaItems="item.questionMedia" :loading="false" />
+        </div>
+        </template>
+</div>
 </div>
 
-  <div>
-    <!-- Check if item.imagePath is defined and not an empty string -->
+  <!-- <div>
+  
     <NImage
       v-if="item.imagePath !== undefined && item.imagePath !== ''"
       class="rounded-lg slide-in-fwd-center"
@@ -88,7 +95,7 @@ const imageUrl =  computed(() => `${supabaseUrlImage}/${bucket}/${props.item.ima
         </div>
       </template>
     </NImage>
-  </div>
+  </div> -->
 </div>
-</div>
+
 </template>

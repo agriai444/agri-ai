@@ -25,6 +25,9 @@ export default {
   },
 
   common: {
+    male: 'Male',   
+    female: 'Female', 
+    other: 'Other' ,
     you:'You',
     nameApp: 'Agricultural Expert',
     errorSomeThing: 'Something went wrong',
@@ -259,7 +262,7 @@ export default {
     config: 'Config',
     avatarLink: 'Avatar Link',
     name: 'Name',
-    description: 'Description',
+ 
     role: 'Role',
     temperature: 'Temperature',
     top_p: 'Top_p',
@@ -278,6 +281,7 @@ export default {
     select: 'Select Role',
 
     isEmojes:'Include emojis in response',
+versionApp: "App Version",
 
 
   },

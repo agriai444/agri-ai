@@ -55,6 +55,70 @@ export const useSettingStore = defineStore('setting-store', {
         throw error
       }
     },
+    async fetchPrivacyPolicyEn(): Promise<void> {
+      try {
+        const { data, error } = await supabase
+          .from(tableName)
+          .select('privacy_policy_en')
+          .single()
+
+        if (error) throw error
+
+        if (data) {
+          this.updateSetting({ privacyPolicyEn: data.privacy_policy_en })
+        }
+      } catch (error: any) {
+        console.error('Error fetching English privacy policy:', error.message)
+        throw error
+      }
+    },
+    async fetchPrivacyPolicyAr(): Promise<void> {
+      try {
+        const { data, error } = await supabase
+          .from(tableName)
+          .select('privacy_policy_ar')
+          .single()
+
+        if (error) throw error
+
+        if (data) {
+          this.updateSetting({ privacyPolicyAr: data.privacy_policy_ar })
+        }
+      } catch (error: any) {
+        console.error('Error fetching Arabic privacy policy:', error.message)
+        throw error
+      }
+    },
+    async updatePrivacyPolicyEn(policy: string): Promise<void> {
+      try {
+        const { error } = await supabase
+          .from(tableName)
+          .update({ privacy_policy_en: policy })
+          .eq('id', this.$state.id)
+
+        if (error) throw error
+
+        this.updateSetting({ privacyPolicyEn: policy })
+      } catch (error: any) {
+        console.error('Error updating English privacy policy:', error.message)
+        throw error
+      }
+    },
+    async updatePrivacyPolicyAr(policy: string): Promise<void> {
+      try {
+        const { error } = await supabase
+          .from(tableName)
+          .update({ privacy_policy_ar: policy })
+          .eq('id', this.$state.id)
+
+        if (error) throw error
+
+        this.updateSetting({ privacyPolicyAr: policy })
+      } catch (error: any) {
+        console.error('Error updating Arabic privacy policy:', error.message)
+        throw error
+      }
+    },
     updateSetting(settings: Partial<SettingsState>) {
       this.$state = { ...this.$state, ...settings }
       this.recordState()

@@ -549,6 +549,8 @@ CREATE POLICY "admin users can manage app notifications." ON public.notification
   FOR ALL USING (true);
 
 
+ALTER TABLE public.app_setting
+ADD COLUMN versionApp VARCHAR(255);
 
 
 -- App Setting Table

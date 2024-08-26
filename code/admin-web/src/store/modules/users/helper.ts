@@ -16,46 +16,33 @@ export const fetchData = async ({
   userType: string;
 }): Promise<{ data: User.UserData[]; totalCount: number }> => {
   try {
-    // Fetch the total count of users with the given userType
-    const { count: totalCount, error: countError } = await supabase
-      .from('users')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_type', userType);
-    
-    if (countError) {
-      if (countError.code === 'PGRST301') {
+    const { data, count, error } = await supabase
+    .from('users')
+    .select('*', { count: 'exact' }) 
+    .eq('user_type', userType)
+    .order('updated_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+  
+
+    if (error) {
+      if (error.code === 'PGRST301') {
         const userStore = useUserStore();
         const chatStore = useChatStore();
         userStore.resetUserInfo();
         chatStore.resetChatState();
         await router.push({ name: 'login' });
       } else {
-        throw countError;
+        throw error;
       }
     }
 
-    // Fetch the paginated user data
-    const { data, error: dataError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('user_type', userType)
-      .order('updated_at', { ascending: false })
-      .range(offset, offset + limit - 1);
-
-    if (dataError) {
-      if (dataError.code === 'PGRST301') {
-        const userStore = useUserStore();
-        const chatStore = useChatStore();
-        userStore.resetUserInfo();
-        chatStore.resetChatState();
-        await router.push({ name: 'login' });
-      } else {
-        throw dataError;
-      }
+    if (error) {
+      throw error;
     }
 
     const camelData = data?.map(snakeToCamel) || [];
-    return { data: camelData, totalCount: totalCount || 0 };
+    return { data: camelData as User.UserData[], totalCount: count || 0 };
+
   } catch (error: any) {
     console.error('Error fetching users from Supabase:', error.code, error.message);
     throw error;

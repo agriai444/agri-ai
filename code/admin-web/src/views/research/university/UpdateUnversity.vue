@@ -57,7 +57,7 @@ async function handleUpdateUniversity() {
         loading.value = true;
         await universityStore.updateDataAction({id:props.row.id!, updates:model.value});
         loading.value = false;
-        universityStore.showModelUpdate = false;
+        universityStore.showUpdate = false;
         message.success(t('commn.updateSuccess'));
     } catch (error: any) {
       

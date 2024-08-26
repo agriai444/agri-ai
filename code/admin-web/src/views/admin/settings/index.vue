@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { NForm, NInput, NButton, FormInst, FormRules, NGrid, NFormItemGi, NSelect, useMessage } from 'naive-ui'
+import { NForm, NInput, NButton, FormInst, FormRules, NGrid, NFormItemGi, NSelect, useMessage, FormValidationError } from 'naive-ui'
 import { t } from '@/locales'
 import { useSettingStore, useModelStore } from '@/store'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
+import { isEmailValid } from '@/utils/functions'
 
 const { isMobile } = useBasicLayout()
 const span = computed(() => (isMobile.value ? 24 : 24))
@@ -14,7 +15,7 @@ const message = useMessage()
 const formRef = ref<FormInst | null>(null)
 const loading = ref(false)
 
-const settings = ref<PublicApp.AppSetting>({ ...settingStore.settings } as PublicApp.AppSetting)
+const model = ref<PublicApp.AppSetting>({ ...settingStore.settings } as PublicApp.AppSetting)
 
 const rules: FormRules = {
   defaultMessage: [{ required: true, message: t('setting.defaultMessageRequired'), trigger: ['input', 'blur'] }],
@@ -29,12 +30,13 @@ const rules: FormRules = {
   urlInstagram: [{ required: false, message: t('setting.urlInstagram'), trigger: ['input', 'blur'] }],
   urlTiktok: [{ required: false, message: t('setting.urlTiktok'), trigger: ['input', 'blur'] }],
   phoneNumber: [{ required: false, message: t('setting.phoneNumber'), trigger: ['input', 'blur'] }],
+  version: [{ required: false, message: t('setting.versionApp'), trigger: ['input', 'blur'] }] 
 }
 
 async function handleUpdateSettings() {
   try {
     loading.value = true
-    await settingStore.updateDataAction(settings.value)
+    await settingStore.updateDataAction(model.value)
     loading.value = false
     message.success(t('setting.updateSuccess'))
   } catch (error: any) {
@@ -44,19 +46,37 @@ async function handleUpdateSettings() {
   }
 }
 
+
+
 function handleValidateButtonClick(e: MouseEvent) {
-  e.preventDefault()
-  formRef.value?.validate((errors) => {
+
+e.preventDefault();
+formRef.value?.validate((errors: Array<FormValidationError> | undefined) => {
     if (!errors) {
-      handleUpdateSettings()
+
+        // Perform custom validation
+        if (model.value.email && !isEmailValid(model.value.email!)) {
+            message.error(t('auth.invalidEmailFormat'));
+            loading.value = false;
+            return;
+        }
+
+      
+        else {
+            loading.value = true
+            handleUpdateSettings();
+        }
+
     } else {
-      message.error(t('setting.fillAllFields'))
+        // console.log(errors);
+        message.error(t('setting.fillAllFields'))
+        loading.value = false
     }
-  })
+});
 }
 
 const isButtonDisabled = computed(() => {
-  return loading.value || !settings.value.defaultMessage || !settings.value.termsOfUseUrl || !settings.value.privacyPolicyUrl
+  return loading.value || !model.value.defaultMessage || !model.value.termsOfUseUrl || !model.value.privacyPolicyUrl
 })
 
 const aiModels = ref<Array<{ label: string; value: string }>>([])
@@ -71,7 +91,7 @@ async function fetchData(): Promise<void> {
         label: model.name,
         value: model.id as string,
       }));
-    settings.value = { ...settingStore.settings } as PublicApp.AppSetting
+    model.value = { ...settingStore.settings } as PublicApp.AppSetting
   } catch (error: any) {
     console.error(t('setting.dataFetchError'), error.message)
   }
@@ -93,14 +113,14 @@ onMounted(fetchData)
     </div>
   <NForm
       ref="formRef"
-      :model="settings"
+      :model="model"
       :rules="rules"
       size="large"
     >
     <NGrid :span="span" :x-gap="24">
           <NFormItemGi :span="span" path="defaultAiModel" :label="t('setting.defaultAiModel')">
             <NSelect
-              v-model:value="settings.defaultAiModel.id"
+              v-model:value="model.defaultAiModel.id"
               :options="aiModels"
               :placeholder="t('setting.selectDefaultModel')"
               clearable
@@ -108,7 +128,7 @@ onMounted(fetchData)
           </NFormItemGi>
           <NFormItemGi :span="span" path="defaultMessage" :label="t('setting.defaultMessage')">
             <NInput
-              v-model:value="settings.defaultMessage"
+              v-model:value="model.defaultMessage"
               :placeholder="t('setting.defaultMessage')"
               type="textarea"
               :autosize="{ minRows: 3, maxRows: 5 }"
@@ -116,71 +136,77 @@ onMounted(fetchData)
           </NFormItemGi>
           <NFormItemGi :span="span" path="termsOfUseUrl" :label="t('setting.termsOfUseUrl')">
             <NInput
-              v-model:value="settings.termsOfUseUrl"
+              v-model:value="model.termsOfUseUrl"
               :placeholder="t('setting.termsOfUseUrl')"
             />
           </NFormItemGi>
           <NFormItemGi :span="span" path="privacyPolicyUrl" :label="t('setting.privacyPolicyUrl')">
             <NInput
-              v-model:value="settings.privacyPolicyUrl"
+              v-model:value="model.privacyPolicyUrl"
               :placeholder="t('setting.privacyPolicyUrl')"
             />
           </NFormItemGi>
           <!-- Added new fields -->
           <NFormItemGi :span="span" path="urlGooglplay" :label="t('setting.urlGooglplay')">
             <NInput
-              v-model:value="settings.urlGooglplay"
+              v-model:value="model.urlGooglplay"
               :placeholder="t('setting.urlGooglplay')"
             />
           </NFormItemGi>
           <NFormItemGi :span="span" path="urlAppstore" :label="t('setting.urlAppstore')">
             <NInput
-              v-model:value="settings.urlAppstore"
+              v-model:value="model.urlAppstore"
               :placeholder="t('setting.urlAppstore')"
             />
           </NFormItemGi>
           <NFormItemGi :span="span" path="urlFacebook" :label="t('setting.urlFacebook')">
             <NInput
-              v-model:value="settings.urlFacebook"
+              v-model:value="model.urlFacebook"
               :placeholder="t('setting.urlFacebook')"
             />
           </NFormItemGi>
           <NFormItemGi :span="span" path="urlYoutube" :label="t('setting.urlYoutube')">
             <NInput
-              v-model:value="settings.urlYoutube"
+              v-model:value="model.urlYoutube"
               :placeholder="t('setting.urlYoutube')"
             />
           </NFormItemGi>
           <NFormItemGi :span="span" path="urlWhatsapp" :label="t('setting.urlWhatsapp')">
             <NInput
-              v-model:value="settings.urlWhatsapp"
+              v-model:value="model.urlWhatsapp"
               :placeholder="t('setting.urlWhatsapp')"
             />
           </NFormItemGi>
           <NFormItemGi :span="span" path="email" :label="t('setting.email')">
             <NInput
-              v-model:value="settings.email"
+              v-model:value="model.email"
               :placeholder="t('setting.email')"
             />
           </NFormItemGi>
           <NFormItemGi :span="span" path="urlInstagram" :label="t('setting.urlInstagram')">
             <NInput
-              v-model:value="settings.urlInstagram"
+              v-model:value="model.urlInstagram"
               :placeholder="t('setting.urlInstagram')"
             />
           </NFormItemGi>
           <NFormItemGi :span="span" path="urlTiktok" :label="t('setting.urlTiktok')">
             <NInput
-              v-model:value="settings.urlTiktok"
+              v-model:value="model.urlTiktok"
               :placeholder="t('setting.urlTiktok')"
             />
           </NFormItemGi>
           <NFormItemGi :span="span" path="phoneNumber" :label="t('setting.phoneNumber')">
             <NInput
-              v-model:value="settings.phoneNumber"
+              v-model:value="model.phoneNumber"
               :placeholder="t('setting.phoneNumber')"
             />
           </NFormItemGi>
+          <NFormItemGi :span="span" path="version" :label="t('setting.versionApp')">
+          <NInput
+            v-model:value="model.version"
+            :placeholder="t('setting.versionApp')"
+          />
+        </NFormItemGi>
         </NGrid>
       <div class="mt-4">
         <NButton

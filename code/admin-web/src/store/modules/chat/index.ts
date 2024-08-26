@@ -13,7 +13,7 @@ import { get, del, put } from '@/utils/request'
 import { fetchDataFromTable } from '@/utils/supabasehelper';
 import { supabase } from '@/utils/supabase';
 import { snakeToCamel } from '@/utils/functions';
-const tableName = 'conversation';
+let tableName = 'conversation';
 export const useChatStore = defineStore('chat-store', {
   state: (): Chat.ChatState => defaultState(),
   getters: {
@@ -76,15 +76,37 @@ export const useChatStore = defineStore('chat-store', {
 
     async getListConversationAction({ limit = 20, offset = 1, type = 'text' }: { limit?: number; offset?: number, type?: PublicApp.TypeService } = {}): Promise<void>  {
       try {
-        const { data, totalCount } = await fetchDataFromTable<Chat.ResConv>(tableName, limit, offset);
+
+        if (type == 'Agri-Expert'){
+          tableName = 'conversation_with_questions'
+   
+        } 
+
+
      
-        this.listConversation = data.map((item, index) => ({
-          ...item,
-         
-          chat:[]
-        }));
-        console.log("this.listConversation", this.listConversation)
-        this.lengthListChatText = totalCount;
+        const { data, totalCount } = await fetchDataFromTable<Chat.ResConv>(tableName, limit, offset);
+        const existingIds = new Set(this.listConversation.map(conv => conv.id));
+
+        // Filter new conversations to ensure uniqueness by ID
+        const newConvs: Chat.ResConv[] = data
+          .filter((item) => !existingIds.has(item.id)) // Keep only items with unique IDs
+          .map((item) => ({
+            ...item,
+            chat: []
+          }));
+    
+        // Update the list of conversations
+        this.listConversation = [...this.listConversation, ...newConvs];
+        console.log("Updated listConversation", this.listConversation);
+
+        if (type == 'Agri-Expert'){
+          this.itemCount['Agri-Expert'] = totalCount;
+   
+        } else if (type == 'AI'){
+          this.itemCount.AI = totalCount;
+        }
+       
+      
       } catch (error: any) {
         console.error('Error fetching models:', error.message);
         throw error;
@@ -257,7 +279,7 @@ export const useChatStore = defineStore('chat-store', {
         // Fetch questions and their related answers
         const { data: questions, error: questionError } = await supabase
           .from('question')
-          .select('*, answers:answer(*)') // Fetching related answers
+          .select('id, conversation_id, content, created_at, updated_at, question_media(*), answer(id, content,status, created_at, updated_at, answer_media(*))') // Fetching related answers
           .eq('conversation_id', conversationId)
 
         if (questionError) {
@@ -265,23 +287,37 @@ export const useChatStore = defineStore('chat-store', {
         }
 
         // Transform data
-        const camelData = questions.map(question => ({
-          messageUser: {
-            id: question.id,
-            text: question.content,
-            createdAt: question.created_at,
-            updatedAt: question.updated_at,
-            type: 'text',
-          },
-          messageAi: question.answers.map(answer => ({
-            id: answer.id,
-            text: answer.content,
-            createdAt: answer.created_at,
-            updatedAt: answer.updated_at,
-            type: 'text',
-          })),
-          currentIndex: 0, // assuming a default value for currentIndex
-        }))
+    const camelData = questions.map(question => ({
+      messageUser: {
+        id: question.id,
+        text: question.content,
+        createdAt: question.created_at,
+        updatedAt: question.updated_at,
+        questionMedia: question.question_media.map(media => ({
+          id: media.id,
+          questionId: media.question_id,
+          mediaUrl: media.media_url,
+          mediaType: media.media_type,
+          createdAt: media.created_at,
+          updatedAt: media.updated_at,
+        })),
+      },
+      messageAi: question.answer.map(answer => ({
+        id: answer.id,
+        text: answer.content,
+        createdAt: answer.created_at,
+        updatedAt: answer.updated_at,
+        answerMedia: answer.answer_media.map(media => ({
+          id: media.id,
+          answerId: media.answer_id,
+          mediaUrl: media.media_url,
+          mediaType: media.media_type,
+          createdAt: media.created_at,
+          updatedAt: media.updated_at,
+        })),
+      })),
+      currentIndex: 0, // Assuming a default value for currentIndex
+    }));
 
         console.log('camelData', camelData)
 

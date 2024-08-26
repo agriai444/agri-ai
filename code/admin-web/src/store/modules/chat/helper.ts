@@ -177,6 +177,24 @@ export function defaultState(): Chat.ChatState {
     loadingMessage: false,
     isErrorResponse: false,
     currentPromptUser:'',
+    loadingCon:{
+      text: false,
+      image: false,
+      research: false,
+      "Agri-Expert": false,
+      video: false,
+      audio: false,
+      AI: false
+    },
+    itemCount:{
+      text: 0,
+      image: 0,
+      research: 0,
+      "Agri-Expert": 0,
+      video: 0,
+      audio: 0,
+      AI: 0
+    },
     lengthListChatText:0,
     lengthListChatImage:0,
     lengthListChatResearch:0,

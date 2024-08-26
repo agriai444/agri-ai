@@ -14,7 +14,7 @@ import { SvgIcon } from '@/components/common';
 import { isEmailValid } from '@/utils/functions';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 const folder: string = 'University';
-const bucket: string = 'research';
+const bucket: string = 'profiles';
 
 interface Props {
     userType: User.UserType
@@ -26,8 +26,8 @@ const message = useMessage();
 const formRef = ref<FormInst | null>(null);
 const loading = ref(false);
 const model = ref<User.UserData>(userStore.initState());
-  const { isMobile } = useBasicLayout()
-  const span = computed(() => {
+const { isMobile } = useBasicLayout()
+const span = computed(() => {
   return isMobile ? 24 : 12
 })
 const passwordFormItemRef = ref<FormItemInst | null>(null)
@@ -54,7 +54,7 @@ async function handleAddData() {
     loading.value = true;
     await userStore.insertDataAction(model.value);
     loading.value = false;
-    userStore.showModelAdd = false
+    userStore.showAdd = false
     message.success(t('common.addSuccess'));
   } catch (error: any) {
     loading.value = false;
@@ -146,10 +146,11 @@ const renderLabel: (option: SelectOption) => VNodeChild = (option) => {
   );
 };
 const genderOptions = [
-  { label: 'Male', value: 'Male' },
-  { label: 'Female', value: 'Female' },
-  { label: 'Other', value: 'Other' }
+  { label: t('common.male'), value: 'Male' },
+  { label: t('common.female'), value: 'Female' },
+  { label: t('common.other'), value: 'Other' }
 ];
+
 
 const options = computed(() => {
     return ['@gmail.com'].map((suffix) => {
@@ -174,7 +175,7 @@ async function addUser() {
       model.value
     );
     loading.value = false;
-    userStore.showModelAdd = false;
+    userStore.showAdd = false;
     message.success(t('commn.addSuccess'));
   } catch (error: any) {
     loading.value = false;

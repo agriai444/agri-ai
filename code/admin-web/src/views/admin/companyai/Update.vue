@@ -71,7 +71,7 @@ async function handleUpdateData() {
               :max="1"
               path="logoUrl"
               :data="{ 'bucket': 'company' }"
-              :default-file-list="previewFileList"
+                :default-file-list="model.logoUrl ? previewFileList : []"
               :custom-request="customRequest"
             />
           </NFormItemGi>

@@ -2,7 +2,10 @@
 import {
   ref,
   onMounted,
-  computed
+  computed,
+  reactive,
+  WritableComputedRef,
+  watch
 } from 'vue'
 import {
   NCollapse,
@@ -32,145 +35,142 @@ import {
   useAppStore,
   useChatStore
 } from '@/store';
-import {
-  extractUrlParams
-} from '@/utils/functions/index'
 
-const {
-  iconRender
-} = useIconRender()
-const {
-  isMobile
-} = useBasicLayout()
+const { iconRender } = useIconRender()
+const { isMobile } = useBasicLayout()
 const appStore = useAppStore()
 const chatStore = useChatStore()
 const message = useMessage()
 
 const errorGetData = ref<boolean>(false)
+const loadMoreLoading = ref<boolean>(false)
+const loadingConversations = ref<boolean>(false)
 
+const typeServices: PublicApp.TypeService[] = [ 'text','AI', 'Agri-Expert'];//'text', 'image', 'research', 'video', 'audio',
+
+// Reactive data structures to hold page size, item counts, and pagination
+const pageSize = reactive(
+  Object.fromEntries(typeServices.map(type => [type, ref(150)])) as unknown as { [K in PublicApp.TypeService]: number }
+);
+
+const itemCount = reactive(
+  Object.fromEntries(typeServices.map(type => [type, computed(() => getItemCount(type))])) as unknown as { [K in PublicApp.TypeService]: number }
+);
+
+function getItemCount(type: PublicApp.TypeService): number {
+  return storeItemCoun.value[type];
+}
+
+
+const pagination = reactive(
+  Object.fromEntries(
+    typeServices.map(type => [type, { page: 1, pageCount: 1 }])
+  ) as { [K in PublicApp.TypeService]: { page: number; pageCount: number } }
+);
+
+const dataSources = reactive<Record<PublicApp.TypeService, WritableComputedRef<Chat.ResConv[]>>>(
+  Object.fromEntries(
+    typeServices.map(type => [type, computed(() => getDataSources(type))])
+  ) as unknown as Record<PublicApp.TypeService, WritableComputedRef<Chat.ResConv[]>>
+);
+
+const labelTextChat = computed(() => t('chat.chatAI'))
+const labelAgriChat = computed(() => t('chat.agriExpert'))
+const storeListConversation = computed(() => chatStore.listConversation)
+const storeItemCoun = computed(() => chatStore.itemCount)
+
+typeServices.forEach(type => {
+  watch(
+    () => [itemCount[type], pageSize[type]],
+    () => {
+      pagination[type].pageCount = Math.ceil(itemCount[type] / pageSize[type]);
+    },
+    { immediate: true }
+  );
+});
+// Function to get data sources based on TypeService
+function getDataSources(type: PublicApp.TypeService) {
+  const start = (pagination[type].page - 1) * pageSize[type];
+  return  storeListConversation.value
+  .filter(conv => conv.type === type)
+  .slice(start, start + pageSize[type]);
+}
+
+// Handle updating the selected conversation
 const handleUpdateValue = (key: string) => {
-  const convId = key;
-  chatStore.handelSelectAction(convId);
+  chatStore.handelSelectAction(key);
   if (isMobile.value) {
     appStore.setSiderCollapsed(true);
   }
 }
 
-const labelTextChat = computed(() => t('chat.chatAI'))
-// const labelImageChat = computed(() => t('chat.chatImage'))
-const labelResearchChat = computed(() => t('chat.agriExpert'))
-
-const loadingConversations = computed(() => chatStore.loadingConversationsText || chatStore.loadingConversationsImage)
-const dataSources = computed(() => chatStore.listConversation)
-const loadMoreLoading = ref<boolean>(false)
-const nextText = ref<string | null>(null)
-const nextImage = ref<string | null>(null)
-const nextResearch = ref<string | null>(null)
-const lengthListChatText = computed(() => chatStore.lengthListChatText - 1)
-// const lengthListChatImage = computed(() => chatStore.lengthListChatImage - 1)
-// const lengthListChatResearch = computed(() => chatStore.lengthListChatResearch)
-
-const nextOffsetText = computed(() => extractUrlParams(nextText.value!).offset as unknown as number)
-// const nextOffsetImage = computed(() => extractUrlParams(nextImage.value!).offset as unknown as number)
-// const nextOffsetResearch = computed(() => extractUrlParams(nextResearch.value!).offset as unknown as number)
-
-async function fetchData({ limit = 20, offset = 1, type = 'text' }: { limit?: number; offset?: number, type?: PublicApp.TypeService } = {}) {
+// Function to fetch data
+async function fetchData(type: PublicApp.TypeService) {
   try {
-    await chatStore.getListConversationAction({ offset: offset, type: type });
-    // if (type === 'text') {
-    //   chatStore.lengthListChatText = result.count;
-    //   nextText.value = result.next;
-    // } else if (type === 'image') {
-    //   chatStore.lengthListChatImage = result.count;
-    //   nextImage.value = result.next;
-    // } else if (type === 'research') {
-    //   chatStore.lengthListChatResearch = result.count;
-    //   nextResearch.value = result.next;
-    // }
-  } catch (error: any) {
-    message.error(t('chat.errorGetData', error.message));
-    throw error;
-  }
-}
-
-async function initData(type: PublicApp.TypeService) {
-  try {
-    if (type === 'text') {
-      chatStore.loadingConversationsText = true;
-    } else if (type === 'image') {
-      chatStore.loadingConversationsImage = true;
-    } else if (type === 'research') {
-      chatStore.loadingConversationsResearch = true;
-    }
-    await fetchData({ type: type });
+    const { page } = pagination[type];
+    const limit = pageSize[type];
+    const offset = (page - 1) * limit + 1;
+    console.error(" limit:",limit,"offset", offset)
+    await chatStore.getListConversationAction({ limit: limit, offset: offset, type: type });
     errorGetData.value = false;
   } catch (error: any) {
+    message.error(t('chat.errorGetData', error.message));
     errorGetData.value = true;
-    console.error("Error initializing data:", error);
-  } finally {
-    if (type === 'text') {
-      chatStore.loadingConversationsText = false;
-    } else if (type === 'image') {
-      chatStore.loadingConversationsImage = false;
-    } else if (type === 'research') {
-      chatStore.loadingConversationsResearch = false;
-    }
   }
 }
 
+
+
+// Function to load more data
 async function loadMore(type: PublicApp.TypeService) {
-  let next;
-  let offset;
-  if (type === 'text') {
-    next = nextText.value
-    offset = nextOffsetText.value || 1
-  } 
-  // else if (type === 'image') {
-  //   next = nextImage.value
-  //   offset = nextOffsetImage.value || 1
-  // } else if (type === 'research') {
-  //   next = nextResearch.value
-  //   offset = nextOffsetResearch.value || 1
-  // }
-
-  if (next) {
-    try {
-      loadMoreLoading.value = true;
-      await fetchData({ offset: offset, type: type });
-    } catch (error: any) {
-      console.error("Error loading more data:", error);
-    } finally {
-      loadMoreLoading.value = false;
-    }
+  try {
+    loadMoreLoading.value = true;
+    pagination[type].page += 1; 
+    await fetchData(type);
+  } catch (error) {
+    console.error("Error loading more data:", error);
+  } finally {
+    loadMoreLoading.value = false;
   }
 }
 
-function getBothType() {
-  // initData('image');
-  initData('text');
-  // initData('research');
+// Function to initialize both text and Agri-Expert data
+async function getBothType() {
+  loadingConversations.value = true
+
+  await fetchData('AI');
+  await fetchData('Agri-Expert');
+  loadingConversations.value = false
 }
 
-onMounted(async () => {
-  getBothType()
+onMounted(() => {
+  getBothType();
 });
 
-const groupByDate = (conversations: any) => {
+type GroupedConversations = {
+  [key: string]: {
+    label: string;
+    key: string;
+    disabled: boolean;
+  }[];
+};
+
+// Group conversations by date
+// Group conversations by date
+const groupByDate = (conversations: Chat.ResConv[]): any[] => {
   const today = new Date().toLocaleDateString();
   const yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toLocaleDateString();
 
-  // Translation object for date labels
   const dateLabels = {
     today: t('chat.today'),
     yesterday: t('chat.yesterday'),
     previous7Days: t('chat.previous7Days'),
-
   };
 
   const pinnedConversations = filterConversationByPin(conversations);
   const nonPinnedConversations = filterConversationByNotPin(conversations);
 
-  const groupedByDate = nonPinnedConversations.reduce((groups, conversation) => {
+  const groupedByDate: GroupedConversations = nonPinnedConversations.reduce((groups, conversation) => {
     const conversationDate = new Date(conversation.updatedAt).toLocaleDateString();
     const key =
       conversationDate === today ? dateLabels.today :
@@ -188,7 +188,7 @@ const groupByDate = (conversations: any) => {
     });
 
     return groups;
-  }, {});
+  }, {} as GroupedConversations);
 
   const sortOrder = [dateLabels.today, dateLabels.yesterday, dateLabels.previous7Days];
 
@@ -215,159 +215,116 @@ const groupByDate = (conversations: any) => {
   return pinnedGroup ? [pinnedGroup, ...sortedGroups] : sortedGroups;
 };
 
-const menuOptions = computed(() => {
-  const textChatOptions =  groupByDate(filterConversationByType('AI'));
-  const researchChatOptions = groupByDate(filterConversationByType('Agri-Expert'));
-  // const imageChatOptions = groupByDate(filterConversationByType('image'));
-  // const favoriteChatOptions = groupByDate(filterConversationByFavorite());
 
-  const options = [{
-    label: labelTextChat.value,
-    key: 'AI',
-    icon: iconRender({
-      icon: 'material-symbols:chat'
-    }),
-    disabled: false,
-    children: textChatOptions,
-  },
-    {
-      label: labelResearchChat.value,
-      key: 'Agri-Expert',
-      icon: iconRender({ icon: 'raphael:paper' }),
+// Generate menu options for the UI
+// Generate menu options for the UI
+const menuOptions = computed(() => {
+  return typeServices.map(type => {
+    const options = groupByDate(filterConversationByType(type));
+    return {
+      label: type === 'AI' ? labelTextChat.value : labelAgriChat.value,
+      key: type,
+      icon: iconRender({ icon: getIcon(type) }),
       disabled: false,
-      children: researchChatOptions,
-    },
-    // {
-    //   label: labelImageChat.value,
-    //   key: 'image',
-    //   icon: iconRender({
-    //     icon: 'line-md:image'
-    //   }),
-    //   disabled: false,
-    //   children: imageChatOptions,
-    // },
-    // {
-    //   label: 'Favorite',
-    //   key: 'favorite-chat',
-    //   disabled: false,
-    //   icon: iconRender({
-    //     icon: 'mdi:book-favorite'
-    //   }),
-    //   children: favoriteChatOptions,
-    // },
-  ];
-  return options.filter(option => option.children.length > 0);
+      children: options,
+    };
+  }).filter(option => option.children.length > 0);
 });
 
-const getConversationById = (convId: string) => {
-  const conversation = chatStore.listConversation.find((conv) => conv.id === convId);
-  return conversation || null;
-};
-
-const type = computed(() => chatStore.currentConversation.type);
-
-// Helper functions
-function filterConversationByType(type: PublicApp.TypeService) {
-  return dataSources.value.filter((conversation) => conversation.type === type);
+function filterConversationByType(type: PublicApp.TypeService): Chat.ResConv[] {
+  return dataSources[type]; // Access the `.value` of ComputedRef to get the actual array
 }
 
-function filterConversationByPin(conversations: any) {
+function filterConversationByPin(conversations: Chat.ResConv[]): Chat.ResConv[] {
   return conversations.filter(conversation => conversation.isPin);
 }
 
-function filterConversationByNotPin(conversations: any) {
+function filterConversationByNotPin(conversations: Chat.ResConv[]): Chat.ResConv[] {
   return conversations.filter(conversation => !conversation.isPin);
 }
 
-function filterConversationByFavorite() {
-  return dataSources.value.filter((conversation) => conversation.isFavorite);
+// Get icon based on the type of service
+function getIcon(type: PublicApp.TypeService) {
+  const icons: { [key in PublicApp.TypeService]?: string } = {
+    text: 'material-symbols:chat',
+    image: 'line-md:image',
+    research: 'raphael:paper',
+    video: 'material-symbols:play-circle',
+    audio: 'material-symbols:audiotrack',
+    AI: 'mdi:robot',
+    'Agri-Expert': 'mdi:leaf'
+  };
+  return icons[type] || '';
 }
 
-function getIcon(option: PublicApp.TypeService) {
-  // Default icon in case option.key is not recognized
-  let icon = '';
-
-  // Check the value of option.key and set the corresponding icon
-  if (option === 'text') {
-    icon = 'material-symbols:chat';
-  } else if (option === 'image') {
-    icon = 'material-symbols:image';
-  }
-  else if (option === 'research') {
-    icon = 'raphael:paper';
-  }
-
-  return icon;
-}
+// Retrieve conversation by ID
+const getConversationById = (convId: string) => {
+  return chatStore.listConversation.find((conv) => conv.id === convId) || null;
+};
 
 function getCountBadge(type: PublicApp.TypeService) {
-  switch (type) {
-    case 'text':
-      return lengthListChatText.value
-      break
-    // case 'image':
-    //   return lengthListChatImage.value
-    //   break
-    // case 'research':
-    //   return lengthListChatResearch.value
-    //   break
-  }
+  return storeItemCoun.value[type];
 }
+function showLoadMore(type: PublicApp.TypeService): boolean {
+  const displayedCount = dataSources[type].length; // Currently loaded conversations
+  const totalCount = storeItemCoun.value[type];; // Total conversations available
+
+  return displayedCount < totalCount;
+}
+
+// Get the count badge for each service type
+// function getCountBadge(type: PublicApp.TypeService) {
+//   return itemCount[type];
+// }
+const expandedKeys = ref<string[]>([]);
+const type = computed(() => chatStore.currentConversation.type);
+
 </script>
 
 <template>
-  <NSpace
-    class="px-2 py-2 glass bg-white dark:bg-purple-900"
-    vertical
-    v-if="loadingConversations"
-  >
-    <template
-      v-for="_ in 30"
-      :key="item"
-    >
-      <NSkeleton
-        height="2rem"
-        class="mx-1 py-1 md:py-[0.2rem] rounded-2xl"
-      />
+  <!-- {{ menuOptions }} -->
+
+  <NSpace class="px-2 py-2 glass bg-white dark:bg-purple-900" vertical v-if="loadingConversations">
+    <template v-for="_ in 30" :key="item">
+      <NSkeleton height="2rem" class="mx-1 py-1 md:py-[0.2rem] rounded-2xl" />
     </template>
-  </NSpace>
-
-  <template v-else>
-
-    <template v-if="errorGetData">
-      <div class="flex flex-col justify-center items-center gap-2 text-center bg-red-50 dark:bg-purple-900 h-full">
-        <div class="text-error text-xl font-bold"> {{ t('common.errorSomeThing') }}</div>
-        <button
-          @click="getBothType()"
-          class=" w-36 flex bg-error text-white  justify-center items-center gap-2 p-1  border border-gray-200 rounded-lg  dark:border-gray-700"
-        >
-          <SvgIcon
-            class="bounce-in-fwd"
-            icon="pajamas:retry"
-          />
-          <div class="font-bold text-base ">{{ t('common.tryAgain') }}</div>
+</NSpace>
 
 
-        </button>
-      </div>
-     {{dataSources}}
-    </template>
 
-    <template v-if="!dataSources.length && !errorGetData">
-      <div class="flex flex-col justify-center items-center mt-4 text-center bg-white dark:bg-purple-900 h-full">
+  <template v-if="errorGetData">
+    <div class="flex flex-col justify-center items-center gap-2 text-center bg-red-50 dark:bg-purple-900 h-full">
+      <div class="text-error text-xl font-bold">{{ t('common.errorSomeThing') }}</div>
+      <button
+        @click="getBothType()"
+        class="w-36 flex bg-error text-white justify-center items-center gap-2 p-1 border border-gray-200 rounded-lg dark:border-gray-700"
+      >
         <SvgIcon
-          icon="ri:inbox-line"
-          class="mb-8 text-3xl"
+          class="bounce-in-fwd"
+          icon="pajamas:retry"
         />
-        <span>{{ $t('common.noData') }}</span>
-      </div>
-    </template>
+        <div class="font-bold text-base">{{ t('common.tryAgain') }}</div>
+      </button>
+    </div>
+  </template>
 
-    <template v-else>
-
-      <NScrollbar class="bg-white dark:bg-purple-900 px-2 py-2">
+  <template
+    v-if="!errorGetData && dataSources['text'].length === 0 && dataSources['Agri-Expert'].length === 0"
+  >
+    <div class="flex flex-col justify-center items-center mt-4 text-center bg-white dark:bg-purple-900 h-full">
+      <SvgIcon
+        class="h-20 w-20 text-purple-500 dark:text-purple-300"
+        icon="eos-icons:loading"
+      />
+      <div class="text-xl font-bold mt-3 text-purple-500 dark:text-purple-300">{{ t('chat.noChat') }}</div>
+      <div class="text-gray-400 dark:text-gray-500">{{ t('chat.noChatDesc') }}</div>
+    </div>
+  </template>
+  <template v-else>
+    <NScrollbar class="bg-white dark:bg-purple-900 px-2 py-2">
+      <!-- :default-expanded-names="type" -->
         <NCollapse
-          :default-expanded-names="type"
+         
           accordion
           v-if="menuOptions.length > 0"
           class="py-2"
@@ -386,7 +343,8 @@ function getCountBadge(type: PublicApp.TypeService) {
                 <NBadge
                   :value="getCountBadge(option.key as PublicApp.TypeService)"
                   type="info"
-                  :max="99"
+                  :max="100"
+                  show-zero 
                 >
                   <NAvatar
                     color="white"
@@ -428,9 +386,9 @@ function getCountBadge(type: PublicApp.TypeService) {
                 </template>
               </div> 
 
-              <div class="pt-2 flex justify-center">
+              <!-- <div class="pt-2 flex justify-center">
                 <NButton
-                  v-if="(option.key === 'text' && nextText) || (option.key === 'image' && nextImage) || (option.key === 'research' && nextResearch)"
+                  v-if="showLoadMore(option.key as PublicApp.TypeService)"
                   type="primary"
                   size="small"
                   :loading="loadMoreLoading"
@@ -440,362 +398,12 @@ function getCountBadge(type: PublicApp.TypeService) {
                   <div class="font-bold text-base">{{ t('common.loadMore') }}</div>
 
                 </NButton>
-              </div>
+              </div> -->
 
             </div>
 
           </NCollapseItem>
-
         </NCollapse>
       </NScrollbar>
-
-
-    </template>
-
-  </template>
 </template>
-
-
-<!-- <script setup lang='ts'>
-import { ref, onMounted, computed } from 'vue'
-import { NCollapse, NBadge, NAvatar, NCollapseItem, NScrollbar, NSkeleton, NSpace, NButton, useMessage } from 'naive-ui'
-import { SvgIcon } from '@/components/common'
-import { useIconRender } from '@/hooks/useIconRender';
-import { t } from '@/locales';
-import { useBasicLayout } from '@/hooks/useBasicLayout';
-import ElementConv from './ElementConv.vue'
-import { useAppStore, useChatStore } from '@/store';
-import { extractUrlParams } from '@/utils/functions/index'
-const { iconRender } = useIconRender()
-const { isMobile } = useBasicLayout()
-const appStore = useAppStore()
-const errorGetData = ref<boolean>(false)
-async function handleUpdateValue(key: string) {
-  const convId = key;
-  chatStore.handelSelectAction(convId);
-  if (isMobile.value) {
-    appStore.setSiderCollapsed(true);
-  }
-
-}
-
-
-const message = useMessage()
-
-const labelTextChat = computed(() => t('chat.chatText'))
-const labelImageChat = computed(() => t('chat.chatImage'))
-const loadingConversations = computed(() => chatStore.loadingConversationsText && chatStore.loadingConversationsImage)
-const chatStore = useChatStore()
-const dataSources = computed(() => chatStore.listConversation)
-const loadMoreLoading = ref<boolean>(false)
-
-const lengthListChatText = computed(() =>chatStore.listConversation.filter((conversation) => conversation.type === 'text').length)
-const lengthListChatImage = computed(() => chatStore.listConversation.filter((conversation) => conversation.type === 'image').length)
-const totalCountText = ref<number>(lengthListChatText.value)
-const nextText = ref<string | null>(null)
-
-const totalCountImage = ref<number>(lengthListChatImage.value)
-const nextImage = ref<string | null>(null)
-
-const nextOffsetText = computed(() => extractUrlParams(nextText.value!).offset as unknown as number)
-const nextOffsetImage = computed(() => extractUrlParams(nextImage.value!).offset as unknown as number)
-async function fetchData({ limit = 20, offset = 1, type = 'text' }: { limit?: number; offset?: number, type?: PublicApp.TypeService } = {}) {
-  try {
-    const result = await chatStore.getListConversationAction({ offset: offset, type: type });
-    if (type === 'text') {
-      totalCountText.value = result.count;
-      nextText.value = result.next;
-    }
-    else {
-      totalCountImage.value = result.count;
-      nextImage.value = result.next;
-    }
-  } catch (error: any) {
-    message.error(t('chat.errorGetData', error.message));
-
-    throw error;
-  }
-}
-async function initData(type: PublicApp.TypeService) {
-  try {
-    if (type === 'text') {
-      chatStore.loadingConversationsText = true;
-    } else {
-      chatStore.loadingConversationsImage = true;
-    }
-    await fetchData({ type: type });
-  } catch (error: any) {
-    errorGetData.value = true;
-
-    console.error("Error initializing data:", error);
-  }
-  finally {
-    if (type === 'text') {
-      chatStore.loadingConversationsText = false;
-    } else {
-      chatStore.loadingConversationsImage = false;
-    }
-  }
-}
-
-async function loadMore(type: PublicApp.TypeService) {
-  let next;
-  let offset;
-  if (type === 'text') {
-    next = nextText.value
-    offset = nextOffsetText.value || 1;
-  } else {
-    next = nextImage.value
-    offset = nextOffsetImage.value || 1
-  }
-  if (next) {
-    try {
-      loadMoreLoading.value = true;
-      await fetchData({ offset: offset, type: type });
-    } catch (error: any) {
-      console.error("Error loading more data:", error);
-    } finally {
-      loadMoreLoading.value = false;
-    }
-  }
-}
-function getBothType() {
-  initData('image');
-  initData('text');
-}
-onMounted(async () => {
-  getBothType()
-});
-
-
-const groupByDate = (conversations:any) => {
-  const today = new Date().toLocaleDateString();
-  const yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toLocaleDateString();
-
-  const pinnedConversations = conversations.filter(conversation => conversation.isPin);
-  const nonPinnedConversations = conversations.filter(conversation => !conversation.isPin);
-
-  const groupedByDate = nonPinnedConversations.reduce((groups, conversation) => {
-    const conversationDate = new Date(conversation.updatedAt).toLocaleDateString();
-    const key =
-      conversationDate === today ? 'Today' :
-        conversationDate === yesterday ? 'Yesterday' :
-          'Previous 7 Days';
-
-    if (!groups[key]) {
-      groups[key] = [];
-    }
-
-    groups[key].push({
-      label: conversation.title,
-      key: conversation.id,
-      disabled: false,
-    });
-
-    return groups;
-  }, {});
-
-  const sortOrder = ['Today', 'Yesterday', 'Previous 7 Days'];
-
-  const sortedGroups = sortOrder
-    .filter(label => groupedByDate[label]?.length > 0)
-    .map(label => ({
-      type: 'group',
-      label,
-      key: label.toLowerCase().replace(' ', '-'),
-      children: groupedByDate[label] || [],
-    }));
-
-  const pinnedGroup = pinnedConversations.length > 0 ? {
-    type: 'group',
-    label: 'Pinned',
-    key: 'pinned',
-    children: pinnedConversations.map(conversation => ({
-      label: conversation.title,
-      key: conversation.id,
-      disabled: false,
-    })),
-  } : null;
-
-  return pinnedGroup ? [pinnedGroup, ...sortedGroups] : sortedGroups;
-};
-
-
-
-
-
-
-const menuOptions = computed(() => {
-  const textChatOptions = groupByDate(dataSources.value.filter((conversation) => conversation.type === 'text'));
-  const imageChatOptions = groupByDate(dataSources.value.filter((conversation) => conversation.type === 'image'));
-  const favoriteChatOptions = groupByDate(dataSources.value.filter((conversation) => conversation.isFavorite));
-
-  const options = [
-
-    {
-      label: labelTextChat.value,
-      key: 'text',
-      icon: iconRender({ icon: 'material-symbols:chat' }),
-      disabled: false,
-      children: textChatOptions,
-    },
-    {
-      label: labelImageChat.value,
-      key: 'image',
-      icon: iconRender({ icon: 'line-md:image' }),
-      disabled: false,
-      children: imageChatOptions,
-    },
-    {
-      label: 'Favorite Chat',
-      key: 'favorite-chat',
-      disabled: false,
-      icon: iconRender({ icon: 'mdi:book-favorite' }),
-      children: favoriteChatOptions,
-    },
-  ];
-  return options.filter(option => option.children.length > 0);
-});
-const getConversationById = (convId: string) => {
-  const conversation = dataSources.value.find((conv) => conv.id === convId);
-  return conversation || null;
-};
-const type = computed(() => chatStore.currentConversation.type)
-</script>
-
-<template>
-  <NSpace
-    class="px-2 py-2 glass bg-white"
-    vertical
-    v-if="loadingConversations"
-  >
-    <template
-      v-for="_ in 30"
-      :key="item"
-    >
-      <NSkeleton
-        height="2rem"
-        class="mx-1 py-1 md:py-[0.2rem] rounded-2xl"
-      />
-    </template>
-  </NSpace>
-
-  <template v-else>
-
-    <template v-if="errorGetData">
-      <div class="flex flex-col justify-center items-center gap-2 text-center bg-red-50 h-full">
-        <div class="text-error text-xl font-bold"> {{ t('common.errorSomeThing') }}</div>
-        <button
-          @click="getBothType()"
-          class=" w-36 flex bg-error text-white  justify-center items-center gap-2 p-1  border border-gray-200 rounded-lg  dark:border-gray-700"
-        >
-          <SvgIcon
-            class="bounce-in-fwd"
-            icon="pajamas:retry"
-          />
-          <div class="font-bold text-base ">{{ t('common.tryAgain') }}</div>
-
-
-        </button>
-      </div>
-    </template>
-
-    <template v-if="!dataSources.length && !errorGetData">
-      <div class="flex flex-col justify-center items-center mt-4 text-center bg-white h-full">
-        <SvgIcon
-          icon="ri:inbox-line"
-          class="mb-8 text-3xl"
-        />
-        <span>{{ $t('common.noData') }}</span>
-      </div>
-    </template>
-
-    <template v-else>
-
-      <NScrollbar class="bg-white px-2 py-2">
-        <NCollapse
-          :default-expanded-names="type"
-          accordion
-          v-if="menuOptions.length > 0"
-          class="py-2"
-        >
-
-
-          <NCollapseItem
-            class="px-2"
-            v-for="(option, index) in menuOptions"
-            :key="index"
-            :title="option.label"
-            :name="option.key"
-          >
-            <template #header-extra>
-<div class="pr-4">
-              <NBadge
-                :value="option.key === 'text' ? lengthListChatText: lengthListChatImage"
-                type="info"
-                :max="99"
-              
-              >
-                <NAvatar
-              color="white"
-                  size="small"
-                >
-                  <SvgIcon
-                    :icon="option.key === 'text' ? 'material-symbols:chat' : (option.key === 'image' ? 'material-symbols:image' : '')"
-                    class="text-black w-5 h-5"
-                  />
-                </NAvatar>
-
-              </NBadge>
-
-            </div>
-
-
-            </template>
-
-
-
-
-            <div class="flex flex-col gap-2 item-center justify-center">
-              <div
-                v-if="option.children && option.children.length > 0"
-                v-for="(child, childIndex) in option.children"
-                :key="childIndex"
-              >
-
-                <div class="text-sm text-primary p-1">{{ child.label }}</div>
-                <template v-for="(subChild, subChildIndex) in child.children">
-                  <div
-                    class="my-1"
-                    @click="handleUpdateValue(subChild.key)"
-                  >
-                    <ElementConv :item="getConversationById(subChild.key)" />
-                  </div>
-                </template>
-              </div>
-
-              <div class="pt-2 flex justify-center">
-                <NButton
-                  v-if="(option.key === 'text' && nextText) || (option.key === 'image' && nextImage)"
-                  type="primary"
-                  size="small"
-                  :loading="loadMoreLoading"
-                  @click="loadMore(option.key)"
-                  class="w-full"
-                >
-                  <div class="font-bold text-base">{{ t('common.loadMore') }}</div>
-
-                </NButton>
-              </div>
-
-            </div>
-
-          </NCollapseItem>
-
-        </NCollapse>
-      </NScrollbar>
-
-
-    </template>
-
-</template></template> -->
+</template>

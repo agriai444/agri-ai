@@ -65,7 +65,7 @@ function handleDeleteAction(row: Research.University) {
 }
 
 async function handleUpdateUniversity(row: Research.University) {
-  universityStore.showModelUpdate = true;
+  universityStore.showUpdate = true;
   rowEdit.value = row;
 }
 
@@ -256,7 +256,7 @@ function deleteSelectedRows() {
   
       <div class="flex gap-2 justify-end items-center">
         <NButton
-          @click="universityStore.showModelAdd = true"
+          @click="universityStore.showAdd = true"
           type="primary"
         >
           <div class="flex gap-2  items-center">

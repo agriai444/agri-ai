@@ -125,14 +125,14 @@ const getTotalItemCount = computed(() => props.item.messageAi.length);
       </button> -->
   
   
-      <div  v-if="(props.type === 'image' && props.item.messageAi.length > itemsPerPage) || ((props.type === 'text' || props.type === 'research') && props.item.messageAi.length > 1) "     class="flex flex-row gap-1 justify-end items-center">
+      <div  v-if="(props.type === 'image' && props.item.messageAi.length > itemsPerPage) || (props.type != 'image' && props.item.messageAi.length > 1) "     class="flex flex-row gap-1 justify-end items-center">
       <SvgIcon
         icon="icon-park-outline:left"
         :class="['text-lg', 'md:text-xl', 'bounce-in-fwd', 'cursor-pointer', { 'text-gray-400': isPreviousDisabled }]"
         @click="showPreviousItem"
       />
       <span class="text-sm text-gray-500 dark:text-gray-400">
-        {{ props.type === 'text' ? `${currentIndex + 1} / ${getTotalItemCount}` : `${getCurrentPageIndex} / ${getTotalPageCount}` }}
+        {{ props.type === 'AI' ? `${currentIndex + 1} / ${getTotalItemCount}` : `${getCurrentPageIndex} / ${getTotalPageCount}` }}
 
       </span>
       <SvgIcon

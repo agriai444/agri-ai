@@ -67,6 +67,8 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     name: 'admin',
     component: AdminLayout,
+    meta: { requiresAuth: true },
+    redirect: '/admin/dashboard',
     children: [
       {
         path: '/admin/dashboard',
@@ -104,6 +106,18 @@ const routes: RouteRecordRaw[] = [
         path: '/admin/settingsapp',
         name: 'settingsapp',
         component: () => import('@/views/admin/settings/index.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: '/admin/edit-terms-of-use',
+        name: 'edit-terms-of-use',
+        component: () => import('@/views/admin/settings/EditTermsOfUse.vue'), 
+        meta: { requiresAuth: true },
+      },
+      {
+        path: '/admin/edit-privacy-policy',
+        name: 'edit-privacy-policy',
+        component: () => import('@/views/admin/settings/EditPrivacyPolicy.vue'), 
         meta: { requiresAuth: true },
       },
       {

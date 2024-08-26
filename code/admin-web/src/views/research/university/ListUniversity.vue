@@ -65,7 +65,7 @@ function handleDeleteAction(row: Research.University) {
 }
 
 async function handleUpdateUniversity(row: Research.University) {
-  universityStore.showModelUpdate = true;
+  universityStore.showUpdate = true;
   rowEdit.value = row;
 }
 
@@ -256,7 +256,7 @@ function deleteSelectedRows() {
   
       <div class="flex gap-2 justify-end items-center">
         <NButton
-          @click="universityStore.showModelAdd = true"
+          @click="universityStore.showAdd = true"
           type="primary"
         >
           <div class="flex gap-2  items-center">
@@ -357,7 +357,7 @@ function deleteSelectedRows() {
 
   <div>
     <NModal
-      v-model:show="universityStore.showModelAdd"
+      v-model:show="universityStore.showAdd"
       :mask-closable=false
       :auto-focus="false"
       preset="card"
@@ -366,7 +366,7 @@ function deleteSelectedRows() {
       <AddUniversity />
     </NModal>
     <NModal
-      v-model:show="universityStore.showModelUpdate"
+      v-model:show="universityStore.showUpdate"
       :mask-closable=false
       :auto-focus="false"
       preset="card"

@@ -16,7 +16,7 @@ async function getChat() {
     chatStore.loadingChat = false
   } catch (error: any) {
     console.error(error.message)
-    message.error(t('chat.deleteFailed') + ' ' + uuid)
+    // message.error(t('chat.deleteFailed') + ' ' + uuid)
     await chatStore.resetChatState()
     chatStore.loadingChat = false
   }

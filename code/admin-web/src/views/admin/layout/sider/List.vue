@@ -27,6 +27,7 @@ function handleFinish() {
   disabledRef.value = true
 }
 
+
 async function handleUpdateValue(key: string, item: MenuOption) {
   handleStart()
 
@@ -68,6 +69,12 @@ async function handleUpdateValue(key: string, item: MenuOption) {
       await router.push({ name: 'settingsapp' });
       handleFinish()
       break
+      case 'edit-terms-of-use':
+        await router.push({ name: 'edit-terms-of-use' });
+        break;
+      case 'edit-privacy-policy':
+        await router.push({ name: 'edit-privacy-policy' });
+        break;
     case 'major':
       await router.push({ name: 'major' });
       handleFinish()
@@ -150,22 +157,22 @@ const menuOptions: MenuOption[] = [
 
     ],
   },
-  // {
-  //   type: 'group',
-  //   label: t('common.notifications'),
-  //   key: 'notification',
+  {
+    type: 'group',
+    label: t('common.notifications'),
+    key: 'notification',
 
-  //   children: [
-  //     {
-  //       label: t('common.addNotification'),
-  //       key: 'notification',
-  //       icon: iconRender({ icon: 'ic:baseline-notification-add' }),
+    children: [
+      {
+        label: t('common.addNotification'),
+        key: 'notification',
+        icon: iconRender({ icon: 'ic:baseline-notification-add' }),
 
-  //     },
+      },
 
 
-  //   ],
-  // },
+    ],
+  },
 
   {
     type: 'group',
@@ -227,6 +234,16 @@ const menuOptions: MenuOption[] = [
         icon: iconRender({ icon: 'mdi:settings-outline' }),
       
 
+      },
+      {
+        label: t('common.editTermsOfUse'),
+        key: 'edit-terms-of-use',
+        icon: iconRender({ icon: 'mdi:book-edit' }), // Use appropriate icon
+      },
+      {
+        label: t('common.editPrivacyPolicy'),
+        key: 'edit-privacy-policy',
+        icon: iconRender({ icon: 'mdi:book-edit' }), // Use appropriate icon
       },
       {
         label: t('common.profile'),

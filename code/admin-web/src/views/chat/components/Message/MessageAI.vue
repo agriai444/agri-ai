@@ -4,6 +4,7 @@ import { useMessage } from 'naive-ui'
 import TextComponent from './Text.vue'
 import HeaderRand from './HeaderRand.vue'
 import FooterMessageAI from './FooterMessageAI.vue'
+import ImageGrid from './ImageGrid.vue'
 import { useChatStore } from '@/store'
 const message = useMessage()
 interface Props {
@@ -68,6 +69,10 @@ const text = computed(() => {
         :as-raw-text="asRawText"
       />
 
+
+      <template v-if="item.answerMedia && item.answerMedia.length > 0">
+          <ImageGrid :mediaItems="item.answerMedia" :loading="item.loading" />
+        </template>
   
   </div>
   <div class="my-1">
