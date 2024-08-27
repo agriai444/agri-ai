@@ -16,7 +16,7 @@ class ChatView extends GetView<ChatAiChatController> {
         body: Obx(() {
           if (!controller.state.isCurrentAgriConv()) {
            
-            if (controller.state.isUserAgri()) {
+            if (controller.state.isUserAgri.value) {
               return const MainChatAgriView();
             } else {
               return const MainChatAiView();

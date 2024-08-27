@@ -57,7 +57,7 @@ class ChatAiChatService {
 
     var answerId = state.uuid.v1();
     state.textController.clear();
-    if (state.isUserAgri()) {
+    if (state.isUserAgri.value) {
       Question? latestQuestion;
       Answer? latestAnswer;
 
@@ -433,7 +433,7 @@ class ChatAiChatService {
         }
         print('File uploaded successfully: $fileUrl');
 
-        if (state.isUserClient()) {
+        if (state.isUserClient.value) {
           final questionMedia = QuestionMedia(
             mediaUrl: fileUrl,
             mediaType: "Image",
@@ -463,7 +463,7 @@ class ChatAiChatService {
 
     state.selectedMediaFiles.removeAt(index);
 
-    if (state.isUserClient()) {
+    if (state.isUserClient.value) {
       state.selectedMediaQuestion.removeAt(index);
     } else {
       state.mediaAnswer.removeAt(index);

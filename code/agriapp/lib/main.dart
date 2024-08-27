@@ -1,5 +1,6 @@
 import 'package:agri_ai/app/data/providers/app_setting_provider.dart';
 import 'package:agri_ai/app/data/providers/conversation_provider.dart';
+import 'package:agri_ai/app/modules/chat/controllers/chat_ai_chat_controller.dart';
 import 'package:agri_ai/config/translations/strings_enum.dart';
 import 'package:agri_ai/utils/app_size.dart';
 import 'package:agri_ai/utils/fcm_helper.dart';
@@ -66,7 +67,7 @@ Future<void> init() async {
        Get.put<ConversationProvider>(ConversationProvider());
  // Register AppSettingProvider with GetX and fetch settings
   Get.put<AppSettingProvider>(AppSettingProvider());
-  
+  Get.put(ChatAiChatController());
   // Hide the keyboard if it's showing
   SystemChannels.textInput.invokeMethod('TextInput.hide');
 

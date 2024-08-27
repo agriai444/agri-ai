@@ -49,7 +49,7 @@ class SettingsView extends GetView<SettingsController> {
                   leading: const Icon(Icons.exit_to_app),
                   title: Text(Strings.signOut.tr),
                   onPressed: (context) async {
-                   await Get.find<AuthController>().logout(context);
+                   await Get.find<AuthController>().logout();
                   },
                 ),
               ],

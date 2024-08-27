@@ -115,7 +115,7 @@ class MessagesView extends GetView<ChatAiChatController> {
 
           // Determine if the last answer has 'pending' status
           bool showInputField = true;
-          if (!controller.state.isUserAgri()) {
+          if (!controller.state.isUserAgri.value) {
             if (controller.state.isCurrentAgriConv()) {
               if (conversation.question?.isNotEmpty ?? false) {
                 final lastQuestion = conversation.question!.last;

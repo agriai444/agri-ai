@@ -1,3 +1,4 @@
+import 'package:agri_ai/app/data/local/my_hive.dart';
 import 'package:agri_ai/app/modules/chat/controllers/chat_ai_chat_controller.dart';
 import 'package:agri_ai/app/modules/chat/views/screens/chat_view.dart';
 import 'package:agri_ai/app/modules/home/views/screen/get_premium_view.dart';
@@ -252,34 +253,53 @@ class AppHomeScreen extends StatefulWidget {
 
 class _AppHomeScreenState extends State<AppHomeScreen>
     with TickerProviderStateMixin {
-  AnimationController? animationController;
-
-  List<TabIconData> tabIconsList = TabIconData.tabIconsList;
-
-  Widget tabBody = Container(
-    color: AppTheme.background,
-  );
+  late AnimationController animationController;
+  late List<TabIconData> tabIconsList;
+  late Widget tabBody;
+  late int selectedTabIndex; 
   final chatAiChatController = Get.put(ChatAiChatController());
-//  final chatAiChatController =  Get.find<ChatAiChatController>();
+
   @override
   void initState() {
-    if (tabIconsList.length > 1 && !chatAiChatController.state.isUserClient()) {
-      tabIconsList.removeWhere((tab) => tab.index == 1);
-    }
-
-    for (var tab in tabIconsList) {
-      tab.isSelected = false;
-    }
-    tabIconsList[widget.defaultIndex].isSelected = true;
+    super.initState();
 
     animationController = AnimationController(
         duration: const Duration(milliseconds: 200), vsync: this);
-    switch (widget.defaultIndex) {
+
+    tabIconsList = TabIconData.tabIconsList;
+  chatAiChatController.state.updateUserType();
+    _updateTabIconsList();
+     selectedTabIndex = widget.defaultIndex;
+    for (var tab in tabIconsList) {
+      tab.isSelected = false;
+    }
+    tabIconsList[selectedTabIndex].isSelected = true;
+
+    setTabBody(tabIconsList[selectedTabIndex].index);
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
+
+  void _updateTabIconsList() {
+    setState(() {
+      if (chatAiChatController.state.isUserAgri.value) {
+        tabIconsList = TabIconData.tabIconsList
+          ..removeWhere((tab) => tab.index == 0 || tab.index == 1);
+      } else {
+        tabIconsList = TabIconData.tabIconsList;
+      }
+    });
+  }
+
+  void setTabBody(int index) {
+    switch (index) {
       case 1:
         chatAiChatController.initializeAISetup();
-
         tabBody = const ChatView();
-
         break;
       case 2:
         chatAiChatController.initializeAgriSetup();
@@ -293,124 +313,46 @@ class _AppHomeScreenState extends State<AppHomeScreen>
         tabBody = MyDiaryScreen(animationController: animationController);
         break;
     }
-
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    animationController?.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: AppTheme.background,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: FutureBuilder<bool>(
-          future: getData(),
-          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-            if (!snapshot.hasData) {
-              return const SizedBox();
-            } else {
-              return Stack(
-                children: <Widget>[
-                  tabBody,
-                  bottomBar(),
-                ],
-              );
-            }
-          },
-        ),
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      body: FutureBuilder<bool>(
+        future: getData(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const SizedBox();
+          } else {
+            return Stack(
+              children: <Widget>[
+                tabBody,
+                bottomBar(),
+              ],
+            );
+          }
+        },
       ),
     );
   }
 
   Future<bool> getData() async {
-    // await Future<dynamic>.delayed(const Duration(milliseconds: 50));
     return true;
   }
 
   Widget bottomBar() {
     return Column(
       children: <Widget>[
-        const Expanded(
-          child: SizedBox(),
-        ),
+        const Expanded(child: SizedBox()),
         BottomBarView(
           tabIconsList: tabIconsList,
-          addClick: () {},
-          changeIndex: (int index) {
-            if (index == 0) {
-              animationController?.reverse().then<dynamic>((data) {
-                if (!mounted) {
-                  return;
-                }
-                setState(() {
-                  tabBody =
-                      MyDiaryScreen(animationController: animationController);
-                });
-              });
-            } else if (index == 1) {
-              if (tabIconsList.length > 1 &&
-                  !chatAiChatController.state.isUserClient()) {
-                chatAiChatController.initializeAgriSetup();
-                animationController?.reverse().then<dynamic>((data) {
-                  if (!mounted) {
-                    return;
-                  }
-
-                  setState(() {
-                    tabBody = const ChatView();
-                  });
-                });
-              } else {
-                chatAiChatController.initializeAISetup();
-                animationController?.reverse().then<dynamic>((data) {
-                  if (!mounted) {
-                    return;
-                  }
-                  setState(() {
-                    tabBody = const ChatView();
-                  });
-                });
-              }
-            } else if (index == 2) {
-              if (tabIconsList.length > 1 &&
-                  !chatAiChatController.state.isUserClient()) {
-                animationController?.reverse().then<dynamic>((data) {
-                  if (!mounted) {
-                    return;
-                  }
-                  setState(() {
-                    tabBody = MoreView();
-                  });
-                });
-              } else {
-                
-                chatAiChatController.initializeAgriSetup();
-                animationController?.reverse().then<dynamic>((data) {
-                  if (!mounted) {
-                    return;
-                  }
-
-                  setState(() {
-                    tabBody = const ChatView();
-                  });
-                });
-              }
-            } else if (index == 3) {
-              animationController?.reverse().then<dynamic>((data) {
-                if (!mounted) {
-                  return;
-                }
-                setState(() {
-                  tabBody = MoreView();
-                });
-              });
-            }
+          changeIndex: (index) {
+            setState(() {
+              // _updateTabIconsList();
+              selectedTabIndex = tabIconsList[index].index;
+              setTabBody(selectedTabIndex);
+            });
           },
         ),
       ],

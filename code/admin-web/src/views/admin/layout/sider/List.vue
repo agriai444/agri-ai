@@ -157,22 +157,22 @@ const menuOptions: MenuOption[] = [
 
     ],
   },
-  {
-    type: 'group',
-    label: t('common.notifications'),
-    key: 'notification',
+  // {
+  //   type: 'group',
+  //   label: t('common.notifications'),
+  //   key: 'notification',
 
-    children: [
-      {
-        label: t('common.addNotification'),
-        key: 'notification',
-        icon: iconRender({ icon: 'ic:baseline-notification-add' }),
+  //   children: [
+  //     {
+  //       label: t('common.addNotification'),
+  //       key: 'notification',
+  //       icon: iconRender({ icon: 'ic:baseline-notification-add' }),
 
-      },
+  //     },
 
 
-    ],
-  },
+  //   ],
+  // },
 
   {
     type: 'group',
@@ -235,16 +235,16 @@ const menuOptions: MenuOption[] = [
       
 
       },
-      {
-        label: t('common.editTermsOfUse'),
-        key: 'edit-terms-of-use',
-        icon: iconRender({ icon: 'mdi:book-edit' }), // Use appropriate icon
-      },
-      {
-        label: t('common.editPrivacyPolicy'),
-        key: 'edit-privacy-policy',
-        icon: iconRender({ icon: 'mdi:book-edit' }), // Use appropriate icon
-      },
+      // {
+      //   label: t('common.editTermsOfUse'),
+      //   key: 'edit-terms-of-use',
+      //   icon: iconRender({ icon: 'mdi:book-edit' }), // Use appropriate icon
+      // },
+      // {
+      //   label: t('common.editPrivacyPolicy'),
+      //   key: 'edit-privacy-policy',
+      //   icon: iconRender({ icon: 'mdi:book-edit' }), // Use appropriate icon
+      // },
       {
         label: t('common.profile'),
         key: 'profile',

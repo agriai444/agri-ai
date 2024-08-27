@@ -17,10 +17,10 @@ const name = ref(atIndex !== -1 ? email.slice(0, atIndex) : email);
   <div class="flex items-center overflow-hidden">
 <LogoUser/>
     <div class="flex-1 min-w-0 ml-2">
-      <h2 class="overflow-hidden font-bold text-md text-ellipsis whitespace-nowrap">
+      <h2 class="overflow-hidden  font-bold text-md text-ellipsis whitespace-nowrap">
         {{ name ?? 'User' }}
       </h2>
-      <p class="overflow-hidden text-xs text-gray-500 text-ellipsis whitespace-nowrap">
+      <p class="overflow-hidden  text-xs text-gray-500 text-ellipsis whitespace-nowrap">
         <span
           v-if="isString(userInfo.description) && userInfo.description !== ''"
           v-html="userInfo.description"

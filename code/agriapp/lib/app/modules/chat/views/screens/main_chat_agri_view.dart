@@ -33,7 +33,7 @@ class AgriView extends GetView<ChatAiChatController> {
     return Obx(() {
       PreferredSizeWidget appBar;
       Widget body;
-      if (controller.state.isUserAgri()) {
+      if (controller.state.isUserAgri.value) {
         if (controller.state.showChatMessageUserToAgri.value) {
            appBar = _buildAppBarChatAgriUser('');
           body = MessagesView();

@@ -9,7 +9,7 @@ const show = ref(false)
 
 <template>
   <footer
-    class="flex  glass m-2 rounded-lg  items-center justify-between min-w-0 p-4 overflow-hidden border-t dark:border-neutral-800">
+    class="flex  glass m-2  rounded-lg  items-center justify-between min-w-0 p-4 overflow-hidden border-t dark:border-neutral-800">
   
   
     

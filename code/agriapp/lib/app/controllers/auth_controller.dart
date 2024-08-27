@@ -1,5 +1,6 @@
 import 'package:agri_ai/app/data/local/my_hive.dart';
 import 'package:agri_ai/app/data/providers/app_setting_provider.dart';
+import 'package:agri_ai/app/modules/chat/controllers/chat_ai_chat_controller.dart';
 import 'package:agri_ai/main.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -33,13 +34,15 @@ String getCurrentUserId()  {
   }
 
 
-Future<void> logout(BuildContext context) async {
-  await supabase.auth.signOut();          // Sign out from Supabase
-  await MyHive.deleteCurrentUser();       // Delete user data from Hive
-    Get.deleteAll();
- Restart.restartApp();
+Future<void> logout() async {
+  await supabase.auth.signOut();         
+  await MyHive.deleteCurrentUser();   
+  // Get.delete<ChatAiChatController>(force: true);    
+    // Get.deleteAll(force: true);
+    // Get.reset();
+//  Restart.restartApp();
              // Restart the app
-  // Get.offAll(Routes.SPLASH_PAGE);
+  Get.offAllNamed(Routes.AUTH_LOGIN);
 }
 
   Future<bool> isLogin() async {

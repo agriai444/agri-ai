@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:agri_ai/app/controllers/auth_controller.dart';
+import 'package:agri_ai/app/data/local/my_hive.dart';
 import 'package:agri_ai/app/data/providers/app_setting_provider.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -49,9 +50,11 @@ final showChatMessageUserToAgri = false.obs;
  final nameHeaderQuestion = 'You'.obs;
   final nameHeaderAnswer = 'AI'.obs;
 late final AppSettingProvider appSettingProvider;
-
+ final isUserAgri = false.obs;
+  final isUserClient = false.obs;
 late Conversation agriConversation;
   void initState() {
+     updateUserType();
      appSettingProvider = Get.find();
     speech = stt.SpeechToText();
     
@@ -80,7 +83,7 @@ late Conversation agriConversation;
 
     isListening.value = false;
     speechText.value = '';
-
+ 
     // listConversations.clear();
     // currentConversation.value = null;
     // selectedMediaQuestion.clear();
@@ -151,12 +154,10 @@ late Conversation agriConversation;
     bool isDefaultConversation() => currentConversation.value?.id == '';
   bool isCurrentAgriConv() => currentConversation.value?.type == 'Agri-Expert';
 
-   bool isUserAgri() {
-    return Get.find<AuthController>().isUserAgri();
-  }
-
-    bool isUserClient() {
-    return Get.find<AuthController>().isUserClient();
+    void updateUserType() {
+    final userType = MyHive.getCurrentUser()?.userType;
+    isUserAgri.value = userType == 'Agri-Expert';
+    isUserClient.value = userType == 'Client';
   }
 
     bool isImageAllow() {

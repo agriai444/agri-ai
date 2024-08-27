@@ -70,7 +70,7 @@ watch(
       <main class="flex flex-col flex-1 min-h-0">
 
 
-        <div class="flex flex-col px-4 py-3  justify-center items-center ">
+        <div class="flex flex-col px-4 py-3   justify-center items-center ">
          
             <div class="flex flex-row py-2  justify-center  items-center gap-2 w-full">
               <!-- <LogoApp :size="35" /> -->

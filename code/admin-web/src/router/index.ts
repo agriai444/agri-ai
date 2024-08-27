@@ -23,12 +23,12 @@ const routes: RouteRecordRaw[] = [
   // },
 
 
-  {
-    path: '/home',
-    name: 'Home',
-    component: () => import('@/views/home/index.vue'),
-    meta: { requiresAuth: false },
-  },
+  // {
+  //   path: '/home',
+  //   name: 'Home',
+  //   component: () => import('@/views/home/index.vue'),
+  //   meta: { requiresAuth: false },
+  // },
 
 
 
@@ -138,69 +138,45 @@ const routes: RouteRecordRaw[] = [
     ],
 
   },
+ 
   // {
-  //   path: '/cv',
-  //   name: 'cv',
-  //   component: () => import('@/views/cv/index.vue'),
-  //   meta: { requiresAuth: true },
-  // },
-
-  // {
-  //   path: '/cv',
-  //   name: 'cv',
-  //   component: AdminLayout,
-
-
+  //   path: '/research',
+  //   name: 'research',
+  //   component: ResearchLayout,
   //   children: [
   //     {
-  //       path: '/admin/',
-  //       name: 'cvindex',
-  //       component: () => import('@/views/cv/index.vue'),
-  //      
-
+  //       path: '/research/add-university',
+  //       name: 'add-university',
+  //       component: () => import('@/views/research/university/AddUniversity.vue'),
+  //       meta: { requiresAuth: true },
   //     },
-
+  //     {
+  //       path: '/research/university',
+  //       name: 'university',
+  //       component: () => import('@/views/research/university/ListUniversity.vue'),
+  //       meta: { requiresAuth: true },
+  //     },
+  //     {
+  //       path: '/research/profile1',
+  //       name: 'profile1',
+  //       component: () => import('@/views/research/profile/index.vue'),
+  //       meta: { requiresAuth: true },
+  //     },
+  //     {
+  //       path: '/research/gen-research',
+  //       name: 'gen-research',
+  //       component: () => import('@/views/research/research/index.vue'),
+  //       meta: { requiresAuth: true },
+  //     },
+  //     {
+  //       path: '/research/major',
+  //       name: 'major',
+  //       component: () => import('@/views/research/major/ListMajor.vue'),
+  //       meta: { requiresAuth: true },
+  //     },
   //   ],
 
   // },
-  {
-    path: '/research',
-    name: 'research',
-    component: ResearchLayout,
-    children: [
-      {
-        path: '/research/add-university',
-        name: 'add-university',
-        component: () => import('@/views/research/university/AddUniversity.vue'),
-        meta: { requiresAuth: true },
-      },
-      {
-        path: '/research/university',
-        name: 'university',
-        component: () => import('@/views/research/university/ListUniversity.vue'),
-        meta: { requiresAuth: true },
-      },
-      {
-        path: '/research/profile1',
-        name: 'profile1',
-        component: () => import('@/views/research/profile/index.vue'),
-        meta: { requiresAuth: true },
-      },
-      {
-        path: '/research/gen-research',
-        name: 'gen-research',
-        component: () => import('@/views/research/research/index.vue'),
-        meta: { requiresAuth: true },
-      },
-      {
-        path: '/research/major',
-        name: 'major',
-        component: () => import('@/views/research/major/ListMajor.vue'),
-        meta: { requiresAuth: true },
-      },
-    ],
-
-  },
 
   {
     path: '/404',

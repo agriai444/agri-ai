@@ -57,7 +57,7 @@ class MoreView extends GetView<MoreController> {
                 icon: Icons.logout,
                 title: Strings.logout.tr,
                 onTap: () async {
-                  await authController.logout(context);
+                  await authController.logout();
                 },
                 textColor: Colors.red,
                 iconColor: Colors.red,

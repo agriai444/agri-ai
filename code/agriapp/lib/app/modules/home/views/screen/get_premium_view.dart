@@ -32,7 +32,7 @@ class SubscriptionView extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 16),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.green[200],
+                            color: Colors.green[300],
                             borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(8.0),
                                 bottomLeft: Radius.circular(8.0),
