@@ -5,7 +5,7 @@ class LightThemeColors
 {
   // PRIMARY
   // static const Color primaryColor = Color.fromARGB(255, 12, 12, 12); 
- static const Color primaryColor = Color(0xff33004d40);
+ static const Color primaryColor = Color.fromARGB(51, 7, 129, 27);
   // SECONDARY COLOR
   static const Color accentColor = Color(0xFFD9EDE1);
 
@@ -24,7 +24,7 @@ class LightThemeColors
 
   //BUTTON
   static const Color buttonColor = Color(0xff132137);
-  static const Color buttonTextColor = Colors.white;
+  static const Color buttonTextColor = Color.fromARGB(255, 29, 124, 6);
   static const Color buttonDisabledColor = Colors.grey;
   static const Color buttonDisabledTextColor = Colors.black;
 

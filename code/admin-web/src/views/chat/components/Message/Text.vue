@@ -135,7 +135,7 @@ const type = computed(() => chatStore.currentConversation.type);
     <div ref="textRef" class="leading-relaxed  break-words">
       
       <div v-if="!inversion">
-        <div v-if="!asRawText" class="markdown-body"   v-html="text" />
+        <div v-if="!asRawText" class="markdown-body " style=" background-color: white;"   v-html="text" />
         <div v-else class="whitespace-pre-wrap" v-text="text" />
       </div>
 

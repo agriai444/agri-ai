@@ -58,7 +58,7 @@ async function handleUpdateValue(key: string, item: MenuOption) {
       handleFinish()
       break
     case 'chat':
-      await router.push({ name: 'chat' });
+      await router.push({ name: 'main-chat' });
       handleFinish()
       break
     case 'profile':

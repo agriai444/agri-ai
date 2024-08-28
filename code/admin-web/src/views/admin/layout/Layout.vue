@@ -19,6 +19,7 @@ const getContainerClass = computed(() => {
     { 'pl-[260px]': !isMobile.value && !collapsed.value },
   ]
 })
+
 </script>
 
 <template>
@@ -31,7 +32,7 @@ const getContainerClass = computed(() => {
         <NLayoutContent class="h-full">
           <HeaderComponent />
           <RouterView  v-slot="{ Component, route }">
-              <component :is="Component" :key="route.fullPath" />  
+              <component  :is="Component" :key="route.fullPath" />  
           </RouterView>
         </NLayoutContent>
       </NLayout>

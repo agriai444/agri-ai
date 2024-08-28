@@ -194,8 +194,8 @@ class MyStyles {
                     : DarkThemeColors.buttonDisabledColor;
               }
               return isLightTheme
-                  ? LightThemeColors.buttonColor
-                  : DarkThemeColors.buttonColor; 
+                  ? LightThemeColors.buttonTextColor
+                  : DarkThemeColors.buttonTextColor; 
             },
           ),
           minimumSize: WidgetStateProperty.all<Size>(

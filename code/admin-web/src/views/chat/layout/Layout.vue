@@ -4,7 +4,8 @@ import { NLayout, NLayoutContent } from 'naive-ui'
 import Sider from './sider/index.vue'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { useAppStore, } from '@/store'
-import Chat from "../Chat.vue";
+import IndexChat from "../index.vue";
+import { ChatLayout } from '@/views/chat/layout'
 const appStore = useAppStore()
 const { isMobile } = useBasicLayout()
 const collapsed = computed(() => appStore.siderCollapsed)
@@ -20,20 +21,26 @@ const getContainerClass = computed(() => {
     { 'pl-[260px]': !isMobile.value && !collapsed.value },
   ]
 })
+
+
 </script>
 
 <template>
   <div class="h-[800px] mt-6 mx-8 border-blue-500 border-2 rounded-md dark:bg-[#24272e] transition-all">
     <div class="h-full overflow-hidden" :class="getMobileClass">
-      <NLayout class="z-40  transition" :class="getContainerClass" has-sider>
+      <NLayout class="z-40 transition" :class="getContainerClass" has-sider>
         <Sider />
-        <NLayoutContent class="h-full ">
-          <RouterView v-slot="{ Component, route }">
-              <component :is="Component" :key="route.fullPath" />
-                  <Chat />
-          </RouterView>
+        <NLayoutContent class="h-full">
+          <IndexChat/>
+          <!-- <ChatLayout/> -->
+          <!-- <RouterView v-slot="{ Component }">
+            <component :is="Component" />
+          </RouterView> -->
         </NLayoutContent>
       </NLayout>
     </div>
   </div>
 </template>
+
+
+  <!-- <Chat /> -->

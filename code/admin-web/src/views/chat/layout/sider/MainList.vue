@@ -144,6 +144,7 @@ async function getBothType() {
 }
 
 onMounted(() => {
+  
   getBothType();
 });
 
@@ -312,10 +313,7 @@ const type = computed(() => chatStore.currentConversation.type);
     v-if="!errorGetData && dataSources['text'].length === 0 && dataSources['Agri-Expert'].length === 0"
   >
     <div class="flex flex-col justify-center items-center mt-4 text-center bg-white dark:bg-purple-900 h-full">
-      <SvgIcon
-        class="h-20 w-20 text-purple-500 dark:text-purple-300"
-        icon="eos-icons:loading"
-      />
+    
       <div class="text-xl font-bold mt-3 text-purple-500 dark:text-purple-300">{{ t('chat.noChat') }}</div>
       <div class="text-gray-400 dark:text-gray-500">{{ t('chat.noChatDesc') }}</div>
     </div>

@@ -7,6 +7,7 @@ import 'package:agri_ai/utils/fcm_helper.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:agri_ai/utils/awesome_notifications_helper.dart';
 import 'app/data/local/my_hive.dart';
@@ -132,4 +133,3 @@ class HexColor extends Color {
     return int.parse(hexColor, radix: 16);
   }
 }
-

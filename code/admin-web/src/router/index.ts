@@ -3,35 +3,9 @@ import type { RouteRecordRaw } from 'vue-router'
 import { createRouter, createWebHistory } from 'vue-router'
 import { setupPageGuard } from './permission'
 import { ChatLayout } from '@/views/chat/layout'
-import { ResearchLayout } from '@/views/research/layout'
 import { AdminLayout } from '@/views/admin/layout'
 
 const routes: RouteRecordRaw[] = [
-  // {
-  //   path: '/chat',
-  //   name: 'Root',
-  //   component: ChatLayout,
-  //   redirect: '/chat',
-  //   children: [
-  //     {
-  //       path: '/chat/:uuid?',
-  //       name: 'Chat',
-  //       component: () => import('@/views/chat/index.vue'),
-  //       meta: { requiresAuth: true },
-  //     },
-  //   ],
-  // },
-
-
-  // {
-  //   path: '/home',
-  //   name: 'Home',
-  //   component: () => import('@/views/home/index.vue'),
-  //   meta: { requiresAuth: false },
-  // },
-
-
-
   {
     path: '/policies/privacy-policy',
     name: 'privacy-policy',
@@ -63,6 +37,64 @@ const routes: RouteRecordRaw[] = [
     name: 'otp',
     component: () => import('@/views/auth/OTP.vue'),
   },
+
+  // {
+  //   path: '/admin/chat',
+  //   name: 'chat',
+  //   component: ChatLayout,
+   
+  //   children: [
+      
+  //     {
+
+  //       path: '/admin/:uuid?',
+  //       name: 'Chat',
+      
+  //       component: () => import('@/views/chat/index.vue'),
+  //       meta: { requiresAuth: true },
+    
+        
+  //     },
+  //   ],
+  // },
+
+  //   {
+  //   path: '/chat',
+  //   name: 'Root',
+  //   component: ChatLayout,
+  //   redirect: '/chat',
+  //   children: [
+  //     {
+  //       path: '/chat/:uuid?',
+  //       name: 'Chat',
+  //       component: () => import('@/views/chat/index.vue'),
+  //       meta: { requiresAuth: true },
+  //     },
+  //   ],
+  // },
+
+
+  // {
+  //   path: '/chats1',
+  //   name: 'main-chat',
+  //   component: ChatLayout,
+  //   meta: { requiresAuth: true },
+  //   children: [
+  //     {
+  //       path: '/chats1',
+  //       name: 'main-chat',
+  //       component: () => import('@/views/chat/index.vue'),
+  //       meta: { requiresAuth: true },
+  //     },
+  //     {
+  //       path: '/chat/:uuid?',
+  //       name: 'Chat',
+  //       component: () => import('@/views/chat/index.vue'),
+  //       meta: { requiresAuth: true },
+  //     },
+  //   ],
+  // },
+
   {
     path: '/',
     name: 'admin',
@@ -120,63 +152,55 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/settings/EditPrivacyPolicy.vue'), 
         meta: { requiresAuth: true },
       },
+      // {
+      //   path: '/admin/chat',
+      //   name: 'chat',
+      //   component: ChatLayout,
+      //   redirect: '/admin/chat',
+      //   meta: { requiresAuth: true },
+      //   children: [
+      //     {
+      //       path: '/admin/chat',
+      //       name: 'main-chat',
+      //       component: () => import('@/views/chat/index.vue'),
+      //       meta: { requiresAuth: true },
+      //     },
+      //     {
+      //       path: '/admin/chat/:uuid?',
+      //       name: 'Chat',
+      //       component: () => import('@/views/chat/index.vue'),
+      //       meta: { requiresAuth: true },
+      //     },
+      //   ],
+      // },
       {
         path: '/admin/chat',
-        name: 'chat',
-        component: ChatLayout,
-        redirect: '/admin/chat',
-        children: [
-          {
-            path: ':uuid?',
-            name: 'Chat',
-            component: () => import('@/views/chat/index.vue'),
-            meta: { requiresAuth: true },
-          },
-        ],
+        name: 'main-chat',
+        component: () => import('@/views/chat/layout/Layout.vue'),
+    
+       
       },
+      // {
+      //   path: '/admin/chat',
+      //   name: 'main-chat',
+      //   component: ChatLayout,
+      //   redirect: '/admin/chat',
+      //   children: [
+      //     {
+      //       path: ':uuid?',
+      //       name: 'Chat',
+      //       component: () => import('@/views/chat/index.vue'),
+      //       meta: { requiresAuth: true },
+      //     },
+      //   ],
+      // },
+   
    
     ],
 
   },
  
-  // {
-  //   path: '/research',
-  //   name: 'research',
-  //   component: ResearchLayout,
-  //   children: [
-  //     {
-  //       path: '/research/add-university',
-  //       name: 'add-university',
-  //       component: () => import('@/views/research/university/AddUniversity.vue'),
-  //       meta: { requiresAuth: true },
-  //     },
-  //     {
-  //       path: '/research/university',
-  //       name: 'university',
-  //       component: () => import('@/views/research/university/ListUniversity.vue'),
-  //       meta: { requiresAuth: true },
-  //     },
-  //     {
-  //       path: '/research/profile1',
-  //       name: 'profile1',
-  //       component: () => import('@/views/research/profile/index.vue'),
-  //       meta: { requiresAuth: true },
-  //     },
-  //     {
-  //       path: '/research/gen-research',
-  //       name: 'gen-research',
-  //       component: () => import('@/views/research/research/index.vue'),
-  //       meta: { requiresAuth: true },
-  //     },
-  //     {
-  //       path: '/research/major',
-  //       name: 'major',
-  //       component: () => import('@/views/research/major/ListMajor.vue'),
-  //       meta: { requiresAuth: true },
-  //     },
-  //   ],
-
-  // },
+ 
 
   {
     path: '/404',
@@ -192,11 +216,7 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: false },
   },
 
-  {
-    path: '/admin',
-    name: 'notFound',
-    redirect: '/admin/dashboard',
-  },
+
   {
     path: '/:pathMatch(.*)*',
     name: 'notFound',
@@ -207,7 +227,7 @@ const routes: RouteRecordRaw[] = [
 export const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior: () => ({ left: 0, top: 0 }),
+  // scrollBehavior: () => ({ left: 0, top: 0 }),
 })
 
 setupPageGuard(router)
