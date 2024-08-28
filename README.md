@@ -1,4 +1,4 @@
-<p align="center"><a href="https://agri-ai-bx0i.onrender.com" target="_blank"><img src="blob:https://github.com/2a6ebf24-5e35-41c3-bd27-730c7b72a459" width="400" alt="Agricultural Expert"></a></p>
+<p align="center"><a href="https://agri-ai-bx0i.onrender.com" target="_blank"><img  src="code/agriapp/assets/images/app_icon.png" width="400" alt="Agricultural Expert"></a></p>
 
 
 # Agricultural Expert
@@ -12,6 +12,7 @@ You can click the button below to download the latest version of the Agricultura
 [![button](https://raw.githubusercontent.com/agriai444/agri-ai/master/resources/download.png)](https://raw.githubusercontent.com/agriai444/agri-ai/main/output/app/android/agri-expert.apk)
 
 
+- **Website:** [Visit Our Official Website](https://agri-ai-bx0i.onrender.com)
 <!-- 
 Run Buttons is a **cross-platform, free and open source** application. You can compile the desktop application yourself or download ready binary files for your platform.
 
