@@ -81,6 +81,25 @@ export const useUsersStore = defineStore('users-store', {
       }
     },
 
+
+    async fetchDataActionById(id:string): Promise<User.UserData> {
+      try {
+        const filters = { id: id };
+        const { data, totalCount } = await fetchDataFromTable<User.UserData>('users', 1, 0, filters);
+        // this.listCompanies = data;
+
+
+      
+
+        // const uniqueUsers = data.filter(newUser => !this.listUsers.some(existingUser => existingUser.id === newUser.id));
+        // this.countTotalData = totalCount;
+        // this.listUsers = [...this.listUsers, ...uniqueUsers];
+        return data[0];
+       
+      } catch (error: any) {
+        throw error;
+      }
+    },
     async insertDataAction(newUniversity: User.UserData): Promise<void> {
       try {
         const insertedData = await insertData(newUniversity);

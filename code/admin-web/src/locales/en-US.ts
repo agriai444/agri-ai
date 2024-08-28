@@ -134,7 +134,16 @@ export default {
     AICompanies: 'AI Companies',
     AIModels: 'AI Models',
     Questions: 'Questions',
-    Dashboard: 'Dashboard'
+    Dashboard: 'Dashboard',
+    AI:'AI',
+
+    deleteMessage: 'Delete Message',
+    deleteMessageConfirm: 'Are you sure to delete this message?',
+    deleteHistoryConfirm: 'Are you sure to clear this history?',
+    clearHistoryConfirm: 'Are you sure to clear chat history?',
+
+    convAI: 'Conversations AI', 
+    convExperts: 'Conversations Experts', 
 
   },
   chat: {
@@ -201,7 +210,7 @@ export default {
 
     chatAI:'Chats AI',
     agriExpert:'Chats Agri Expert',
-
+   
 
   },
   setting: {

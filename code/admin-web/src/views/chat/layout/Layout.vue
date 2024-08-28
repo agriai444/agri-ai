@@ -32,10 +32,7 @@ const getContainerClass = computed(() => {
         <Sider />
         <NLayoutContent class="h-full">
           <IndexChat/>
-          <!-- <ChatLayout/> -->
-          <!-- <RouterView v-slot="{ Component }">
-            <component :is="Component" />
-          </RouterView> -->
+     
         </NLayoutContent>
       </NLayout>
     </div>
@@ -43,4 +40,3 @@ const getContainerClass = computed(() => {
 </template>
 
 
-  <!-- <Chat /> -->

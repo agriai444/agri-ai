@@ -8,6 +8,8 @@ interface DashboardState {
   aiCompanyCount: number
   aiModelCount: number
   questionCount: number
+  convAICount: number
+  convExpertCount: number
 }
 
 export const useDashboardStore = defineStore('dashboard', {
@@ -18,6 +20,8 @@ export const useDashboardStore = defineStore('dashboard', {
     aiCompanyCount: 0,
     aiModelCount: 0,
     questionCount: 0,
+    convAICount: 0,
+    convExpertCount:0
   }),
   actions: {
     async fetchDashboardData() {
@@ -29,6 +33,8 @@ export const useDashboardStore = defineStore('dashboard', {
           { count: aiCompanyCount },
           { count: aiModelCount },
           { count: questionCount },
+          { count: convClientCount },
+          { count: convExpertCount },
         ] = await Promise.all([
           supabase.from('users').select('*', { count: 'exact', head: true }).eq('user_type', 'Client'),
           supabase.from('users').select('*', { count: 'exact', head: true }).eq('user_type', 'Agri-Expert'),
@@ -36,6 +42,8 @@ export const useDashboardStore = defineStore('dashboard', {
           supabase.from('ai_company').select('*', { count: 'exact', head: true }),
           supabase.from('ai_model').select('*', { count: 'exact', head: true }),
           supabase.from('question').select('*', { count: 'exact', head: true }),
+          supabase.from('conversation').select('*', { count: 'exact', head: true }).eq('type', 'AI'),
+          supabase.from('conversation_with_questions').select('*', { count: 'exact', head: true }),
         ])
 
         this.clientCount = clientCount || 0
@@ -44,6 +52,8 @@ export const useDashboardStore = defineStore('dashboard', {
         this.aiCompanyCount = aiCompanyCount || 0
         this.aiModelCount = aiModelCount || 0
         this.questionCount = questionCount || 0
+        this.convAICount = convClientCount || 0
+        this.convExpertCount = convExpertCount || 0
       } catch (error) {
         console.error('Error fetching dashboard data:', error)
       }

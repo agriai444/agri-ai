@@ -125,6 +125,13 @@ export default {
     AIModels: 'نماذج الذكاء الاصطناعي',
     Questions: 'الأسئلة',
     Dashboard: 'اللوحة الرئيسية',
+    AI: 'ذكاء اصطناعي',
+    deleteMessage: 'حذف الرسالة',
+    deleteMessageConfirm: 'هل أنت متأكد من حذف هذه الرسالة؟',
+    deleteHistoryConfirm: 'هل أنت متأكد من مسح هذا السجل؟',
+    clearHistoryConfirm: 'هل أنت متأكد من مسح سجل الدردشة؟',
+    convAI: 'محادثات الذكاء الاصطناعي',
+    convExperts: 'محادثات الخبراء', 
   },
 
   chat: {

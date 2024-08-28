@@ -6,7 +6,7 @@ import {
   DataTableRowKey, NModal,NBreadcrumb,NBreadcrumbItem,
   useMessage, DataTableFilterState, DataTableColumns,
 } from 'naive-ui'
-import { useUsersStore } from '@/store'
+import { useUsersStore, useUserStore } from '@/store'
 import { t } from '@/locales';
 import { useIconRender } from '@/hooks/useIconRender'
 import { useBasicLayout } from '@/hooks/useBasicLayout';
@@ -101,6 +101,9 @@ const mainColumn = reactive<DataTableBaseColumn<User.UserData>>({
     )
   },
 })
+const userStore = useUserStore();
+const myUserId = computed(() => userStore.userInfo!.user!.id!);
+
 
 const columns = reactive<DataTableColumns<User.UserData>>([
   {
@@ -126,7 +129,7 @@ const columns = reactive<DataTableColumns<User.UserData>>([
             {
               strong: true,
               tertiary: true,
-              disabled:false,
+              disabled: row.id === myUserId.value, 
               size: 'small',
               loading: loadingActionEdit.value,
               style: "border-radius:100%",
@@ -146,6 +149,7 @@ const columns = reactive<DataTableColumns<User.UserData>>([
             NButton,
             {
               strong: true,
+              disabled: row.id === myUserId.value, 
               tertiary: true,
               size: 'small',
               loading: loadingActionDelete.value,

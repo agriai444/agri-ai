@@ -1,4 +1,4 @@
-import { supabase } from '@/utils/supabase';
+import { adminAuthClient, supabase } from '@/utils/supabase';
 import { snakeToCamel } from '@/utils/functions';
 import { useUserStore } from '../user';
 import { useChatStore } from '@/store';
@@ -76,15 +76,23 @@ export const insertData = async (dataInserted: User.UserData): Promise<User.User
 
 export const deleteData = async (id: string): Promise<void> => {
   try {
-    const { error } = await supabase
-      .from('users')
-      .delete()
-      .eq('id', id);
+    // Delete the user from Supabase Auth
+    const { error } = await adminAuthClient.deleteUser(id);
 
     if (error) {
       throw error;
     }
+
+    // Optionally, if you need to also delete user-related data from your database, you can do that here
+    // const { error: dbError } = await supabase
+    //   .from('users')
+    //   .delete()
+    //   .eq('id', id);
+    // if (dbError) {
+    //   throw dbError;
+    // }
   } catch (error: any) {
+    console.error('Error deleting user:', error.message);
     throw error;
   }
 };

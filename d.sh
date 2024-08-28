@@ -37,7 +37,7 @@ handle_git() {
 original_dir=$(pwd)
 
 
-# run_script_in_directory "code/admin-web" "d.sh"
+run_script_in_directory "code/admin-web" "d.sh"
 
 # run_script_in_directory "code/agriapp" "build.sh"
 

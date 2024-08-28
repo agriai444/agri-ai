@@ -77,14 +77,14 @@ export const useChatStore = defineStore('chat-store', {
     async getListConversationAction({ limit = 20, offset = 1, type = 'text' }: { limit?: number; offset?: number, type?: PublicApp.TypeService } = {}): Promise<void>  {
       try {
 
-        if (type == 'Agri-Expert'){
+        if (type === 'Agri-Expert'){
           tableName = 'conversation_with_questions'
    
         } 
 
 
-     
-        const { data, totalCount } = await fetchDataFromTable<Chat.ResConv>(tableName, limit, offset);
+        const filters = { type: type };
+        const { data, totalCount } = await fetchDataFromTable<Chat.ResConv>(tableName, limit, offset, filters);
         const existingIds = new Set(this.listConversation.map(conv => conv.id));
 
         // Filter new conversations to ensure uniqueness by ID

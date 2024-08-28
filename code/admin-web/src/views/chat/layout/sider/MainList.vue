@@ -264,7 +264,7 @@ const getConversationById = (convId: string) => {
 };
 
 function getCountBadge(type: PublicApp.TypeService) {
-  return storeItemCoun.value[type];
+  return storeItemCoun.value[type] -1;
 }
 function showLoadMore(type: PublicApp.TypeService): boolean {
   const displayedCount = dataSources[type].length; // Currently loaded conversations

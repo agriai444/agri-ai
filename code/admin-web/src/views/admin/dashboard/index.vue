@@ -19,6 +19,8 @@ const cardItems = [
   { title: t('common.AICompanies'), count: () => dashboardStore.aiCompanyCount, icon: 'mdi:domain' },
   { title: t('common.AIModels'), count: () => dashboardStore.aiModelCount, icon: 'mdi:robot' },
   { title: t('common.Questions'), count: () => dashboardStore.questionCount, icon: 'mdi:help-circle' },
+  { title: t('common.convAI'), count: () => dashboardStore.convAICount, icon: 'hugeicons:ai-chat-02' }, 
+  { title: t('common.convExperts'), count: () => dashboardStore.convExpertCount, icon: 'mdi:chat-processing' }, 
 ];
 </script>
 

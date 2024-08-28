@@ -5,14 +5,24 @@ import { camelToSnake, snakeToCamel } from '@/utils/functions';
 export const fetchDataFromTable = async <T>(
   tableName: string,
   limit: number,
-  offset: number
+  offset: number,
+  filters?: { [key: string]: any } 
 ): Promise<{ data: T[]; totalCount: number }> => {
   try {
-    const { data, count, error } = await supabase
+    let query = supabase
       .from(tableName)
-      .select('*', { count: 'exact' }) 
+      .select('*', { count: 'exact' })
       .order('updated_at', { ascending: false })
       .range(offset, offset + limit - 1);
+
+    // Apply filters if provided
+    if (filters) {
+      for (const [key, value] of Object.entries(filters)) {
+        query = query.eq(key, value);
+      }
+    }
+
+    const { data, count, error } = await query;
 
     if (error) {
       throw error;

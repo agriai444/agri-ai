@@ -1,18 +1,19 @@
 <script setup lang='ts'>
-import { computed, ref } from 'vue'
-import { useMessage, NImage } from 'naive-ui'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useMessage,NSkeleton, NImage } from 'naive-ui'
 import { LogoUser } from '@/components/common'
 import TextComponent from './Text.vue'
 import { SvgIcon } from '@/components/common'
 import { t } from '@/locales'
 import { copyToClip } from '@/utils/copy'
 import ImageGrid from './ImageGrid.vue'
-import { useChatStore } from '@/store'
+import { useChatStore, useUsersStore } from '@/store'
 interface Props {
   item: Chat.MessageUser
 }
 const props = defineProps<Props>()
 const message = useMessage()
+const usersStore = useUsersStore()
 const textRef = ref<HTMLElement>()
 const asRawText = ref(props.item.inversion)
 async function handleCopy() {
@@ -31,6 +32,34 @@ const lang = computed(() => chatStore.currentConversation.lang)
 import { supabaseUrlImage } from '@/utils/supabase';
 const bucket: string = 'chat-text';
 const imageUrl =  computed(() => `${supabaseUrlImage}/${bucket}/${props.item.imagePath}`)
+const userId = computed(() =>  chatStore.currentConversation.userId)
+
+const user = ref<User.UserData | null>(null);
+const loading = ref<boolean>(false);
+const error = ref<string | null>(null); 
+
+// Fetch user data when the component is mounted
+onMounted(async () => {
+  if (!userId.value) return // If there's no userId, don't fetch
+
+  loading.value = true
+  error.value = null // Reset error state
+
+  try {
+    // Fetch user data using the store action
+    user.value = await usersStore.fetchDataActionById(userId.value)
+  } catch (err: any) {
+    error.value = err.message // Store error message if fetch fails
+    user.value = null // Reset user data on error
+  } finally {
+    loading.value = false // Always reset loading state
+  }
+})
+
+// Computed property for user data
+const userData = computed(() => user.value);
+
+
 </script>
 
 <template>
@@ -40,7 +69,10 @@ const imageUrl =  computed(() => `${supabaseUrlImage}/${bucket}/${props.item.ima
     <LogoUser />
     <div class="">
       <div class="text-base font-bold">
-        <div>{{ t('common.you') }}</div>
+        <NSkeleton v-if="loading" text :repeat="1" :width="80" :round="true" size="medium"/>
+        <NSkeleton v-if="loading" text :repeat="1" :width="80" :round="true" size="medium"/>
+      <div v-else>{{userData?.firstName}} {{userData?.lastName}}</div>
+      
       </div>
       <p class="text-[0.6rem] md:text-[0.7rem]">
         {{ new Date(item.createdAt || '').toLocaleString() }}
