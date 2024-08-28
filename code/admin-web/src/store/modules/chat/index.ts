@@ -74,7 +74,7 @@ export const useChatStore = defineStore('chat-store', {
       }
     },
 
-    async getListConversationAction({ limit = 20, offset = 1, type = 'text' }: { limit?: number; offset?: number, type?: PublicApp.TypeService } = {}): Promise<void>  {
+    async getListConversationAction({ limit = 20, offset = 1, type = 'AI' }: { limit?: number; offset?: number, type?: PublicApp.TypeService } = {}): Promise<void>  {
       try {
 
         if (type === 'Agri-Expert'){

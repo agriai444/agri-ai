@@ -108,8 +108,10 @@ const handleUpdateValue = (key: string) => {
 async function fetchData(type: PublicApp.TypeService) {
   try {
     const { page } = pagination[type];
-    const limit = pageSize[type];
-    const offset = (page - 1) * limit + 1;
+    const limit =1000
+    const offset = 0
+    // const limit = pageSize[type];
+    // const offset = (page - 1) * limit + 1;
     console.error(" limit:",limit,"offset", offset)
     await chatStore.getListConversationAction({ limit: limit, offset: offset, type: type });
     errorGetData.value = false;
@@ -264,7 +266,7 @@ const getConversationById = (convId: string) => {
 };
 
 function getCountBadge(type: PublicApp.TypeService) {
-  return storeItemCoun.value[type] -1;
+  return storeItemCoun.value[type] ;
 }
 function showLoadMore(type: PublicApp.TypeService): boolean {
   const displayedCount = dataSources[type].length; // Currently loaded conversations
@@ -310,7 +312,7 @@ const type = computed(() => chatStore.currentConversation.type);
   </template>
 
   <template
-    v-if="!errorGetData && dataSources['text'].length === 0 && dataSources['Agri-Expert'].length === 0"
+    v-if="!errorGetData && dataSources['AI'].length === 0 && dataSources['Agri-Expert'].length === 0"
   >
     <div class="flex flex-col justify-center items-center mt-4 text-center bg-white dark:bg-purple-900 h-full">
     
