@@ -82,7 +82,7 @@ return Center(
                     child: Column(
                       children: [
                         Text(
-                          Strings.sometimesThereIsAnError.tr, // Assuming you add this string to your localization
+                          Strings.sometimesThereIsAnError.tr, 
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.red,

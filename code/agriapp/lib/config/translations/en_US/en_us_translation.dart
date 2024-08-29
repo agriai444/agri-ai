@@ -210,5 +210,5 @@ Strings.emailAlreadyRegistered : "Email already registered. Please log in.",
     Strings.learnMore : 'Start Now',
 
   Strings.noNotifications : 'No notifications yet.',
-
+  Strings.chatList : 'Chat List',
 };

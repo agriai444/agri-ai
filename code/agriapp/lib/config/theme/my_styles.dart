@@ -62,6 +62,7 @@ class MyStyles {
         backgroundColor: isLightTheme
             ? LightThemeColors.appBarColor
             : DarkThemeColors.appbarColor,
+             toolbarHeight: 70,
       );
 
   // Text theme

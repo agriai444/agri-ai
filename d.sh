@@ -11,7 +11,18 @@ run_script_in_directory() {
 
 # Function to copy the APK file
 copy_apk() {
-  cp code/agriapp/build/app/outputs/flutter-apk/app-release.apk output/app/android/agri-expert.apk
+  local apk_path="output/app/android/agri-expert.apk"
+
+  # Remove the existing APK file if it exists
+  if [ -f "$apk_path" ]; then
+    echo "Deleting existing APK: $apk_path"
+    rm "$apk_path"
+  else
+    echo "No existing APK found at $apk_path"
+  fi
+
+  # Copy the new APK file
+  cp code/agriapp/build/app/outputs/flutter-apk/app-release.apk "$apk_path"
 }
 
 # Function to handle Git operations
@@ -39,10 +50,10 @@ original_dir=$(pwd)
 
 run_script_in_directory "code/admin-web" "d.sh"
 
-# run_script_in_directory "code/agriapp" "build.sh"
+run_script_in_directory "code/agriapp" "build.sh"
 
 
-# copy_apk
+copy_apk
 
 
 handle_git

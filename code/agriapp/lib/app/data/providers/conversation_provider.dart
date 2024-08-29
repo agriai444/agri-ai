@@ -1,4 +1,5 @@
 import 'package:agri_ai/app/controllers/auth_controller.dart';
+import 'package:agri_ai/app/data/local/my_hive.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -8,14 +9,12 @@ import '../models/conversation_model.dart';
 class ConversationProvider extends GetConnect {
   final supabase = Supabase.instance.client;
 
-   final   userId = ''.obs;
-  AuthController authController = Get.find<AuthController>();
+   
+  AuthController auth = Get.find<AuthController>();
   @override
   void onInit() async {
     super.onInit();
   
-    userId.value = authController.getCurrentUserId();
-   
   }
 
 
@@ -28,7 +27,7 @@ class ConversationProvider extends GetConnect {
     final response = await supabase
         .from('conversation')
         .select()
-        .eq('user_id', userId)
+        .eq('user_id', auth.getCurrentUserId())
         .eq('type', type)
         .order('created_at', ascending: false)
         .range((page - 1) * 10, page * 10 - 1);
@@ -45,7 +44,7 @@ class ConversationProvider extends GetConnect {
     final response = await supabase
         .from('conversation')
         .select()
-        .eq('user_id', userId.value)
+        .eq('user_id', auth.getCurrentUserId())
         .eq('type',  'Agri-Expert')
         .single();
 
@@ -69,7 +68,7 @@ class ConversationProvider extends GetConnect {
     final response = await supabase
         .from('conversation')
         .insert({
-          'user_id': userId.value,
+          'user_id': auth.getCurrentUserId(),
           'title': title,
         })
         .select()
@@ -116,7 +115,7 @@ Future<String?> getLastQuestionContentByConversationId(String conversationId) as
     final response = await supabase
         .from('conversation')
         .insert({
-          'user_id': userId.value,
+          'user_id': auth.getCurrentUserId(),
           'title': title,
           'type': type,
         })

@@ -113,7 +113,7 @@ class AuthLoginView extends GetView<AuthLoginController> {
                           )),
                       const SizedBox(height: 30),
                       Obx(() => ElevatedButton(
-                            onPressed: () async {
+                            onPressed: controller.isLoading.value ? null :() async {
                               
                                
                               

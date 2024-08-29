@@ -39,6 +39,7 @@ class AuthLoginController extends GetxController {
 
         bool saved = await MyHive.saveUserToHive(newUser);
         if (saved) {
+          
           await appProvider.checkAndFetchClientConversation();
         await  Get.put<UserProvider>(UserProvider()).updateFcmToken();
           Get.offAllNamed(Routes.HOME);

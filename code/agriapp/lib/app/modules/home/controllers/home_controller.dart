@@ -1,59 +1,84 @@
-import 'package:agri_ai/app/modules/chat/controllers/chat_ai_chat_controller.dart';
 import 'package:agri_ai/app/modules/chat/views/screens/chat_view.dart';
 import 'package:agri_ai/app/modules/home/views/screen/home_screen.dart';
-import 'package:agri_ai/app/modules/home/views/screen/models/tabIcon_data.dart';
 import 'package:agri_ai/app/modules/more/views/more_view.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:agri_ai/app/modules/chat/controllers/chat_ai_chat_controller.dart';
+import 'package:agri_ai/app/modules/home/views/screen/models/tabIcon_data.dart';
 
-import '../../../../utils/constants.dart';
-import '../../../services/api_call_status.dart';
-import '../../../services/base_client.dart';
-
-class HomeController extends GetxController  with GetSingleTickerProviderStateMixin {
-  late AnimationController animationController;
-  late List<TabIconData> tabIconsList;
-  late Rx<Widget> tabBody;
-  late RxInt selectedTabIndex;
-
+class HomeController extends GetxController {
   final chatAiChatController = Get.put(ChatAiChatController());
+  late AnimationController animationController;
+ 
+  
+  var tabIconsList = <TabIconData>[].obs;
+  var selectedTabIndex = 0.obs;
+  Rx<Widget> tabBody = Rx<Widget>(const SizedBox());
 
   @override
   void onInit() {
     super.onInit();
 
-     animationController = AnimationController(
-      duration: const Duration(milliseconds: 200), 
-      vsync: this,
-    );
-
-    tabIconsList = TabIconData.tabIconsList;
-    tabBody = Rx<Widget>(Container());
-    selectedTabIndex = 0.obs;
-
-    updateUserType();
-
-    if (isUserAgri()) {
-      tabIconsList.removeWhere((tab) => tab.index == 0 || tab.index == 1);
-      selectedTabIndex.value = 0;
-    } else {
-      selectedTabIndex.value = 0; // Use a default index or provide a parameter if needed.
-    }
-
-    for (var tab in tabIconsList) {
-      tab.isSelected = false;
-    }
-    tabIconsList[selectedTabIndex.value].isSelected = true;
-
-    setTabBody(tabIconsList[selectedTabIndex.value].index);
+    updateTabIconsList();
+    setTabBody(selectedTabIndex.value);
   }
 
-  void updateUserType() {
+  void updateTabIconsList() {
     chatAiChatController.state.updateUserType();
+    if (chatAiChatController.state.isUserAgri.value) {
+      tabIconsList.value = [
+        TabIconData(
+          imagePath: 'assets/images/gardener.png',
+          imageSelectedPath: 'assets/images/gardener.png',
+          label: 'Chat',
+          index: 2,
+          isSelected: false,
+        ),
+        TabIconData(
+          imagePath: 'assets/images/option.png',
+          imageSelectedPath: 'assets/images/option.png',
+          label: 'More',
+          index: 3,
+          isSelected: false,
+        ),
+      ];
+    } else {
+      tabIconsList.value = [
+        TabIconData(
+          imagePath: 'assets/images/home.png',
+          imageSelectedPath: 'assets/images/home.png',
+          label: 'Home',
+          index: 0,
+          isSelected: true,
+        ),
+        TabIconData(
+          imagePath: 'assets/images/chat_ai_icon.png',
+          imageSelectedPath: 'assets/images/chat_ai_icon.png',
+          label: 'Chat AI',
+          index: 1,
+          isSelected: false,
+        ),
+        TabIconData(
+          imagePath: 'assets/images/gardener.png',
+          imageSelectedPath: 'assets/images/gardener.png',
+          label: 'Chat',
+          index: 2,
+          isSelected: false,
+        ),
+        TabIconData(
+          imagePath: 'assets/images/option.png',
+          imageSelectedPath: 'assets/images/option.png',
+          label: 'More',
+          index: 3,
+          isSelected: false,
+        ),
+      ];
+    }
   }
 
-  bool isUserAgri() => chatAiChatController.state.isUserAgri.value;
-  bool isUserClient() => chatAiChatController.state.isUserClient.value;
+  void updateSelectedTabIndex(int index) {
+    selectedTabIndex.value = index;
+  }
 
   void setTabBody(int index) {
     switch (index) {
@@ -66,18 +91,15 @@ class HomeController extends GetxController  with GetSingleTickerProviderStateMi
         tabBody.value = const ChatView();
         break;
       case 3:
-        tabBody.value = MoreView();
+        tabBody.value =  MoreView();
         break;
-      case 0:
-      default:
-        tabBody.value = MyDiaryScreen(animationController: animationController);
-        break;
-    }
-  }
+      // case 0:
+      // default:
+      //  animationController = AnimationController(
+      //   duration: const Duration(milliseconds: 200), vsync: this);
 
-  @override
-  void onClose() {
-    animationController.dispose();
-    super.onClose();
+      //   tabBody.value = MyDiaryScreen(animationController:animationController);
+      //   break;
+    }
   }
 }

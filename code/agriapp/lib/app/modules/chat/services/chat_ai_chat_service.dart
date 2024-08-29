@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:agri_ai/app/data/local/my_hive.dart';
 import 'package:agri_ai/app/data/models/app_setting_model.dart';
 import 'package:agri_ai/app/data/models/conversation_model.dart';
 import 'package:agri_ai/app/modules/chat/controllers/chat_ai_chat_state.dart';
@@ -402,7 +403,7 @@ class ChatAiChatService {
   void simulateMediaUpload(ChatAiChatState state) async {
     if (state.selectedMediaFiles.isEmpty) return;
 
-    final userId = Get.find<ConversationProvider>().userId;
+    final userId = MyHive.getCurrentUser()?.id;
     const bucket = 'chat';
 
     for (int i = 0; i < state.selectedMediaFiles.length; i++) {

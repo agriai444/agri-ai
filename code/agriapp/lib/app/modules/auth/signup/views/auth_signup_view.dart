@@ -269,7 +269,7 @@ class StepThree extends StatelessWidget {
           )),
           SizedBox(height: 20.h),
           Obx(() => ElevatedButton(
-            onPressed: controller.canProceedStep3() ? controller.signUp : null,
+            onPressed: (controller.canProceedStep3() && !controller.isLoading.value) ? controller.signUp : null,
             child: Text(controller.isLoading.isFalse ? Strings.register.tr : Strings.loading.tr),
           )),
         ],

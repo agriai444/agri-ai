@@ -1,6 +1,7 @@
 import 'package:agri_ai/app/data/local/my_hive.dart';
 import 'package:agri_ai/app/modules/chat/controllers/chat_ai_chat_controller.dart';
 import 'package:agri_ai/app/modules/chat/views/screens/chat_view.dart';
+import 'package:agri_ai/app/modules/home/controllers/home_controller.dart';
 import 'package:agri_ai/app/modules/home/views/screen/get_premium_view.dart';
 import 'package:agri_ai/app/modules/more/views/more_view.dart';
 import 'package:agri_ai/app/routes/app_pages.dart';
@@ -242,6 +243,40 @@ class FeatureView extends StatelessWidget {
   }
 }
 
+
+class BottomBar extends StatelessWidget {
+  const BottomBar({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<HomeController>(
+      init: HomeController(),
+      builder: (controller) {
+        return Stack(
+              children: <Widget>[
+                controller.tabBody.value,
+                Column(
+          children: <Widget>[
+            const Expanded(child: SizedBox()),
+            BottomBarView(
+              tabIconsList: controller.tabIconsList,
+              changeIndex: (index) {
+                controller.updateSelectedTabIndex(index);
+                controller.setTabBody(index);
+              },
+            ),
+          ],
+        )
+              ],
+            );
+        
+        
+        
+      },
+    );
+  }
+}
+
 class AppHomeScreen extends StatefulWidget {
   final int defaultIndex;
 
@@ -258,7 +293,8 @@ class _AppHomeScreenState extends State<AppHomeScreen>
   late Widget tabBody;
   late int selectedTabIndex; 
   final chatAiChatController = Get.put(ChatAiChatController());
-
+    final homeController = Get.put(HomeController());
+ 
   @override
   void initState() {
     super.initState();
@@ -286,12 +322,13 @@ class _AppHomeScreenState extends State<AppHomeScreen>
 
   void _updateTabIconsList() {
     setState(() {
-      if (chatAiChatController.state.isUserAgri.value) {
-        tabIconsList = TabIconData.tabIconsList
-          ..removeWhere((tab) => tab.index == 0 || tab.index == 1);
-      } else {
-        tabIconsList = TabIconData.tabIconsList;
-      }
+    tabIconsList =   homeController.tabIconsList;
+      // if (chatAiChatController.state.isUserAgri.value) {
+      //   tabIconsList = TabIconData.tabIconsList
+      //     ..removeWhere((tab) => tab.index == 0 || tab.index == 1);
+      // } else {
+      //   tabIconsList = TabIconData.tabIconsList;
+      // }
     });
   }
 
@@ -554,7 +591,7 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
                                     child: const Center(
                                       child: Icon(
                                         Icons.person,
-                                        color: AppTheme.grey,
+                                     
                                       ),
                                     ),
                                   ),
@@ -575,7 +612,7 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
                                     child: const Center(
                                       child: Icon(
                                         Icons.notifications,
-                                        color: AppTheme.grey,
+                                    
                                       ),
                                     ),
                                   ),

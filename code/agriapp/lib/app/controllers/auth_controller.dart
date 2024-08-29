@@ -11,42 +11,22 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:agri_ai/app/data/models/user_model.dart' as local_user;
 class AuthController extends GetxController {
    SupabaseClient client = Supabase.instance.client;
- Rx<local_user.User?> user = Rx<local_user.User?>(MyHive.getCurrentUser());
 
-
-  // void _listenAuthState() {
-  //   supabase.auth.onAuthStateChange.listen((data) {
-  //     final AuthChangeEvent event = data.event;
-  //     final Session? session = data.session;
-
-  //     user.value = session?.user;
-
-  //     if (event == AuthChangeEvent.signedIn) {
-  //       Get.offAllNamed(Routes.HOME);
-  //     } else if (event == AuthChangeEvent.signedOut) {
-  //       Get.offAllNamed(Routes.AUTH_LOGIN);
-  //     }
-  //   });
-  // }
-
+  
 String getCurrentUserId()  {
-    return user.value?.id ?? '';
+    return MyHive.getCurrentUser()?.id ?? '';
+   
   }
 
 
 Future<void> logout() async {
   await supabase.auth.signOut();         
   await MyHive.deleteCurrentUser();   
-  // Get.delete<ChatAiChatController>(force: true);    
-    // Get.deleteAll(force: true);
-    // Get.reset();
-//  Restart.restartApp();
-             // Restart the app
   Get.offAllNamed(Routes.AUTH_LOGIN);
 }
 
   Future<bool> isLogin() async {
-    return user.value != null;
+    return MyHive.getCurrentUser() != null;
   }
 
 
@@ -63,11 +43,11 @@ Future<void> logout() async {
   }
   
   Future<String?> getUserType() async {
-    if (user.value != null) {
+    if (MyHive.getCurrentUser() != null) {
       final response = await supabase
           .from('users')
           .select('user_type')
-          .eq('id', user.value?.id ?? '')
+          .eq('id', MyHive.getCurrentUser()?.id ?? '')
           .single();
 
       return response['user_type'];
@@ -77,18 +57,18 @@ Future<void> logout() async {
 
   bool isUserAgri() {
     
-    if (user.value != null) {
+    if (MyHive.getCurrentUser() != null) {
       
-      return user.value!.userType == 'Agri-Expert';
+      return MyHive.getCurrentUser()!.userType == 'Agri-Expert';
     }
     return false;
   }
 
   bool isUserClient() {
     
-    if (user.value != null) {
+    if (MyHive.getCurrentUser() != null) {
       
-      return user.value!.userType == 'Client';
+      return MyHive.getCurrentUser()!.userType == 'Client';
     }
     return false;
   }
@@ -122,7 +102,7 @@ Future<void> logout() async {
       final response = await client
           .from('users')
           .select()
-          .eq('id', user.value?.id ?? '')
+          .eq('id', currentUser.id ?? '')
           .single();
       
       // Assuming response contains the user data in a suitable format
@@ -137,10 +117,26 @@ Future<void> logout() async {
         updatedAt: response['updated_at'],
       );
 
-      user.value = updatedUser;
+      // currentUser = updatedUser;
 
       // Optionally save to Hive for persistence
       await MyHive.saveUserToHive(updatedUser);
         }
   }
 }
+
+
+// void _listenAuthState() {
+  //   supabase.auth.onAuthStateChange.listen((data) {
+  //     final AuthChangeEvent event = data.event;
+  //     final Session? session = data.session;
+
+  //     user.value = session?.user;
+
+  //     if (event == AuthChangeEvent.signedIn) {
+  //       Get.offAllNamed(Routes.HOME);
+  //     } else if (event == AuthChangeEvent.signedOut) {
+  //       Get.offAllNamed(Routes.AUTH_LOGIN);
+  //     }
+  //   });
+  // }

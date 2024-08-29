@@ -216,4 +216,5 @@ static const String loadMore = 'load_more';
     // New keys for FeatureView
     static const String learnMore = 'learn_more';
   static const String noNotifications = 'noNotifications';
+    static const String chatList = 'chat_list';
 }

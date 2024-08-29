@@ -1,3 +1,4 @@
+import 'package:agri_ai/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -58,13 +59,7 @@ class AgriView extends GetView<ChatAiChatController> {
           }
         }
       } else {
-             Get.snackbar(
-        'Error',
-      'Error inserting answer: ',
-        snackPosition: SnackPosition.BOTTOM,
-   
-        duration: const Duration(seconds: 30),
-      );
+            
         appBar = _buildAppBar();
         body = MessagesView();
       }
@@ -168,9 +163,9 @@ PreferredSizeWidget _buildAppBarChatAgriUser( String? avatar) {
         child: Row(
           children: [
             SizedBox(width: 8.w), // Adjust spacing between the icon and text
-            const Text(
-              'Strings.chatList.tr', // Replace with the appropriate string for chat list
-              style: TextStyle(
+             Text(
+              Strings.chatList.tr, // Replace with the appropriate string for chat list
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
@@ -178,187 +173,152 @@ PreferredSizeWidget _buildAppBarChatAgriUser( String? avatar) {
           ],
         ),
       ),
+      
       actions: [
-        IconButton(
-          icon: const Icon(Icons.search),
-          onPressed: () {
-            // Handle search action
-          },
-        ),
+       
+                                 Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                                   child: InkWell(
+                                      highlightColor: Colors.transparent,
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(32.0)),
+                                      onTap: () {
+                                        Get.toNamed(Routes.LIST_NOTIFICATION);
+                                      },
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.notifications,
+                                  
+                                        ),
+                                      ),
+                                    ),
+                                 ),
+                             
       ],
     );
   }
-
-  Widget _buildConversationItem(Conversation conversation) {
-    return GestureDetector(
-      onTap: () {
-        controller.state.showChatMessageUserToAgri.value = true;
-        Conversation newConveration = conversation;
-
-        newConveration.question = [];
-        controller.getQuestionAndAnswerAgri(newConveration);
-        controller.state.nameHeaderQuestion.value = conversation.title ?? 'Client';
-         controller.state.nameHeaderAnswer.value =  'You';
+Widget _buildConversationItem(Conversation conversation) {
+  return GestureDetector(
+    onTap: () => _handleConversationTap(conversation),
+    child: FutureBuilder<String?>(
+      future: authController.getAvatarUser(conversation.userId ?? ''),
+      builder: (context, avatarSnapshot) {
+        return FutureBuilder<String?>(
+          future: convProvider.getLastQuestionContentByConversationId(conversation.id ?? ''),
+          builder: (context, questionSnapshot) {
+            if (_isLoading(avatarSnapshot, questionSnapshot)) {
+              return _buildLoadingPlaceholder(conversation);
+            } else if (_hasError(avatarSnapshot, questionSnapshot)) {
+              return _buildErrorPlaceholder(conversation);
+            } else {
+              return _buildConversationContent(avatarSnapshot, questionSnapshot, conversation);
+            }
+          },
+        );
       },
-      child: FutureBuilder<String?>(
-        future: authController.getAvatarUser(conversation.userId ?? ''),
-        builder: (BuildContext context, AsyncSnapshot<String?> avatarSnapshot) {
-          return FutureBuilder<String?>(
-            future: convProvider
-                .getLastQuestionContentByConversationId(conversation.id ?? ''),
-            builder: (BuildContext context,
-                AsyncSnapshot<String?> questionSnapshot) {
-              if (avatarSnapshot.connectionState == ConnectionState.waiting ||
-                  questionSnapshot.connectionState == ConnectionState.waiting) {
-                // Show a placeholder while waiting for the result
-                return Padding(
-                  padding:
-                      EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
-                  child: Row(
-                    children: [
-                      const CircleAvatar(
-                        backgroundColor: Colors.grey,
-                        radius: 25,
-                      ),
-                      SizedBox(width: 16.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              conversation.title ?? 'No Title',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16.sp),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              'Loading...',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: 14.sp, color: Colors.grey[600]),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              } else if (avatarSnapshot.hasError || questionSnapshot.hasError) {
-                // Handle error state
-                return Padding(
-                  padding:
-                      EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
-                  child: Row(
-                    children: [
-                      const CircleAvatar(
-                        backgroundImage: AssetImage('assets/images/boy.png'),
-                        radius: 25,
-                      ),
-                      SizedBox(width: 16.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              conversation.title ?? 'No Title',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16.sp),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              'Error loading content',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: 14.sp, color: Colors.grey[600]),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              } else if (!avatarSnapshot.hasData ||
-                  avatarSnapshot.data == null) {
-                // Show default icon if URL is null
-                return Padding(
-                  padding:
-                      EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
-                  child: Row(
-                    children: [
-                      const CircleAvatar(
-                        backgroundImage: AssetImage('assets/images/boy.png'),
-                        radius: 25,
-                      ),
-                      SizedBox(width: 16.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              conversation.title ?? 'No Title',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16.sp),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              questionSnapshot.data ?? 'No Description',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: 14.sp, color: Colors.grey[600]),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              } else {
-                // Show avatar from URL and last question content
-                return Padding(
-                  padding:
-                      EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundImage: (avatarSnapshot.data != null &&
-                                avatarSnapshot.data!.isNotEmpty)
-                            ? NetworkImage(avatarSnapshot.data!)
-                            : const AssetImage('assets/images/boy.png')
-                                as ImageProvider<Object>,
-                        radius: 25,
-                      ),
-                      SizedBox(width: 16.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              conversation.title ?? 'No Title',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16.sp),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              questionSnapshot.data ?? 'No Description',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: 14.sp, color: Colors.grey[600]),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-            },
-          );
-        },
+    ),
+  );
+}
+
+void _handleConversationTap(Conversation conversation) {
+  controller.state.showChatMessageUserToAgri.value = true;
+  Conversation newConversation = conversation..question = [];
+  controller.getQuestionAndAnswerAgri(newConversation);
+  controller.state.nameHeaderQuestion.value = conversation.title ?? 'Client';
+  controller.state.nameHeaderAnswer.value = 'You';
+}
+
+bool _isLoading(AsyncSnapshot avatarSnapshot, AsyncSnapshot questionSnapshot) {
+  return avatarSnapshot.connectionState == ConnectionState.waiting ||
+         questionSnapshot.connectionState == ConnectionState.waiting;
+}
+
+bool _hasError(AsyncSnapshot avatarSnapshot, AsyncSnapshot questionSnapshot) {
+  return avatarSnapshot.hasError || questionSnapshot.hasError;
+}
+
+Widget _buildLoadingPlaceholder(Conversation conversation) {
+  return _buildConversationRow(
+    avatar: const CircleAvatar(backgroundColor: Colors.grey, radius: 25),
+    title: conversation.title ?? 'No Title',
+    description: 'Loading...',
+  );
+}
+
+Widget _buildErrorPlaceholder(Conversation conversation) {
+  return _buildConversationRow(
+    avatar: const CircleAvatar(backgroundImage: AssetImage('assets/images/boy.png'), radius: 25),
+    title: conversation.title ?? 'No Title',
+    description: 'Error loading content',
+  );
+}
+
+Widget _buildConversationContent(AsyncSnapshot<String?> avatarSnapshot, AsyncSnapshot<String?> questionSnapshot, Conversation conversation) {
+  return _buildConversationRow(
+    avatar: CircleAvatar(
+      backgroundImage: (avatarSnapshot.data != null && avatarSnapshot.data!.isNotEmpty)
+          ? NetworkImage(avatarSnapshot.data!)
+          : const AssetImage('assets/images/boy.png') as ImageProvider<Object>,
+      radius: 25,
+    ),
+    title: conversation.title ?? 'No Title',
+    description: questionSnapshot.data ?? 'No Description',
+  );
+}
+Widget _buildConversationRow({
+  required Widget avatar,
+  required String title,
+  required String description,
+}) {
+  return Padding(
+    padding:EdgeInsets.symmetric( horizontal: 16.w),
+    child: Container(
+      width: double.infinity, 
+      padding: EdgeInsets.symmetric(vertical: 8.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey.shade300, 
+            width: 1.0,
+          ),
+        ),
       ),
-    );
-  }
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start, // Aligns children to the start of the row
+        crossAxisAlignment: CrossAxisAlignment.center, // Center aligns children vertically
+        children: [
+          avatar,
+          SizedBox(width: 16.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.sp,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  description,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+
 }

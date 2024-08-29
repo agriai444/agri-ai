@@ -195,5 +195,5 @@ Strings.emailAlreadyRegistered :  "البريد الإلكتروني مسجل ب
     Strings.learnMore : 'أبدا الان',
     Strings.loadMore : 'تحميل المزيد',
 Strings.noNotifications: 'لا توجد إشعارات بعد.',
-
+ Strings.chatList : 'قائمة المحادثات',
 };
