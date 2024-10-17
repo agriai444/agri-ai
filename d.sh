@@ -21,7 +21,7 @@ copy_apk() {
     echo "No existing APK found at $apk_path"
   fi
 
-  # Copy the new APK file
+  # Copy the new APK file code/agriapp/build/app/outputs/flutter-apk/app-release.apk
   cp code/agriapp/build/app/outputs/flutter-apk/app-release.apk "$apk_path"
 }
 

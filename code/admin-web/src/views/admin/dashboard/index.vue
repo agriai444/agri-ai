@@ -4,8 +4,10 @@ import { NCard, NGrid, NGridItem, NNumberAnimation, NSkeleton } from 'naive-ui'
 import { useDashboardStore } from '@/store'
 import { SvgIcon } from '@/components/common'
 import { t } from '@/locales';
+import { useBasicLayout } from '@/hooks/useBasicLayout';
 const dashboardStore = useDashboardStore()
 const isLoading = ref(true)
+const { isMobile } = useBasicLayout()
 
 onMounted(async () => {
   await dashboardStore.fetchDashboardData()
@@ -27,7 +29,7 @@ const cardItems = [
 <template>
   <div class="p-4 mx-12 ">
     <h1 class="text-2xl font-bold mb-4 gtext">{{ t('common.Dashboard') }}</h1>
-    <NGrid :x-gap="12" :y-gap="12" :cols="2">
+     <NGrid :x-gap="12" :y-gap="12" :cols="isMobile ? 1 : 2">
       <NGridItem v-for="item in cardItems" :key="item.title">
         <NCard>
           <div class="flex  items-center justify-between">

@@ -12,6 +12,8 @@ import SelectCountry from './SelectCountry/index.vue'
 import LogoApp from './LogoApp/index.vue'
 import LogoUser from './LogoUser/index.vue'
 import Footer from './Footer/index.vue'
+import DataTableBase from './DataTableBase/index.vue'
+
 export {
     HoverButton,
     NaiveProvider,
@@ -26,5 +28,6 @@ export {
     LogoApp,
     LogoUser,
     Footer,
-    LanguageSelect
+    LanguageSelect,
+    DataTableBase,
 }

@@ -30,7 +30,7 @@ const tableName = 'ai_model';
 
 export const useModelStore = defineStore('model-store', {
   state: () => ({
-    listModels: [] as APIAI.ModelAI[],
+    listData: [] as APIAI.ModelAI[],
     modelInfo: initState(),
     loadingInit: false,
     showModelAdd: false,
@@ -45,7 +45,7 @@ export const useModelStore = defineStore('model-store', {
     async fetchDataAction({ limit, offset }: { limit: number; offset: number }): Promise<void> {
       try {
         const { data, totalCount } = await fetchDataFromTable<APIAI.ModelAI>(tableName, limit, offset);
-        this.listModels = data;
+        this.listData = data;
         this.countTotalData = totalCount;
       } catch (error: any) {
         console.error('Error fetching models:', error.message);
@@ -56,7 +56,7 @@ export const useModelStore = defineStore('model-store', {
     async insertDataAction(newModel: APIAI.ModelAI): Promise<void> {
       try {
         let insertedData = await insertDataIntoTable<APIAI.ModelAI>(tableName, newModel);
-        this.listModels = [insertedData, ...this.listModels];
+        this.listData = [insertedData, ...this.listData];
         this.countTotalData += 1;
       } catch (error: any) {
         console.error('Error inserting model:', error.message);
@@ -67,7 +67,7 @@ export const useModelStore = defineStore('model-store', {
     async deleteDataAction(id: string): Promise<void> {
       try {
         await deleteDataFromTable(tableName, id);
-        this.listModels = this.listModels.filter(model => model.id !== id);
+        this.listData = this.listData.filter(model => model.id !== id);
         this.countTotalData -= 1;
       } catch (error: any) {
         console.error('Error deleting model:', error.message);
@@ -78,7 +78,7 @@ export const useModelStore = defineStore('model-store', {
     async updateDataAction(data: APIAI.ModelAI): Promise<void> {
       try {
         await updateDataInTable<APIAI.ModelAI>(tableName, data);
-        this.listModels = this.listModels.map(model =>
+        this.listData = this.listData.map(model =>
           model.id === data.id ? { ...model, ...data } : model
         );
       } catch (error: any) {

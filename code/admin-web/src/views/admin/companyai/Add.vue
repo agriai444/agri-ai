@@ -39,8 +39,7 @@ async function handleAddData() {
     >
       <div>
         <NGrid
-          :span="span"
-          :x-gap="24"
+       
         >
           <NFormItemGi
             :span="span"

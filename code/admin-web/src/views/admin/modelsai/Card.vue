@@ -20,7 +20,7 @@ async function fetchData(): Promise<void> {
   loading.value = true;
   try {
     await companyStore.fetchDataAction({ limit: 1000, offset: 0 });
-    companyStore.listCompanies = await Promise.all(companyStore.listCompanies.map(async (company) => {
+    companyStore.listData = await Promise.all(companyStore.listData.map(async (company) => {
       if (company.logoUrl) {
         try {
           company.logoUrl = await getImageUrl(companyStore.bucket, company.logoUrl);
@@ -39,12 +39,12 @@ async function fetchData(): Promise<void> {
 
 async function initializeCompany() {
   // Check if the company already exists in the list
-  let foundCompany = companyStore.listCompanies.find(company => company.id === props.companyId);
+  let foundCompany = companyStore.listData.find(company => company.id === props.companyId);
 
   // If not found, fetch the data
   if (!foundCompany) {
     await fetchData();
-    foundCompany = companyStore.listCompanies.find(company => company.id === props.companyId);
+    foundCompany = companyStore.listData.find(company => company.id === props.companyId);
   }
 
   // Set the row data

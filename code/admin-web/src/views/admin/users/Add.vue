@@ -233,9 +233,7 @@ formRef.value?.validate((errors: Array<FormValidationError> | undefined) => {
     >
       <div>
         <NGrid
-      
-        :span="span" 
-        :x-gap="24"
+    
         >
           <NFormItemGi
             :span="span"

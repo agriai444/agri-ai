@@ -85,7 +85,7 @@ async function fetchData(): Promise<void> {
   try {
     await settingStore.fetchDataAction()
     await modelStore.fetchDataAction({ limit: 1000, offset: 0 })
-    aiModels.value = modelStore.listModels
+    aiModels.value = modelStore.listData
       .filter(model => model.isActivate) 
       .map(model => ({
         label: model.name,

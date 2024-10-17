@@ -77,7 +77,7 @@ async function fetchData(): Promise<void> {
     // loading.value = true;
     await companyStore.fetchDataAction({ limit: 1000, offset: 0 });
 
-    companyStore.listCompanies = await Promise.all(companyStore.listCompanies.map(async (company) => {
+    companyStore.listData = await Promise.all(companyStore.listData.map(async (company) => {
       if (company.logoUrl) {
         try {
           company.logoUrl = await getImageUrl(companyStore.bucket, company.logoUrl);
@@ -88,7 +88,7 @@ async function fetchData(): Promise<void> {
       return { ...company };
     }));
 
-    companies.value = companyStore.listCompanies.map(company => ({
+    companies.value = companyStore.listData.map(company => ({
       label: company.name,
       value: company.id,
       logoUrl: company.logoUrl // Optionally include the logo URL for display
@@ -128,7 +128,7 @@ onMounted(fetchData);
           >
             <NSelect
               v-model:value="model.companyId"
-              :options="companyStore.listCompanies.map(company => ({ label: company.name, value: company.id }))"
+              :options="companyStore.listData.map(company => ({ label: company.name, value: company.id }))"
               :placeholder="t('common.selectCompany')"
               clearable
             />

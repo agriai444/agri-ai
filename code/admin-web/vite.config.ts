@@ -19,7 +19,8 @@ function setupPlugins(env: ImportMetaEnv): PluginOption[] {
       },
     }),
     Terminal()
-    // Terminal({console: 'terminal'})
+    // Terminal({console: 'terminal'}),
+    
   ]
 }
 
